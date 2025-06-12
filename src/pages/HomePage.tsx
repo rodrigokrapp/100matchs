@@ -56,13 +56,31 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="card max-w-2xl w-full fade-in">
+        {/* Botão Premium no Topo */}
+        <div className="text-center mb-6">
+          <button 
+            onClick={handlePremiumClick}
+            className="btn-premium text-2xl px-16 py-8 animate-bounce shadow-2xl transform hover:scale-110 transition-all duration-300"
+            style={{
+              background: 'linear-gradient(135deg, #ff1744, #ff6b9d, #ff8fab)',
+              boxShadow: '0 12px 40px rgba(255, 23, 68, 0.6)',
+              fontSize: '2rem',
+              fontWeight: 'bold',
+              border: '3px solid #fff',
+              borderRadius: '50px'
+            }}
+          >
+            🚀 SEJA PREMIUM AGORA! 🚀
+          </button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">
             💬 Resenha sem matchs
           </h1>
           <p className="text-lg md:text-xl text-gray-600 mb-6">
-            chega de deslizar e não conversar aqui você conhece pessoas no free e do seu bairro
+            desliza desliza e desliza e nada de conversar neh, aqui o USUARIO FREE conversa com pessoas do seu bairro e cidade.
           </p>
           
           {/* Botão Premium Destacado */}
