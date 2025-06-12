@@ -62,7 +62,7 @@ const HomePage: React.FC = () => {
             💬 Resenha sem matchs
           </h1>
           <p className="text-lg md:text-xl text-gray-600 mb-6">
-            só desliza e não conversa e muito menos beija ninguém né. aqui você visitante gratuito conversa com alguém do seu bairro e cidade
+            chega de deslizar e não conversar aqui você conhece pessoas no free e do seu bairro
           </p>
           
           {/* Botão Premium Destacado */}
