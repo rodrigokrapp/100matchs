@@ -85,7 +85,7 @@ const HomePage: React.FC = () => {
             
             <p className="relative z-10 text-3xl md:text-4xl text-white font-black leading-relaxed">
               <span className="text-pink-300">desliza desliza desliza</span> e{' '}
-              <span className="text-blue-300">nada de conversar ne?</span> aqui o{' '}
+              <span className="text-blue-300">nade de conversar ne?</span> aqui o{' '}
               <span className="text-yellow-300 bg-black/20 px-4 py-2 rounded-full">USUARIO FREE</span>{' '}
               conhece alguem do seu bairro e cidade{' '}
               <span className="text-green-300">todo dia</span>
