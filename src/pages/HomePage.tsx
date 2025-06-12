@@ -1,159 +1,137 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaHeart, FaUsers, FaMapMarkerAlt } from 'react-icons/fa';
-
-interface User {
-  id: string;
-  email: string;
-  nome: string;
-  isPremium: boolean;
-  loginTime: number;
-}
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ nome: '', email: '' });
-  const [loading, setLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    // Verificar se já existe um usuário logado
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-    }
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.nome || !formData.email) return;
-
-    setLoading(true);
-    setTimeout(() => {
-      const user: User = {
-        id: `user_${Date.now()}`,
-        email: formData.email,
-        nome: formData.nome,
-        isPremium: false,
-        loginTime: Date.now()
-      };
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      navigate('/salas');
-    }, 1000);
-  };
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
 
   const handlePremiumClick = () => {
-    // Redirecionar para página de pagamento (implementar depois)
-    alert('Funcionalidade de pagamento será implementada em breve!');
+    alert('🌟 Seja Premium e tenha acesso ilimitado! 🌟');
   };
 
-  const handleLoggedUserAccess = () => {
-    if (currentUser) {
-      navigate('/salas');
+  const handleSuporteClick = () => {
+    navigate('/suporte6828');
+  };
+
+  const handleEntrarChat = () => {
+    if (!nome.trim() || !email.trim()) {
+      alert('Por favor, preencha seu nome e email!');
+      return;
     }
+    navigate('/salas');
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="card max-w-2xl w-full fade-in">
-        {/* Botão Premium no Topo */}
-        <div className="text-center mb-6">
-          <button 
-            onClick={handlePremiumClick}
-            className="btn-premium text-2xl px-16 py-8 animate-bounce shadow-2xl transform hover:scale-110 transition-all duration-300"
-            style={{
-              background: 'linear-gradient(135deg, #ff1744, #ff6b9d, #ff8fab)',
-              boxShadow: '0 12px 40px rgba(255, 23, 68, 0.6)',
-              fontSize: '2rem',
-              fontWeight: 'bold',
-              border: '3px solid #fff',
-              borderRadius: '50px'
-            }}
-          >
-            🚀 SEJA PREMIUM AGORA! 🚀
-          </button>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-500 to-blue-500">
+      {/* Header com botões */}
+      <div className="flex justify-between items-center p-4">
+        <button 
+          onClick={handleSuporteClick}
+          className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full font-semibold hover:bg-white/30 transition-all duration-300 shadow-lg"
+        >
+          📞 Suporte
+        </button>
+        
+        <button 
+          onClick={handlePremiumClick}
+          className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-8 py-4 rounded-full font-bold text-lg animate-pulse shadow-2xl hover:scale-105 transition-all duration-300"
+        >
+          ⭐ SEJA PREMIUM ⭐
+        </button>
+      </div>
 
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">
+      <div className="container mx-auto px-4 py-8">
+        {/* Título Principal */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-2xl">
             💬 Resenha sem matchs
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 mb-6">
-            desliza desliza e desliza e nada de conversar neh, aqui o USUARIO FREE conversa com pessoas do seu bairro e cidade.
+          <p className="text-xl md:text-2xl text-white/90 mb-8 font-medium max-w-4xl mx-auto leading-relaxed">
+            desliza desliza desliza e nada de conversar ne? aqui o usuario FREE conhece alguem do seu bairro e cidade todo dia
           </p>
-          
-          {/* Botão Premium Destacado */}
-          <button 
-            onClick={handlePremiumClick}
-            className="btn-premium text-xl px-12 py-6 mb-8 animate-pulse shadow-2xl transform hover:scale-105 transition-all duration-300"
-            style={{
-              background: 'linear-gradient(135deg, #ff6b9d, #ff8fab, #ff6b9d)',
-              boxShadow: '0 8px 32px rgba(255, 107, 157, 0.5)',
-              fontSize: '1.5rem',
-              fontWeight: 'bold'
-            }}
-          >
-            ⭐ SEJA PREMIUM ⭐
-          </button>
         </div>
 
-        {/* Explicação do Site */}
-        <div className="bg-gradient-to-r from-pink-50 to-blue-50 p-6 rounded-xl mb-8">
-          <h3 className="text-xl font-semibold mb-4 text-center">
-            <FaUsers className="inline mr-2" />
-            Como funciona?
-          </h3>
-          <div className="grid md:grid-cols-3 gap-4 text-center">
-            <div>
-              <FaMapMarkerAlt className="text-2xl text-pink-500 mx-auto mb-2" />
-              <p className="text-sm">Encontre pessoas do seu bairro e cidade</p>
+        {/* Seção de Fotos de Jovens */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-white text-center mb-8">
+            🔥 Pessoas incríveis te esperando! 🔥
+          </h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {/* Foto 1 */}
+            <div className="relative group">
+              <div className="w-full h-64 bg-gradient-to-br from-pink-300 to-purple-400 rounded-2xl shadow-xl overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop&crop=face" 
+                  alt="Jovem estiloso"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+              <div className="absolute bottom-4 left-4 text-white font-semibold text-lg drop-shadow-lg">
+                Lucas, 24
+              </div>
             </div>
-            <div>
-              <FaHeart className="text-2xl text-blue-500 mx-auto mb-2" />
-              <p className="text-sm">Converse em tempo real</p>
+
+            {/* Foto 2 */}
+            <div className="relative group">
+              <div className="w-full h-64 bg-gradient-to-br from-blue-300 to-purple-400 rounded-2xl shadow-xl overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=300&h=400&fit=crop&crop=face" 
+                  alt="Jovem estilosa"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+              <div className="absolute bottom-4 left-4 text-white font-semibold text-lg drop-shadow-lg">
+                Ana, 22
+              </div>
             </div>
-            <div>
-              <span className="text-2xl mx-auto mb-2 block">⭐</span>
-              <p className="text-sm">Premium: fotos, vídeos e áudios</p>
+
+            {/* Foto 3 */}
+            <div className="relative group">
+              <div className="w-full h-64 bg-gradient-to-br from-purple-300 to-pink-400 rounded-2xl shadow-xl overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=400&fit=crop&crop=face" 
+                  alt="Jovem estiloso"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+              <div className="absolute bottom-4 left-4 text-white font-semibold text-lg drop-shadow-lg">
+                Pedro, 26
+              </div>
+            </div>
+
+            {/* Foto 4 */}
+            <div className="relative group">
+              <div className="w-full h-64 bg-gradient-to-br from-pink-300 to-blue-400 rounded-2xl shadow-xl overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=400&fit=crop&crop=face" 
+                  alt="Jovem estilosa"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+              <div className="absolute bottom-4 left-4 text-white font-semibold text-lg drop-shadow-lg">
+                Maria, 23
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Opções de Entrada */}
-        <div className="space-y-6">
-          {/* Usuário já logado */}
-          {currentUser && (
-            <div className="bg-green-50 p-4 rounded-xl border border-green-200">
-              <h3 className="font-semibold text-green-800 mb-2">
-                Bem-vindo de volta, {currentUser.nome}! 👋
-              </h3>
-              <p className="text-green-600 text-sm mb-3">
-                {currentUser.isPremium ? '⭐ Usuário Premium' : '🆓 Visitante Gratuito'}
-              </p>
-              <button 
-                onClick={handleLoggedUserAccess}
-                className="btn-secondary w-full"
-              >
-                Acessar Salas de Bate-papo
-              </button>
-            </div>
-          )}
-
-          {/* Formulário para Visitante Gratuito */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4 text-center">
-              🆓 Entrar como Visitante Gratuito
+        {/* Formulário de Entrada */}
+        <div className="max-w-md mx-auto">
+          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+            <h3 className="text-2xl font-bold text-white text-center mb-6">
+              🚀 Entre no Chat Agora!
             </h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            
+            <div className="space-y-4">
               <div>
                 <input
                   type="text"
                   placeholder="📝 Seu nome"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({...formData, nome: e.target.value})}
-                  required
-                  className="input-field"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  className="w-full px-4 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white placeholder-white/70 border border-white/30 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/50 text-lg"
                 />
               </div>
               
@@ -161,47 +139,30 @@ const HomePage: React.FC = () => {
                 <input
                   type="email"
                   placeholder="📧 Seu email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  required
-                  className="input-field"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white placeholder-white/70 border border-white/30 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/50 text-lg"
                 />
               </div>
               
               <button
-                type="submit"
-                disabled={loading}
-                className="btn-secondary w-full"
+                onClick={handleEntrarChat}
+                className="w-full bg-gradient-to-r from-pink-500 to-blue-500 text-white py-4 px-6 rounded-2xl font-bold text-lg hover:from-pink-600 hover:to-blue-600 transform hover:scale-105 transition-all duration-300 shadow-xl"
               >
-                {loading ? '⏳ Entrando...' : '🚀 Entrar no Chat'}
-              </button>
-            </form>
-            
-            <p className="text-xs text-gray-500 mt-3 text-center">
-              ⏰ Visitantes gratuitos têm 30 minutos de acesso
-            </p>
-
-            {/* Botão Premium adicional no final do formulário */}
-            <div className="mt-6 text-center">
-              <button 
-                onClick={handlePremiumClick}
-                className="btn-premium w-full text-lg py-4 animate-bounce"
-                style={{
-                  background: 'linear-gradient(135deg, #ff6b9d, #ff8fab)',
-                  boxShadow: '0 6px 20px rgba(255, 107, 157, 0.4)'
-                }}
-              >
-                ⭐ UPGRADE PARA PREMIUM - SEM LIMITES! ⭐
+                💬 Entrar no Chat
               </button>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-8 pt-6 border-t border-gray-200">
-          <p className="text-sm text-gray-500">
-            Conecte-se com pessoas reais da sua região! 🌟
-          </p>
+        {/* Botão Premium Grande */}
+        <div className="text-center mt-12">
+          <button 
+            onClick={handlePremiumClick}
+            className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white px-16 py-6 rounded-full font-bold text-2xl animate-bounce shadow-2xl hover:scale-110 transition-all duration-300 border-4 border-white"
+          >
+            🌟 SEJA PREMIUM E CONVERSE SEM LIMITES! 🌟
+          </button>
         </div>
       </div>
     </div>
