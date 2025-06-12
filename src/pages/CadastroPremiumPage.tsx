@@ -72,10 +72,10 @@ const CadastroPremiumPage: React.FC = () => {
       setLoading(false);
       setSucesso(true);
       
-      // Redirecionar após 2 segundos
+      // Redirecionar após 3 segundos
       setTimeout(() => {
         navigate('/salas');
-      }, 2000);
+      }, 3000);
     }, 2000);
   };
 
@@ -85,104 +85,27 @@ const CadastroPremiumPage: React.FC = () => {
 
   if (sucesso) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 flex items-center justify-center p-4">
-        <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 max-w-md w-full text-center">
-          <div className="text-6xl mb-6">🎉</div>
-          <h1 className="text-3xl font-bold text-white mb-4">
+      <div className="min-h-screen bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 relative overflow-hidden flex items-center justify-center p-6">
+        {/* Elementos decorativos de fundo */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-green-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-300/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        </div>
+
+        <div className="relative z-10 bg-white/10 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-white/20 max-w-lg w-full text-center">
+          <div className="text-8xl mb-8 animate-bounce">🎉</div>
+          <h1 className="text-4xl font-black text-white mb-6 drop-shadow-lg">
             Cadastro Realizado!
           </h1>
-          <p className="text-white/80 text-lg mb-6">
+          <p className="text-white/90 text-xl mb-8 font-semibold">
             Bem-vindo ao Premium! Você agora tem acesso ilimitado.
           </p>
-          <div className="animate-spin w-8 h-8 border-4 border-white/30 border-t-white rounded-full mx-auto"></div>
-          <p className="text-white/60 mt-4">Redirecionando...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 flex items-center justify-center p-4">
-      <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 max-w-md w-full">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-4">
-            ⭐ Cadastro Premium ⭐
-          </h1>
-          <p className="text-white/80 text-lg">
-            Preencha seus dados para ter acesso ilimitado
-          </p>
-        </div>
-
-        {/* Formulário */}
-        <div className="space-y-6">
-          <div>
-            <label className="block text-white font-semibold mb-2">
-              Nome completo:
-            </label>
-            <input
-              type="text"
-              name="nome"
-              value={formData.nome}
-              onChange={handleInputChange}
-              placeholder="Digite seu nome"
-              className="w-full px-4 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white placeholder-white/50 border border-white/30 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/50 text-lg"
-            />
-          </div>
-
-          <div>
-            <label className="block text-white font-semibold mb-2">
-              Email:
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="seu@email.com"
-              className="w-full px-4 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white placeholder-white/50 border border-white/30 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/50 text-lg"
-            />
-          </div>
-
-          <div>
-            <label className="block text-white font-semibold mb-2">
-              Senha:
-            </label>
-            <input
-              type="password"
-              name="senha"
-              value={formData.senha}
-              onChange={handleInputChange}
-              placeholder="Mínimo 6 caracteres"
-              className="w-full px-4 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white placeholder-white/50 border border-white/30 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/50 text-lg"
-            />
-          </div>
-
-          <div>
-            <label className="block text-white font-semibold mb-2">
-              Confirmar senha:
-            </label>
-            <input
-              type="password"
-              name="confirmarSenha"
-              value={formData.confirmarSenha}
-              onChange={handleInputChange}
-              placeholder="Digite a senha novamente"
-              className="w-full px-4 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white placeholder-white/50 border border-white/30 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/50 text-lg"
-            />
-          </div>
-
-          {/* Mensagem de erro */}
-          {erro && (
-            <div className="bg-red-500/20 border border-red-400 text-red-100 px-4 py-3 rounded-2xl text-center">
-              ❌ {erro}
-            </div>
-          )}
-
-          {/* Benefícios Premium */}
-          <div className="bg-white/10 p-4 rounded-2xl">
-            <h3 className="text-white font-bold mb-2">🌟 Benefícios Premium:</h3>
-            <ul className="text-white/80 text-sm space-y-1">
+          
+          {/* Lista de benefícios */}
+          <div className="bg-white/10 rounded-2xl p-6 mb-8 border border-white/20">
+            <h3 className="text-white font-bold text-lg mb-4">🌟 Seus benefícios ativados:</h3>
+            <ul className="text-white/80 text-sm space-y-2 text-left">
               <li>✅ Tempo ilimitado de chat</li>
               <li>✅ Envio de fotos e vídeos</li>
               <li>✅ Mensagens de áudio</li>
@@ -191,36 +114,177 @@ const CadastroPremiumPage: React.FC = () => {
             </ul>
           </div>
 
+          <div className="animate-spin w-12 h-12 border-4 border-white/30 border-t-white rounded-full mx-auto mb-4"></div>
+          <p className="text-white/70 text-lg font-semibold">Redirecionando para as salas...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 relative overflow-hidden flex items-center justify-center p-6">
+      {/* Elementos decorativos de fundo */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-300/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+      </div>
+
+      <div className="relative z-10 bg-white/10 backdrop-blur-xl rounded-3xl p-10 shadow-2xl border border-white/20 max-w-lg w-full">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <div className="text-6xl mb-6">⭐</div>
+          <h1 className="text-4xl font-black text-white mb-6 drop-shadow-lg">
+            Cadastro Premium
+          </h1>
+          <p className="text-white/90 text-xl font-semibold">
+            Preencha seus dados para ter acesso ilimitado
+          </p>
+        </div>
+
+        {/* Formulário */}
+        <div className="space-y-6">
+          <div>
+            <label className="block text-white font-bold mb-3 text-lg">
+              Nome completo:
+            </label>
+            <input
+              type="text"
+              name="nome"
+              value={formData.nome}
+              onChange={handleInputChange}
+              placeholder="Digite seu nome"
+              className="w-full px-6 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white placeholder-white/50 border-2 border-white/30 focus:border-white focus:outline-none focus:ring-4 focus:ring-white/20 text-lg font-semibold transition-all duration-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-white font-bold mb-3 text-lg">
+              Email:
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder="seu@email.com"
+              className="w-full px-6 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white placeholder-white/50 border-2 border-white/30 focus:border-white focus:outline-none focus:ring-4 focus:ring-white/20 text-lg font-semibold transition-all duration-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-white font-bold mb-3 text-lg">
+              Senha:
+            </label>
+            <input
+              type="password"
+              name="senha"
+              value={formData.senha}
+              onChange={handleInputChange}
+              placeholder="Mínimo 6 caracteres"
+              className="w-full px-6 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white placeholder-white/50 border-2 border-white/30 focus:border-white focus:outline-none focus:ring-4 focus:ring-white/20 text-lg font-semibold transition-all duration-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-white font-bold mb-3 text-lg">
+              Confirmar senha:
+            </label>
+            <input
+              type="password"
+              name="confirmarSenha"
+              value={formData.confirmarSenha}
+              onChange={handleInputChange}
+              placeholder="Digite a senha novamente"
+              className="w-full px-6 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white placeholder-white/50 border-2 border-white/30 focus:border-white focus:outline-none focus:ring-4 focus:ring-white/20 text-lg font-semibold transition-all duration-300"
+            />
+          </div>
+
+          {/* Mensagem de erro */}
+          {erro && (
+            <div className="bg-red-500/20 border-2 border-red-400 text-red-100 px-6 py-4 rounded-2xl text-center font-bold text-lg animate-shake">
+              ❌ {erro}
+            </div>
+          )}
+
+          {/* Benefícios Premium */}
+          <div className="bg-white/10 rounded-2xl p-6 border border-white/20">
+            <h3 className="text-white font-black text-lg mb-4 text-center">🌟 Benefícios Premium:</h3>
+            <div className="grid grid-cols-1 gap-3">
+              <div className="flex items-center space-x-3">
+                <span className="text-green-400 text-xl">✅</span>
+                <span className="text-white/90 font-semibold">Tempo ilimitado de chat</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className="text-green-400 text-xl">✅</span>
+                <span className="text-white/90 font-semibold">Envio de fotos e vídeos</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className="text-green-400 text-xl">✅</span>
+                <span className="text-white/90 font-semibold">Mensagens de áudio</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className="text-green-400 text-xl">✅</span>
+                <span className="text-white/90 font-semibold">Ver perfis completos</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className="text-green-400 text-xl">✅</span>
+                <span className="text-white/90 font-semibold">Suporte prioritário</span>
+              </div>
+            </div>
+          </div>
+
           {/* Botões */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <button
               onClick={handleCadastrar}
               disabled={loading}
-              className={`w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 ${
+              className={`w-full py-5 px-8 rounded-2xl font-black text-xl transition-all duration-300 relative overflow-hidden group ${
                 loading
-                  ? 'bg-gray-500/50 text-gray-300 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600 transform hover:scale-105 shadow-xl'
+                  ? 'bg-gray-500/50 text-gray-300 cursor-not-allowed border-2 border-gray-400/30'
+                  : 'bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600 transform hover:scale-105 shadow-2xl border-2 border-white/30'
               }`}
+              style={!loading ? {
+                boxShadow: '0 20px 60px rgba(34, 197, 94, 0.4)',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+              } : {}}
             >
-              {loading ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full mr-2"></div>
-                  Cadastrando...
-                </div>
-              ) : (
-                '🚀 Cadastrar Premium'
+              {!loading && (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               )}
+              <span className="relative z-10">
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin w-6 h-6 border-2 border-white/30 border-t-white rounded-full mr-3"></div>
+                    Cadastrando...
+                  </div>
+                ) : (
+                  '🚀 Cadastrar Premium'
+                )}
+              </span>
             </button>
 
             <button
               onClick={handleVoltar}
-              className="w-full bg-white/20 backdrop-blur-sm text-white py-3 px-6 rounded-2xl font-semibold hover:bg-white/30 transition-all duration-300"
+              className="w-full bg-white/20 backdrop-blur-sm text-white py-4 px-8 rounded-2xl font-bold text-lg hover:bg-white/30 transition-all duration-300 border border-white/30 hover:scale-105"
             >
               ← Voltar
             </button>
           </div>
         </div>
       </div>
+
+      {/* Estilos para animação shake */}
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 };
