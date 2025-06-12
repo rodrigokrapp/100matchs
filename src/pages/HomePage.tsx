@@ -68,7 +68,13 @@ const HomePage: React.FC = () => {
           {/* Botão Premium Destacado */}
           <button 
             onClick={handlePremiumClick}
-            className="btn-premium text-lg px-8 py-4 mb-8 animate-pulse"
+            className="btn-premium text-xl px-12 py-6 mb-8 animate-pulse shadow-2xl transform hover:scale-105 transition-all duration-300"
+            style={{
+              background: 'linear-gradient(135deg, #ff6b9d, #ff8fab, #ff6b9d)',
+              boxShadow: '0 8px 32px rgba(255, 107, 157, 0.5)',
+              fontSize: '1.5rem',
+              fontWeight: 'bold'
+            }}
           >
             ⭐ SEJA PREMIUM ⭐
           </button>
@@ -156,6 +162,20 @@ const HomePage: React.FC = () => {
             <p className="text-xs text-gray-500 mt-3 text-center">
               ⏰ Visitantes gratuitos têm 30 minutos de acesso
             </p>
+
+            {/* Botão Premium adicional no final do formulário */}
+            <div className="mt-6 text-center">
+              <button 
+                onClick={handlePremiumClick}
+                className="btn-premium w-full text-lg py-4 animate-bounce"
+                style={{
+                  background: 'linear-gradient(135deg, #ff6b9d, #ff8fab)',
+                  boxShadow: '0 6px 20px rgba(255, 107, 157, 0.4)'
+                }}
+              >
+                ⭐ UPGRADE PARA PREMIUM - SEM LIMITES! ⭐
+              </button>
+            </div>
           </div>
         </div>
 
