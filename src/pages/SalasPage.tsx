@@ -1,311 +1,373 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaSearch, FaPlus, FaUsers, FaMapMarkerAlt, FaClock, FaSignOutAlt } from 'react-icons/fa';
-
-interface User {
-  id: string;
-  email: string;
-  nome: string;
-  isPremium: boolean;
-  loginTime: number;
-}
+import { FiMapPin, FiUsers, FiLogOut, FiCrown } from 'react-icons/fi';
 
 interface Sala {
   id: string;
   nome: string;
-  cidade: string;
-  bairro: string;
-  criadorId: string;
-  usuariosOnline: number;
-  criadaEm: number;
+  estado: string;
+  usuarios: number;
+  ultimaMensagem: string;
 }
 
-// Capitais brasileiras para organizar as salas
-const CAPITAIS_BRASILEIRAS = [
-  { nome: 'São Paulo', estado: 'São Paulo' },
-  { nome: 'Rio de Janeiro', estado: 'Rio de Janeiro' },
-  { nome: 'Brasília', estado: 'Distrito Federal' },
-  { nome: 'Salvador', estado: 'Bahia' },
-  { nome: 'Fortaleza', estado: 'Ceará' },
-  { nome: 'Belo Horizonte', estado: 'Minas Gerais' },
-  { nome: 'Manaus', estado: 'Amazonas' },
-  { nome: 'Curitiba', estado: 'Paraná' },
-  { nome: 'Recife', estado: 'Pernambuco' },
-  { nome: 'Porto Alegre', estado: 'Rio Grande do Sul' },
-  { nome: 'Belém', estado: 'Pará' },
-  { nome: 'Goiânia', estado: 'Goiás' },
-  { nome: 'Guarulhos', estado: 'São Paulo' },
-  { nome: 'Campinas', estado: 'São Paulo' },
-  { nome: 'Nova Iguaçu', estado: 'Rio de Janeiro' }
-];
-
 const SalasPage: React.FC = () => {
+  const [usuario, setUsuario] = useState<any>(null);
+  const [salas] = useState<Sala[]>([
+    { id: 'sp', nome: 'São Paulo', estado: 'SP', usuarios: 1247, ultimaMensagem: 'Alguém aí da zona sul?' },
+    { id: 'rj', nome: 'Rio de Janeiro', estado: 'RJ', usuarios: 892, ultimaMensagem: 'Praia hoje?' },
+    { id: 'bh', nome: 'Belo Horizonte', estado: 'MG', usuarios: 634, ultimaMensagem: 'Pão de açúcar ou brigadeiro?' },
+    { id: 'salvador', nome: 'Salvador', estado: 'BA', usuarios: 567, ultimaMensagem: 'Axé! 🎉' },
+    { id: 'fortaleza', nome: 'Fortaleza', estado: 'CE', usuarios: 445, ultimaMensagem: 'Sol o ano todo ☀️' },
+    { id: 'brasilia', nome: 'Brasília', estado: 'DF', usuarios: 423, ultimaMensagem: 'Política deixa pra lá hehe' },
+    { id: 'curitiba', nome: 'Curitiba', estado: 'PR', usuarios: 398, ultimaMensagem: 'Frio mas o coração é quente' },
+    { id: 'recife', nome: 'Recife', estado: 'PE', usuarios: 376, ultimaMensagem: 'Frevo no sangue! 💃' },
+    { id: 'manaus', nome: 'Manaus', estado: 'AM', usuarios: 289, ultimaMensagem: 'Floresta urbana 🌳' },
+    { id: 'goiania', nome: 'Goiânia', estado: 'GO', usuarios: 267, ultimaMensagem: 'Sertanejo universitário?' },
+    { id: 'porto-alegre', nome: 'Porto Alegre', estado: 'RS', usuarios: 243, ultimaMensagem: 'Chimarrão online? ☕' },
+    { id: 'belem', nome: 'Belém', estado: 'PA', usuarios: 198, ultimaMensagem: 'Açaí é vida!' },
+  ]);
+  
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [salas, setSalas] = useState<Sala[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [timeLeft, setTimeLeft] = useState<number>(0);
-  const [isBlocked, setIsBlocked] = useState(false);
 
   useEffect(() => {
-    // Verificar usuário logado
-    const savedUser = localStorage.getItem('currentUser');
-    if (!savedUser) {
-      navigate('/inicio');
-      return;
-    }
+    // Verificar se usuário está logado
+    const visitante = localStorage.getItem('visitante');
+    const usuarioPremium = localStorage.getItem('usuario');
     
-    const userData = JSON.parse(savedUser);
-    setUser(userData);
-
-    // Verificar se é visitante gratuito e calcular tempo restante
-    if (!userData.isPremium) {
-      const timeElapsed = Date.now() - userData.loginTime;
-      const thirtyMinutes = 30 * 60 * 1000; // 30 minutos em ms
-      const remaining = thirtyMinutes - timeElapsed;
-
-      if (remaining <= 0) {
-        // Verificar se está bloqueado por 24h
-        const lastBlock = localStorage.getItem(`blocked_${userData.email}`);
-        if (lastBlock) {
-          const blockTime = parseInt(lastBlock);
-          const twentyFourHours = 24 * 60 * 60 * 1000;
-          if (Date.now() - blockTime < twentyFourHours) {
-            setIsBlocked(true);
-            return;
-          }
-        }
-        
-        // Bloquear usuário
-        localStorage.setItem(`blocked_${userData.email}`, Date.now().toString());
-        localStorage.removeItem('currentUser');
-        alert('Seu tempo de 30 minutos expirou! Você foi bloqueado por 24 horas.');
-        navigate('/inicio');
-        return;
-      }
-
-      setTimeLeft(Math.floor(remaining / 1000));
+    if (visitante) {
+      setUsuario(JSON.parse(visitante));
+    } else if (usuarioPremium) {
+      setUsuario(JSON.parse(usuarioPremium));
+    } else {
+      navigate('/inicio');
     }
-
-    // Carregar salas (simulado - depois conectar com backend)
-    loadSalas();
   }, [navigate]);
 
-  // Timer para visitantes gratuitos
-  useEffect(() => {
-    if (user && !user.isPremium && timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            // Tempo esgotado
-            localStorage.setItem(`blocked_${user.email}`, Date.now().toString());
-            localStorage.removeItem('currentUser');
-            alert('Seu tempo expirou! Você foi bloqueado por 24 horas.');
-            navigate('/inicio');
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [user, timeLeft, navigate]);
-
-  const loadSalas = () => {
-    // Simular salas existentes (depois conectar com backend real)
-    const salasMock: Sala[] = [
-      { id: '1', nome: 'Galera de Copacabana', cidade: 'Rio de Janeiro', bairro: 'Copacabana', criadorId: 'user1', usuariosOnline: 12, criadaEm: Date.now() },
-      { id: '2', nome: 'Pessoal da Vila Madalena', cidade: 'São Paulo', bairro: 'Vila Madalena', criadorId: 'user2', usuariosOnline: 8, criadaEm: Date.now() },
-      { id: '3', nome: 'Turma de Ipanema', cidade: 'Rio de Janeiro', bairro: 'Ipanema', criadorId: 'user3', usuariosOnline: 15, criadaEm: Date.now() },
-      { id: '4', nome: 'Galera do Centro', cidade: 'São Paulo', bairro: 'Centro', criadorId: 'user4', usuariosOnline: 6, criadaEm: Date.now() },
-      { id: '5', nome: 'Pessoal de Brasília', cidade: 'Brasília', bairro: 'Asa Norte', criadorId: 'user5', usuariosOnline: 9, criadaEm: Date.now() },
-    ];
-    setSalas(salasMock);
-  };
-
-  const handleSalaClick = (sala: Sala) => {
-    navigate(`/chat/${sala.id}`, { state: { sala } });
+  const handleEntrarSala = (salaId: string, nomeSala: string) => {
+    navigate(`/chat/${salaId}`, { state: { nomeSala } });
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('currentUser');
+    localStorage.removeItem('visitante');
+    localStorage.removeItem('usuario');
     navigate('/inicio');
   };
 
-  const handlePremiumClick = () => {
-    alert('Funcionalidade de pagamento será implementada em breve!');
+  const handleUpgradePremium = () => {
+    window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank');
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const filteredSalas = salas.filter(sala =>
-    sala.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sala.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sala.bairro.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const salasPorCidade = filteredSalas.reduce((acc, sala) => {
-    if (!acc[sala.cidade]) {
-      acc[sala.cidade] = [];
-    }
-    acc[sala.cidade].push(sala);
-    return acc;
-  }, {} as Record<string, Sala[]>);
-
-  if (isBlocked) {
+  if (!usuario) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="card max-w-md w-full text-center">
-          <div className="text-6xl mb-4">🚫</div>
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Acesso Bloqueado</h2>
-          <p className="text-gray-600 mb-6">
-            Você foi bloqueado por 24 horas após esgotar seu tempo gratuito.
-          </p>
-          <button onClick={handlePremiumClick} className="btn-premium w-full">
-            ⭐ SEJA PREMIUM ⭐
-          </button>
-        </div>
+      <div style={styles.loading}>
+        <div style={styles.spinner}></div>
+        <p>Carregando...</p>
       </div>
     );
   }
 
-  if (!user) return <div>Carregando...</div>;
-
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="card mb-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+    <div style={styles.salasPage}>
+      {/* Header */}
+      <header style={styles.header}>
+        <div style={styles.headerContent}>
+          <div style={styles.userInfo}>
+            <div style={styles.avatar}>
+              {usuario.tipo === 'premium' ? <FiCrown /> : '👤'}
+            </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">
-                🏙️ Salas de Bate-papo
-              </h1>
-              <p className="text-gray-600">Encontre pessoas da sua região!</p>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              {/* Timer para visitantes gratuitos */}
-              {!user.isPremium && (
-                <div className="bg-orange-100 px-4 py-2 rounded-lg border border-orange-200">
-                  <div className="flex items-center gap-2 text-orange-700">
-                    <FaClock />
-                    <span className="font-mono font-bold">{formatTime(timeLeft)}</span>
-                  </div>
-                  <p className="text-xs text-orange-600">Tempo restante</p>
-                </div>
-              )}
-              
-              {/* Info do usuário */}
-              <div className="text-right">
-                <p className="font-semibold">{user.nome}</p>
-                <p className="text-sm text-gray-500">
-                  {user.isPremium ? '⭐ Premium' : '🆓 Gratuito'}
-                </p>
-              </div>
-              
-              <button onClick={handleLogout} className="text-gray-500 hover:text-red-500">
-                <FaSignOutAlt size={20} />
-              </button>
+              <h3 style={styles.userName}>{usuario.nome}</h3>
+              <span style={styles.userType}>
+                {usuario.tipo === 'premium' ? '👑 Premium' : '🆓 Gratuito'}
+              </span>
             </div>
           </div>
-        </div>
-
-        {/* Botão Premium (se não for premium) */}
-        {!user.isPremium && (
-          <div className="card mb-6 bg-gradient-to-r from-pink-50 to-blue-50 border-2 border-pink-200">
-            <div className="text-center">
-              <h3 className="text-xl font-bold mb-2">🚀 Upgrade para Premium!</h3>
-              <p className="text-gray-600 mb-4">
-                Sem limite de tempo • Envie fotos e vídeos • Mensagens de áudio
-              </p>
-              <button onClick={handlePremiumClick} className="btn-premium">
-                ⭐ SEJA PREMIUM ⭐
+          
+          <div style={styles.headerActions}>
+            {usuario.tipo !== 'premium' && (
+              <button onClick={handleUpgradePremium} style={styles.btnUpgrade}>
+                <FiCrown /> Seja Premium
               </button>
-            </div>
-          </div>
-        )}
-
-        {/* Barra de pesquisa e botão criar sala */}
-        <div className="card mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Pesquisar por sala, cidade ou bairro..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field pl-10"
-              />
-            </div>
-            <button
-              onClick={() => navigate('/criar-sala')}
-              className="btn-secondary flex items-center gap-2 whitespace-nowrap"
-            >
-              <FaPlus /> Criar Sala
+            )}
+            <button onClick={handleLogout} style={styles.btnLogout}>
+              <FiLogOut /> Sair
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Lista de salas por cidade */}
-        <div className="space-y-6">
-          {Object.keys(salasPorCidade).length === 0 ? (
-            <div className="card text-center py-12">
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold mb-2">Nenhuma sala encontrada</h3>
-              <p className="text-gray-600 mb-4">
-                {searchTerm ? 'Tente pesquisar por outros termos' : 'Seja o primeiro a criar uma sala!'}
-              </p>
-              <button
-                onClick={() => navigate('/criar-sala')}
-                className="btn-premium"
+      {/* Main Content */}
+      <main style={styles.main}>
+        <div style={styles.container}>
+          <div style={styles.welcomeSection}>
+            <h1 style={styles.title}>Salas de Chat por Cidade</h1>
+            <p style={styles.subtitle}>
+              Escolha sua cidade e comece a conversar com pessoas da sua região!
+            </p>
+          </div>
+
+          {/* Grid de Salas */}
+          <div style={styles.salasGrid}>
+            {salas.map((sala) => (
+              <div 
+                key={sala.id} 
+                style={styles.salaCard}
+                onClick={() => handleEntrarSala(sala.id, sala.nome)}
               >
-                <FaPlus className="inline mr-2" /> Criar Nova Sala
-              </button>
-            </div>
-          ) : (
-            Object.entries(salasPorCidade).map(([cidade, salasCity]) => (
-              <div key={cidade} className="card">
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <FaMapMarkerAlt className="text-pink-500" />
-                  {cidade}
-                </h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {salasCity.map(sala => (
-                    <div
-                      key={sala.id}
-                      onClick={() => handleSalaClick(sala)}
-                      className="bg-gradient-to-br from-white to-gray-50 p-4 rounded-xl border border-gray-200 hover:border-pink-300 hover:shadow-lg transition-all cursor-pointer"
-                    >
-                      <h3 className="font-semibold text-lg mb-2">{sala.nome}</h3>
-                      <p className="text-gray-600 text-sm mb-3">
-                        📍 {sala.bairro}, {sala.cidade}
-                      </p>
-                      <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-1 text-green-600 text-sm">
-                          <FaUsers />
-                          {sala.usuariosOnline} online
-                        </span>
-                        <button className="btn-secondary text-sm px-3 py-1">
-                          Entrar
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                <div style={styles.salaHeader}>
+                  <div style={styles.salaIcon}>
+                    <FiMapPin />
+                  </div>
+                  <div style={styles.salaInfo}>
+                    <h3 style={styles.salaNome}>{sala.nome}</h3>
+                    <span style={styles.salaEstado}>{sala.estado}</span>
+                  </div>
+                  <div style={styles.salaUsuarios}>
+                    <FiUsers />
+                    <span>{sala.usuarios}</span>
+                  </div>
+                </div>
+                
+                <div style={styles.ultimaMensagem}>
+                  <p>💬 {sala.ultimaMensagem}</p>
+                </div>
+                
+                <div style={styles.salaFooter}>
+                  <span style={styles.statusOnline}>🟢 Online agora</span>
                 </div>
               </div>
-            ))
+            ))}
+          </div>
+
+          {/* Informações para usuários gratuitos */}
+          {usuario.tipo !== 'premium' && (
+            <div style={styles.premiumBanner}>
+              <div style={styles.bannerContent}>
+                <FiCrown size={40} />
+                <div>
+                  <h3>Quer mais recursos?</h3>
+                  <p>Com o Premium você pode enviar fotos, vídeos, áudios e muito mais!</p>
+                </div>
+                <button onClick={handleUpgradePremium} style={styles.btnBanner}>
+                  Upgrade agora
+                </button>
+              </div>
+            </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
+};
+
+const styles = {
+  salasPage: {
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+  },
+  loading: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+    color: 'white',
+  },
+  spinner: {
+    width: '40px',
+    height: '40px',
+    border: '4px solid rgba(255,255,255,0.3)',
+    borderTop: '4px solid white',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+    marginBottom: '1rem',
+  },
+  header: {
+    background: 'rgba(255, 255, 255, 0.1)',
+    backdropFilter: 'blur(10px)',
+    padding: '1rem 0',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+  },
+  headerContent: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '0 2rem',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  userInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+  },
+  avatar: {
+    width: '50px',
+    height: '50px',
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, #ff6b9d, #c44569)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+    fontSize: '1.5rem',
+  },
+  userName: {
+    color: 'white',
+    margin: 0,
+    fontSize: '1.2rem',
+  },
+  userType: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: '0.9rem',
+  },
+  headerActions: {
+    display: 'flex',
+    gap: '1rem',
+  },
+  btnUpgrade: {
+    background: 'linear-gradient(135deg, #ffd700, #ffb347)',
+    color: '#333',
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: '20px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    transition: 'transform 0.2s',
+  },
+  btnLogout: {
+    background: 'rgba(255, 255, 255, 0.2)',
+    color: 'white',
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: '20px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    transition: 'background 0.2s',
+  },
+  main: {
+    padding: '2rem 0',
+  },
+  container: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '0 2rem',
+  },
+  welcomeSection: {
+    textAlign: 'center' as const,
+    marginBottom: '3rem',
+  },
+  title: {
+    color: 'white',
+    fontSize: '3rem',
+    fontWeight: 'bold',
+    marginBottom: '1rem',
+    textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+  },
+  subtitle: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: '1.2rem',
+    maxWidth: '600px',
+    margin: '0 auto',
+  },
+  salasGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+    gap: '2rem',
+    marginBottom: '3rem',
+  },
+  salaCard: {
+    background: 'white',
+    borderRadius: '20px',
+    padding: '1.5rem',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    hover: {
+      transform: 'translateY(-5px)',
+      boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+    },
+  },
+  salaHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '1rem',
+  },
+  salaIcon: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '10px',
+    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+    marginRight: '1rem',
+  },
+  salaInfo: {
+    flex: 1,
+  },
+  salaNome: {
+    margin: 0,
+    fontSize: '1.3rem',
+    color: '#333',
+  },
+  salaEstado: {
+    color: '#666',
+    fontSize: '0.9rem',
+  },
+  salaUsuarios: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    color: '#4caf50',
+    fontWeight: 'bold',
+  },
+  ultimaMensagem: {
+    marginBottom: '1rem',
+    padding: '0.8rem',
+    background: '#f5f5f5',
+    borderRadius: '10px',
+  },
+  salaFooter: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statusOnline: {
+    color: '#4caf50',
+    fontSize: '0.9rem',
+    fontWeight: 'bold',
+  },
+  premiumBanner: {
+    background: 'linear-gradient(135deg, #ffd700, #ffb347)',
+    borderRadius: '20px',
+    padding: '2rem',
+    marginTop: '2rem',
+  },
+  bannerContent: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '2rem',
+    color: '#333',
+  },
+  btnBanner: {
+    background: '#333',
+    color: 'white',
+    border: 'none',
+    padding: '12px 24px',
+    borderRadius: '25px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    transition: 'transform 0.2s',
+  },
 };
 
 export default SalasPage;
