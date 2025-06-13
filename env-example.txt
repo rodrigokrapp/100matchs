@@ -1,0 +1,10 @@
+# VARIÁVEIS DE AMBIENTE - EXEMPLO
+# Copie estes valores exatos no Netlify e no seu .env.local
+
+# SUPABASE (obtenha em https://supabase.com/dashboard → Settings → API)
+VITE_SUPABASE_URL=https://SEU_PROJETO.supabase.co
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima_longa_aqui
+
+# EXEMPLO DE VALORES REAIS (SUBSTITUA PELOS SEUS):
+# VITE_SUPABASE_URL=https://abcdefghijklmnop.supabase.co
+# VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6... 
