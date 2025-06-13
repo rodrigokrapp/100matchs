@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Configuração do Supabase com credenciais reais
 const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://jnupyqszampirwyyvqlh.supabase.co';
-const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpudXB5cXN6YW1waXJ3eXl2cWxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3OTcsImV4cCI6MjA2NDgxNzc5N30.IA6029OrT86-Gxn8FZzu7YHhK7AtNL96KrF4_xqU390';
+const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpudXB5cXN6YW1waXJ3eXl2cWxoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTI0MTc5NywiZXhwIjoyMDY0ODE3Nzk3fQ.YqcgqVm5L-wckqfSdxuDPhKFYu9f82-8qxNSn7JD6nM';
 
 console.log('🔧 Supabase configurado:', { url: supabaseUrl, hasKey: !!supabaseKey });
 
