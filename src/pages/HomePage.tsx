@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiUser, FiMail, FiHeart, FiHeadphones } from 'react-icons/fi';
+import './HomePage.css';
 
 const HomePage: React.FC = () => {
   const [nome, setNome] = useState('');
