@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiMapPin, FiUsers, FiLogOut, FiCrown } from 'react-icons/fi';
+import { FiMapPin, FiUsers, FiLogOut, FiStar } from 'react-icons/fi';
 
 interface Sala {
   id: string;
@@ -73,12 +73,12 @@ const SalasPage: React.FC = () => {
         <div style={styles.headerContent}>
           <div style={styles.userInfo}>
             <div style={styles.avatar}>
-              {usuario.tipo === 'premium' ? <FiCrown /> : '👤'}
+              {usuario.tipo === 'premium' ? <FiStar /> : '👤'}
             </div>
             <div>
               <h3 style={styles.userName}>{usuario.nome}</h3>
               <span style={styles.userType}>
-                {usuario.tipo === 'premium' ? '👑 Premium' : '🆓 Gratuito'}
+                {usuario.tipo === 'premium' ? '⭐ Premium' : '🆓 Gratuito'}
               </span>
             </div>
           </div>
@@ -86,7 +86,7 @@ const SalasPage: React.FC = () => {
           <div style={styles.headerActions}>
             {usuario.tipo !== 'premium' && (
               <button onClick={handleUpgradePremium} style={styles.btnUpgrade}>
-                <FiCrown /> Seja Premium
+                <FiStar /> Seja Premium
               </button>
             )}
             <button onClick={handleLogout} style={styles.btnLogout}>
@@ -143,7 +143,7 @@ const SalasPage: React.FC = () => {
           {usuario.tipo !== 'premium' && (
             <div style={styles.premiumBanner}>
               <div style={styles.bannerContent}>
-                <FiCrown size={40} />
+                <FiStar size={40} />
                 <div>
                   <h3>Quer mais recursos?</h3>
                   <p>Com o Premium você pode enviar fotos, vídeos, áudios e muito mais!</p>

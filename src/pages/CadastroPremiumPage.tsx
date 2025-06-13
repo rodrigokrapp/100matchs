@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiLock, FiArrowLeft, FiCrown } from 'react-icons/fi';
+import { FiUser, FiMail, FiLock, FiArrowLeft, FiStar } from 'react-icons/fi';
 import { supabase } from '../lib/supabase';
 import './CadastroPremiumPage.css';
 
@@ -17,7 +17,7 @@ const CadastroPremiumPage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setErro('');
-
+    
     try {
       // Cadastrar usuário no Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -50,7 +50,7 @@ const CadastroPremiumPage: React.FC = () => {
       // Redirecionar após 2 segundos
       setTimeout(() => {
         navigate('/salas');
-      }, 2000);
+    }, 2000);
 
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
@@ -70,8 +70,8 @@ const CadastroPremiumPage: React.FC = () => {
         <div className="cadastro-container">
           <div className="sucesso-content">
             <div className="sucesso-icon">
-              <FiCrown size={80} />
-            </div>
+              <FiStar size={80} />
+        </div>
             <h1>Bem-vindo ao Premium!</h1>
             <p>Sua conta premium foi criada com sucesso!</p>
             <div className="loading-redirect">
@@ -93,7 +93,7 @@ const CadastroPremiumPage: React.FC = () => {
 
         <div className="cadastro-content">
           <div className="premium-header">
-            <FiCrown size={60} />
+            <FiStar size={60} />
             <h1>Cadastro Premium</h1>
             <p>Complete seu cadastro para ter acesso total à plataforma</p>
           </div>
@@ -145,12 +145,12 @@ const CadastroPremiumPage: React.FC = () => {
                   Criando conta...
                 </>
               ) : (
-                <>
-                  <FiCrown />
-                  Cadastrar Premium
-                </>
-              )}
-            </button>
+                              <>
+                <FiStar />
+                Cadastrar Premium
+                  </>
+                )}
+              </button>
           </form>
 
           <div className="premium-benefits">

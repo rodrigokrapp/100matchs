@@ -31,8 +31,8 @@ const HomePage: React.FC = () => {
           <h1 className="logo">RESENHA sem Matchs</h1>
           <button onClick={handleSuporte} className="btn-suporte">
             <FiHeadphones /> Suporte
-          </button>
-        </div>
+        </button>
+      </div>
       </header>
 
       {/* Hero Section */}
@@ -69,8 +69,8 @@ const HomePage: React.FC = () => {
                       onChange={(e) => setNome(e.target.value)}
                       required
                     />
-                  </div>
-                  
+                </div>
+                
                   <div className="input-group">
                     <FiMail className="input-icon" />
                     <input
@@ -90,7 +90,7 @@ const HomePage: React.FC = () => {
                 <div className="divider">
                   <span>ou</span>
                 </div>
-
+                
                 <button onClick={handleSejaPremium} className="btn-premium">
                   <FiHeart /> SEJA PREMIUM
                 </button>
@@ -123,12 +123,12 @@ const HomePage: React.FC = () => {
               <div className="feature-icon">🏠</div>
               <h4>Pessoas do seu bairro</h4>
               <p>Conheça quem está pertinho de você</p>
-            </div>
+                </div>
             <div className="feature-card">
               <div className="feature-icon">💬</div>
               <h4>Chat em tempo real</h4>
               <p>Converse instantaneamente</p>
-            </div>
+                </div>
             <div className="feature-card">
               <div className="feature-icon">🎯</div>
               <h4>100% Real</h4>

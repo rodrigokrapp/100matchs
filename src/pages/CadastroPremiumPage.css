@@ -1,0 +1,258 @@
+/* CadastroPremiumPage.css */
+.cadastro-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 2rem;
+}
+
+.cadastro-container {
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+}
+
+.btn-voltar {
+  position: absolute;
+  top: -60px;
+  left: 0;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btn-voltar:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.cadastro-content {
+  background: white;
+  padding: 3rem;
+  border-radius: 30px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.premium-header {
+  margin-bottom: 2.5rem;
+}
+
+.premium-header svg {
+  color: #ffd700;
+  margin-bottom: 1rem;
+}
+
+.premium-header h1 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.premium-header p {
+  color: #666;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.cadastro-form {
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 1.2rem;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 18px 15px 18px 45px;
+  border: 2px solid #e0e0e0;
+  border-radius: 15px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input-group input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.erro-msg {
+  color: #f44336;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.btn-cadastrar {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-cadastrar:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+}
+
+.btn-cadastrar:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.premium-benefits {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 15px;
+  text-align: left;
+}
+
+.premium-benefits h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.premium-benefits ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.premium-benefits li {
+  padding: 0.5rem 0;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Página de Sucesso */
+.sucesso-content {
+  background: white;
+  padding: 3rem;
+  border-radius: 30px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.sucesso-icon {
+  color: #ffd700;
+  margin-bottom: 2rem;
+  animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+.sucesso-content h1 {
+  color: #4caf50;
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.sucesso-content p {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.loading-redirect {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(102, 126, 234, 0.3);
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-redirect p {
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cadastro-page {
+    padding: 1rem;
+  }
+  
+  .cadastro-content, .sucesso-content {
+    padding: 2rem;
+  }
+  
+  .premium-header h1 {
+    font-size: 2rem;
+  }
+  
+  .btn-voltar {
+    top: -50px;
+  }
+} 
