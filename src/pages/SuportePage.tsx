@@ -11,7 +11,7 @@ const SuportePage: React.FC = () => {
 
   const handleValidarCodigo = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (codigo === '6838') {
       setCodigoValidado(true);
       setErro('');
@@ -40,7 +40,7 @@ const SuportePage: React.FC = () => {
           <div className="suporte-icon">
             <FiLock size={60} />
           </div>
-          
+
           <h1>Área de Suporte</h1>
           <p>Para acessar funcionalidades especiais, digite o código de acesso:</p>
 
@@ -57,13 +57,13 @@ const SuportePage: React.FC = () => {
                   className={erro ? 'input-erro' : ''}
                   required
                 />
-              </div>
-              
+            </div>
+
               {erro && <p className="erro-msg">{erro}</p>}
               
               <button type="submit" className="btn-validar">
                 Validar Código
-              </button>
+                </button>
             </form>
           ) : (
             <div className="codigo-validado">

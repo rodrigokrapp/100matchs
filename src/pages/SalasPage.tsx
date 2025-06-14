@@ -68,7 +68,7 @@ const SalasPage: React.FC = () => {
 
   return (
     <div style={styles.salasPage}>
-      {/* Header */}
+        {/* Header */}
       <header style={styles.header}>
         <div style={styles.headerContent}>
           <div style={styles.userInfo}>
@@ -80,9 +80,9 @@ const SalasPage: React.FC = () => {
               <span style={styles.userType}>
                 {usuario.tipo === 'premium' ? '⭐ Premium' : '🆓 Gratuito'}
               </span>
-            </div>
           </div>
-          
+        </div>
+
           <div style={styles.headerActions}>
             {usuario.tipo !== 'premium' && (
               <button onClick={handleUpgradePremium} style={styles.btnUpgrade}>
@@ -104,13 +104,13 @@ const SalasPage: React.FC = () => {
             <p style={styles.subtitle}>
               Escolha sua cidade e comece a conversar com pessoas da sua região!
             </p>
-          </div>
+            </div>
 
           {/* Grid de Salas */}
           <div style={styles.salasGrid}>
             {salas.map((sala) => (
-              <div 
-                key={sala.id} 
+                    <div
+                      key={sala.id}
                 style={styles.salaCard}
                 onClick={() => handleEntrarSala(sala.id, sala.nome)}
               >
@@ -134,9 +134,9 @@ const SalasPage: React.FC = () => {
                 
                 <div style={styles.salaFooter}>
                   <span style={styles.statusOnline}>🟢 Online agora</span>
-                </div>
-              </div>
-            ))}
+                      </div>
+                    </div>
+                  ))}
           </div>
 
           {/* Informações para usuários gratuitos */}

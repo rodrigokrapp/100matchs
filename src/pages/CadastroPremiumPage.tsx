@@ -17,7 +17,7 @@ const CadastroPremiumPage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setErro('');
-
+    
     try {
       console.log('🔄 Iniciando cadastro no Supabase...');
       
@@ -56,7 +56,7 @@ const CadastroPremiumPage: React.FC = () => {
       // Redirecionar após 2 segundos
       setTimeout(() => {
         navigate('/salas');
-      }, 2000);
+    }, 2000);
 
     } catch (error: any) {
       console.error('❌ Erro no cadastro:', error);
