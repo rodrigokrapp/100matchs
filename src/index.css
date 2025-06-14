@@ -8,7 +8,7 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #ff6b9d 0%, #4facfe 50%, #00f2fe 100%);
+  background: white;
   min-height: 100vh;
   color: #333;
 }

@@ -9,24 +9,24 @@ html, body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%) !important;
+  background: white !important;
   min-height: 100vh;
 }
 
 body {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%) !important;
+  background: white !important;
   min-height: 100vh;
 }
 
 .App {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%) !important;
+  background: white !important;
 }
 
-/* Força o tema azul em todas as páginas */
+/* Força o fundo branco em todas as páginas */
 #root {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%) !important;
+  background: white !important;
   min-height: 100vh;
 }
 
