@@ -14,8 +14,14 @@ export default defineConfig({
         manualChunks: undefined,
       },
     },
+    target: 'esnext',
+    minify: 'esbuild',
   },
   optimizeDeps: {
     exclude: ['@rollup/rollup-linux-x64-gnu'],
+    include: ['esbuild']
   },
+  esbuild: {
+    target: 'esnext'
+  }
 }) 

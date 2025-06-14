@@ -10,9 +10,17 @@ const HomePage: React.FC = () => {
 
   const handleSubmitVisitante = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('📝 Dados do formulário:', { nome: nome.trim(), email: email.trim() });
+    
     if (nome.trim() && email.trim()) {
-      localStorage.setItem('visitante', JSON.stringify({ nome, email, tipo: 'gratuito' }));
+      const userData = { nome: nome.trim(), email: email.trim(), tipo: 'gratuito' };
+      localStorage.setItem('visitante', JSON.stringify(userData));
+      console.log('✅ Visitante salvo:', userData);
+      console.log('🔄 Redirecionando para /salas...');
       navigate('/salas');
+    } else {
+      console.log('❌ Dados inválidos - nome ou email vazios');
+      alert('Por favor, preencha seu nome e email para continuar!');
     }
   };
 
