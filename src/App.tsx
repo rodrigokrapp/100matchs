@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import SalasPage from './pages/SalasPage';
@@ -6,9 +6,14 @@ import CriarSalaPage from './pages/CriarSalaPage';
 import ChatPage from './pages/ChatPage';
 import SuportePage from './pages/SuportePage';
 import CadastroPremiumPage from './pages/CadastroPremiumPage';
+import { testSupabaseConnection } from './lib/supabase';
 import './App.css';
 
 function App() {
+  useEffect(() => {
+    console.log('🚀 Iniciando aplicação e testando Supabase...');
+    testSupabaseConnection();
+  }, []);
 
   return (
     <Router>

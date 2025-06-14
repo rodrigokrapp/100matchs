@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiUser, FiMail, FiLock, FiArrowLeft, FiStar } from 'react-icons/fi';
+import { supabase } from '../lib/supabase';
 import './CadastroPremiumPage.css';
 
 const CadastroPremiumPage: React.FC = () => {
@@ -18,15 +19,34 @@ const CadastroPremiumPage: React.FC = () => {
     setErro('');
 
     try {
-      // Simular tempo de processamento
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('🔄 Iniciando cadastro no Supabase...');
+      
+      // Criar usuário no Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password: senha,
+        options: {
+          data: {
+            name: nome,
+            tipo: 'premium'
+          }
+        }
+      });
 
-      // Salvar dados localmente
+      if (authError) {
+        console.error('❌ Erro no auth:', authError);
+        throw authError;
+      }
+
+      console.log('✅ Usuário criado no Supabase Auth:', authData.user?.id);
+
+      // Salvar dados localmente também
       const userData = {
         nome,
         email,
         tipo: 'premium',
-        id: Date.now().toString()
+        id: authData.user?.id || Date.now().toString(),
+        supabaseId: authData.user?.id
       };
       
       localStorage.setItem('usuario', JSON.stringify(userData));
@@ -39,8 +59,8 @@ const CadastroPremiumPage: React.FC = () => {
       }, 2000);
 
     } catch (error: any) {
-      console.error('Erro no cadastro:', error);
-      setErro('Erro ao criar conta. Tente novamente.');
+      console.error('❌ Erro no cadastro:', error);
+      setErro(error.message || 'Erro ao criar conta. Tente novamente.');
     } finally {
       setLoading(false);
     }
