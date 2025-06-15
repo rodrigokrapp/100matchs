@@ -1,17 +1,23 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import HomePage from './pages/HomePage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { testSupabaseConnection } from './lib/supabase';
+
+// Páginas
+import InicioPage from './pages/InicioPage';
 import SalasPage from './pages/SalasPage';
-import CriarSalaPage from './pages/CriarSalaPage';
 import ChatPage from './pages/ChatPage';
+import MeuPerfilPage from './pages/MeuPerfilPage';
 import SuportePage from './pages/SuportePage';
 import CadastroPremiumPage from './pages/CadastroPremiumPage';
-import { testSupabaseConnection } from './lib/supabase';
+import CriarSalaPage from './pages/CriarSalaPage';
+import LoginPremiumPage from './pages/LoginPremiumPage';
+
+// Estilos globais
 import './App.css';
 
 function App() {
   useEffect(() => {
-    console.log('🚀 Iniciando aplicação e testando Supabase...');
+    console.log('🚀 Iniciando Resenha sem Matchs...');
     testSupabaseConnection();
   }, []);
 
@@ -19,13 +25,15 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={<Navigate to="/inicio" replace />} />
-          <Route path="/inicio" element={<HomePage />} />
+          <Route path="/" element={<InicioPage />} />
+          <Route path="/inicio" element={<InicioPage />} />
           <Route path="/salas" element={<SalasPage />} />
-          <Route path="/criar-sala" element={<CriarSalaPage />} />
           <Route path="/chat/:salaId" element={<ChatPage />} />
+          <Route path="/meu-perfil" element={<MeuPerfilPage />} />
           <Route path="/suporte6828" element={<SuportePage />} />
           <Route path="/cadastropremium6838k" element={<CadastroPremiumPage />} />
+          <Route path="/criarsala" element={<CriarSalaPage />} />
+          <Route path="/login-premium" element={<LoginPremiumPage />} />
         </Routes>
       </div>
     </Router>
