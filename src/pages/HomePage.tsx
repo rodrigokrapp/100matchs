@@ -1,151 +1,213 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiHeart, FiHeadphones } from 'react-icons/fi';
-import './HomePage.css';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const HomePage: React.FC = () => {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const navigate = useNavigate();
+  const handleUpgrade = () => {
+    console.log('🔄 Redirecionando para upgrade...');
+    // Remover link específico - será configurado posteriormente
+    alert('Link de pagamento será configurado posteriormente');
+  };
 
-  const handleSubmitVisitante = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('📝 Dados do formulário:', { nome: nome.trim(), email: email.trim() });
-    
-    if (nome.trim() && email.trim()) {
-      const userData = { nome: nome.trim(), email: email.trim(), tipo: 'gratuito' };
-      localStorage.setItem('visitante', JSON.stringify(userData));
-      console.log('✅ Visitante salvo:', userData);
-      console.log('🔄 Redirecionando para /salas...');
-      navigate('/salas');
-    } else {
-      console.log('❌ Dados inválidos - nome ou email vazios');
-      alert('Por favor, preencha seu nome e email para continuar!');
+  const styles = {
+    container: {
+      minHeight: '100vh',
+      background: 'white',
+      color: '#333',
+      fontFamily: 'Inter, sans-serif'
+    },
+    header: {
+      background: 'rgba(255, 255, 255, 0.95)',
+      padding: '15px 0',
+      boxShadow: '0 2px 20px rgba(0,0,0,0.1)',
+      backdropFilter: 'blur(10px)',
+      position: 'sticky' as const,
+      top: 0,
+      zIndex: 1000,
+    },
+    headerContent: {
+      maxWidth: '1200px',
+      margin: '0 auto',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '0 20px'
+    },
+    logo: {
+      fontSize: '28px',
+      fontWeight: 700,
+      background: 'linear-gradient(135deg, #ff6b9d, #4facfe)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text'
+    },
+    nav: {
+      display: 'flex',
+      gap: '30px',
+      alignItems: 'center'
+    },
+    navLink: {
+      color: '#333',
+      textDecoration: 'none',
+      fontWeight: 500,
+      transition: 'all 0.3s ease'
+    },
+    upgradeBtn: {
+      background: 'linear-gradient(135deg, #ff6b9d, #ff8fab)',
+      color: 'white',
+      border: 'none',
+      padding: '12px 24px',
+      borderRadius: '25px',
+      fontWeight: 600,
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 4px 15px rgba(255, 107, 157, 0.3)'
+    },
+    hero: {
+      textAlign: 'center' as const,
+      padding: '80px 20px',
+      maxWidth: '800px',
+      margin: '0 auto'
+    },
+    heroTitle: {
+      fontSize: '48px',
+      fontWeight: 700,
+      marginBottom: '20px',
+      background: 'linear-gradient(135deg, #ff6b9d, #4facfe)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text'
+    },
+    heroSubtitle: {
+      fontSize: '20px',
+      color: '#666',
+      marginBottom: '40px',
+      lineHeight: 1.6
+    },
+    ctaButton: {
+      background: 'linear-gradient(135deg, #ff6b9d, #ff8fab)',
+      color: 'white',
+      border: 'none',
+      padding: '16px 32px',
+      borderRadius: '30px',
+      fontSize: '18px',
+      fontWeight: 600,
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 6px 20px rgba(255, 107, 157, 0.3)',
+      textDecoration: 'none',
+      display: 'inline-block'
+    },
+    features: {
+      padding: '80px 20px',
+      background: 'rgba(248, 249, 250, 0.5)'
+    },
+    featuresContainer: {
+      maxWidth: '1200px',
+      margin: '0 auto'
+    },
+    featuresTitle: {
+      textAlign: 'center' as const,
+      fontSize: '36px',
+      fontWeight: 700,
+      marginBottom: '50px',
+      color: '#333'
+    },
+    featuresGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+      gap: '30px'
+    },
+    featureCard: {
+      background: 'rgba(255, 255, 255, 0.95)',
+      padding: '30px',
+      borderRadius: '20px',
+      textAlign: 'center' as const,
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      transition: 'all 0.3s ease'
+    },
+    featureIcon: {
+      fontSize: '48px',
+      marginBottom: '20px'
+    },
+    featureTitle: {
+      fontSize: '24px',
+      fontWeight: 600,
+      marginBottom: '15px',
+      color: '#333'
+    },
+    featureDesc: {
+      color: '#666',
+      lineHeight: 1.6
+    },
+    footer: {
+      background: '#333',
+      color: 'white',
+      textAlign: 'center' as const,
+      padding: '40px 20px'
     }
   };
 
-  const handleSejaPremium = () => {
-    window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank');
-  };
-
-  const handleSuporte = () => {
-    navigate('/suporte6828');
-  };
-
   return (
-    <div className="homepage">
-      {/* Header */}
-      <header className="header">
-        <div className="container">
-          <h1 className="logo">RESENHA sem Matchs</h1>
-          <button onClick={handleSuporte} className="btn-suporte">
-            <FiHeadphones /> Suporte
-        </button>
-      </div>
+    <div style={styles.container}>
+      <header style={styles.header}>
+        <div style={styles.headerContent}>
+          <h1 className="logo">Plataforma Premium</h1>
+          <nav style={styles.nav}>
+            <Link to="/" style={styles.navLink}>Início</Link>
+            <Link to="/salas" style={styles.navLink}>Salas</Link>
+            <button style={styles.upgradeBtn} onClick={handleUpgrade}>
+              ⭐ Upgrade Premium
+            </button>
+          </nav>
+        </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="hero">
-        <div className="container">
-          <div className="hero-content">
-            
-            {/* Lado Esquerdo - Jovem Chorando */}
-            <div className="hero-side sad-side">
-              <div className="image-container">
-                <div className="sad-person">
-                  <div className="person-icon">😢📱</div>
-                  <p className="sad-text">Desliza, desliza...</p>
-                </div>
-              </div>
-              <div className="message-bubble sad-bubble">
-                <p>Desliza desliza e nada de alguém né?</p>
-              </div>
-            </div>
+      <main>
+        <section style={styles.hero}>
+          <h1 style={styles.heroTitle}>Acesso Premium Exclusivo</h1>
+          <p style={styles.heroSubtitle}>
+            Conecte-se com uma comunidade exclusiva e tenha acesso a conteúdos premium únicos
+          </p>
+          <Link to="/salas" style={styles.ctaButton}>
+            🚀 Começar Agora
+          </Link>
+        </section>
 
-            {/* Centro - Formulário */}
-            <div className="hero-center">
-              <div className="form-container">
-                <h2>Conheça pessoas do seu bairro!</h2>
-                <p className="subtitle">Aqui o usuário FREE conhece alguém da sua cidade todo dia!</p>
-                
-                <form onSubmit={handleSubmitVisitante} className="form-visitante">
-                  <div className="input-group">
-                    <FiUser className="input-icon" />
-                    <input
-                      type="text"
-                      placeholder="Seu nome"
-                      value={nome}
-                      onChange={(e) => setNome(e.target.value)}
-                      required
-                    />
-                </div>
-                
-                  <div className="input-group">
-                    <FiMail className="input-icon" />
-                    <input
-                      type="email"
-                      placeholder="Seu email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <button type="submit" className="btn-visitante">
-                    Entrar como Visitante Gratuito
-                  </button>
-                </form>
-
-                <div className="divider">
-                  <span>ou</span>
-                </div>
-                
-                <button onClick={handleSejaPremium} className="btn-premium">
-                  <FiHeart /> SEJA PREMIUM
-                </button>
+        <section style={styles.features}>
+          <div style={styles.featuresContainer}>
+            <h3>Por que escolher nossa Plataforma Premium?</h3>
+            <div style={styles.featuresGrid}>
+              <div style={styles.featureCard}>
+                <div style={styles.featureIcon}>🎯</div>
+                <h4 style={styles.featureTitle}>Conteúdo Exclusivo</h4>
+                <p style={styles.featureDesc}>
+                  Acesso a materiais premium únicos e de alta qualidade
+                </p>
               </div>
-            </div>
-
-            {/* Lado Direito - Jovem Feliz */}
-            <div className="hero-side happy-side">
-              <div className="image-container">
-                <div className="happy-person">
-                  <div className="person-icon">😍📱</div>
-                  <p className="happy-text">Bora, chega aqui!</p>
-                </div>
+              <div style={styles.featureCard}>
+                <div style={styles.featureIcon}>💬</div>
+                <h4 style={styles.featureTitle}>Comunidade Ativa</h4>
+                <p style={styles.featureDesc}>
+                  Conecte-se com membros premium em tempo real
+                </p>
               </div>
-              <div className="message-bubble happy-bubble">
-                <p>Já encontrei 3 pessoas legais hoje! 💕</p>
+              <div style={styles.featureCard}>
+                <div style={styles.featureIcon}>🔒</div>
+                <h4 style={styles.featureTitle}>100% Seguro</h4>
+                <p style={styles.featureDesc}>
+                  Ambiente seguro e privado para seus dados
+                </p>
               </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="features">
-        <div className="container">
-          <h3>Por que escolher o Resenha sem Matchs?</h3>
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">🏠</div>
-              <h4>Pessoas do seu bairro</h4>
-              <p>Conheça quem está pertinho de você</p>
-                </div>
-            <div className="feature-card">
-              <div className="feature-icon">💬</div>
-              <h4>Chat em tempo real</h4>
-              <p>Converse instantaneamente</p>
-                </div>
-            <div className="feature-card">
-              <div className="feature-icon">🎯</div>
-              <h4>100% Real</h4>
-              <p>Pessoas reais, conexões verdadeiras</p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
+
+      <footer style={styles.footer}>
+        <p>&copy; 2024 Plataforma Premium. Todos os direitos reservados.</p>
+      </footer>
     </div>
   );
 };
