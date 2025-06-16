@@ -8,6 +8,9 @@ export interface ChatMessage {
   content: string;
   message_type: 'texto' | 'imagem' | 'video' | 'audio' | 'emoji';
   is_premium: boolean;
+  is_temporary?: boolean;
+  expires_at?: string;
+  viewed_by?: string[];
   created_at: string;
 }
 
@@ -136,15 +139,22 @@ class ChatService {
     userName: string,
     content: string,
     messageType: 'texto' | 'imagem' | 'video' | 'audio' | 'emoji' = 'texto',
-    isPremium: boolean = false
+    isPremium: boolean = false,
+    isTemporary: boolean = false,
+    duration: number = 10
   ): Promise<boolean> {
     try {
+      const expiresAt = isTemporary ? new Date(Date.now() + duration * 1000).toISOString() : undefined;
+      
       const message = {
         room_id: roomId,
         user_name: userName,
         content,
         message_type: messageType,
         is_premium: isPremium,
+        is_temporary: isTemporary,
+        expires_at: expiresAt,
+        viewed_by: [],
         created_at: new Date().toISOString(),
       };
 
@@ -208,6 +218,78 @@ class ChatService {
     ];
 
     return mockMessages;
+  }
+
+  // Marcar mensagem temporária como visualizada
+  async markTemporaryMessageViewed(messageId: string, userName: string): Promise<boolean> {
+    try {
+      // Buscar a mensagem atual
+      const { data: message, error: fetchError } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('id', messageId)
+        .single();
+
+      if (fetchError || !message) {
+        console.error('❌ Erro ao buscar mensagem:', fetchError);
+        return false;
+      }
+
+      // Adicionar usuário à lista de visualizadores
+      const viewedBy = message.viewed_by || [];
+      if (!viewedBy.includes(userName)) {
+        viewedBy.push(userName);
+      }
+
+      // Atualizar mensagem
+      const { error: updateError } = await supabase
+        .from('chat_messages')
+        .update({ viewed_by: viewedBy })
+        .eq('id', messageId);
+
+      if (updateError) {
+        console.error('❌ Erro ao marcar mensagem como visualizada:', updateError);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('❌ Erro ao marcar mensagem como visualizada:', error);
+      return false;
+    }
+  }
+
+  // Limpar mensagens temporárias expiradas
+  async cleanExpiredMessages(roomId: string) {
+    try {
+      const now = new Date().toISOString();
+      
+      const { error } = await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('room_id', roomId)
+        .eq('is_temporary', true)
+        .lt('expires_at', now);
+
+      if (error) {
+        console.error('❌ Erro ao limpar mensagens expiradas:', error);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao limpar mensagens expiradas:', error);
+    }
+  }
+
+  // Filtrar mensagens não expiradas
+  filterValidMessages(messages: ChatMessage[]): ChatMessage[] {
+    const now = new Date();
+    
+    return messages.filter(msg => {
+      if (!msg.is_temporary) return true;
+      if (!msg.expires_at) return true;
+      
+      const expiresAt = new Date(msg.expires_at);
+      return now < expiresAt;
+    });
   }
 
   // Atualizar número de usuários online

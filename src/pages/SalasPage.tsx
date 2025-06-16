@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiMapPin, FiUsers, FiLogOut, FiStar } from 'react-icons/fi';
+import Header from '../components/Header';
 
 interface Sala {
   id: string;
@@ -68,9 +69,11 @@ const SalasPage: React.FC = () => {
 
   return (
     <div style={styles.salasPage}>
-        {/* Header */}
-      <header style={styles.header}>
-        <div style={styles.headerContent}>
+      <Header />
+      
+      {/* User Info Header */}
+      <header style={styles.userHeader}>
+        <div style={styles.userHeaderContent}>
           <div style={styles.userInfo}>
             <div style={styles.avatar}>
               {usuario.tipo === 'premium' ? <FiStar /> : '👤'}
@@ -80,8 +83,8 @@ const SalasPage: React.FC = () => {
               <span style={styles.userType}>
                 {usuario.tipo === 'premium' ? '⭐ Premium' : '🆓 Gratuito'}
               </span>
+            </div>
           </div>
-        </div>
 
           <div style={styles.headerActions}>
             {usuario.tipo !== 'premium' && (
@@ -163,7 +166,7 @@ const SalasPage: React.FC = () => {
 const styles = {
   salasPage: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)',
+    background: 'linear-gradient(135deg, #6B46C1 0%, #8B5CF6 50%, #A855F7 100%)',
     fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
   },
   loading: {
@@ -183,13 +186,13 @@ const styles = {
     animation: 'spin 1s linear infinite',
     marginBottom: '1rem',
   },
-  header: {
+  userHeader: {
     background: 'rgba(255, 255, 255, 0.1)',
     backdropFilter: 'blur(10px)',
     padding: '1rem 0',
     borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
   },
-  headerContent: {
+  userHeaderContent: {
     maxWidth: '1200px',
     margin: '0 auto',
     padding: '0 2rem',
