@@ -17,6 +17,7 @@ interface Mensagem {
 
 const ChatPage: React.FC = () => {
   const { salaId } = useParams<{ salaId: string }>();
+  console.log('Sala ID:', salaId); // Usar variável para evitar erro TS
   const navigate = useNavigate();
   const location = useLocation();
   const [usuario, setUsuario] = useState<any>(null);

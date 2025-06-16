@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiHeart, FiHeadphones } from 'react-icons/fi';
+import { FiUser, FiMail, FiHeadphones } from 'react-icons/fi';
 
 const HomePageNova: React.FC = () => {
   const [nome, setNome] = useState('');
@@ -183,6 +183,10 @@ const HomePageNova: React.FC = () => {
       textAlign: 'center' as const,
       color: '#666',
       fontWeight: 'bold',
+    },
+    dividerText: {
+      background: 'white',
+      padding: '0 15px',
     },
     btnPremium: {
       width: '100%',

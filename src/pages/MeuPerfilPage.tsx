@@ -25,7 +25,7 @@ const MeuPerfilPage: React.FC = () => {
 
   const carregarPerfil = async () => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('perfis')
         .select('*')
         .eq('email', usuario.email)
@@ -85,7 +85,7 @@ const MeuPerfilPage: React.FC = () => {
       
       for (const foto of fotos) {
         const fileName = `${usuario.email}_${Date.now()}_${foto.name}`;
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from('fotos-perfil')
           .upload(fileName, foto);
 

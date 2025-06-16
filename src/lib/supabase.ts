@@ -11,7 +11,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 // Função para testar conexão
 export const testSupabaseConnection = async () => {
   try {
-    const { data, error } = await supabase.from('profiles').select('count').limit(1);
+    const { error } = await supabase.from('profiles').select('count').limit(1);
     if (error) {
       console.error('❌ Erro na conexão Supabase:', error.message);
       return false;
