@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Configuração do Supabase com nova chave secreta
-const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://twygtrvzltsptytkgooor.supabase.co';
-const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3eWd0cnZ6bHRzcHl0a2dvb29yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTg0NTM0MSwiZXhwIjoyMDY1NDIxMzQxfQ.TAFfn9Iy1eWT-CxuBHeEDY6aHCqS4Dt2VImJCETd7Yc';
+// Configuração do Supabase - PRODUÇÃO
+const supabaseUrl = 'https://twygtrvzltsptytkgooor.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3eWd0cnZ6bHRzcHl0a2dvb29yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTg0NTM0MSwiZXhwIjoyMDY1NDIxMzQxfQ.TAFfn9Iy1eWT-CxuBHeEDY6aHCqS4Dt2VImJCETd7Yc';
 
-console.log('🔧 Supabase configurado:', { url: supabaseUrl, hasKey: !!supabaseKey });
+console.log('🔧 Supabase configurado para produção:', { url: supabaseUrl, hasKey: !!supabaseKey });
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
