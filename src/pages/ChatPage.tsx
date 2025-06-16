@@ -4,27 +4,19 @@ import {
   FiSend, FiImage, FiVideo, FiMic, FiSmile, FiArrowLeft, 
   FiUsers, FiStar, FiClock, FiCheck 
 } from 'react-icons/fi';
+import { chatService, ChatMessage } from '../lib/chatService';
 import './ChatPage.css';
-
-interface Mensagem {
-  id: string;
-  usuario: string;
-  conteudo: string;
-  tipo: 'texto' | 'imagem' | 'video' | 'audio' | 'emoji';
-  timestamp: Date;
-  premium: boolean;
-}
 
 const ChatPage: React.FC = () => {
   const { salaId } = useParams<{ salaId: string }>();
-  console.log('Sala ID:', salaId); // Usar variável para evitar erro TS
   const navigate = useNavigate();
   const location = useLocation();
   const [usuario, setUsuario] = useState<any>(null);
   const [mensagem, setMensagem] = useState('');
-  const [mensagens, setMensagens] = useState<Mensagem[]>([]);
+  const [mensagens, setMensagens] = useState<ChatMessage[]>([]);
   const [showEmojis, setShowEmojis] = useState(false);
-  const [usuariosOnline] = useState<number>(Math.floor(Math.random() * 500) + 100);
+  const [usuariosOnline, setUsuariosOnline] = useState<number>(0);
+  const [isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -51,36 +43,63 @@ const ChatPage: React.FC = () => {
       return;
     }
 
-    // Simular mensagens existentes
-    const mensagensIniciais: Mensagem[] = [
-      {
-        id: '1',
-        usuario: 'Ana',
-        conteudo: 'Oi pessoal! Alguém aí da região da Paulista?',
-        tipo: 'texto',
-        timestamp: new Date(Date.now() - 300000),
-        premium: false
-      },
-      {
-        id: '2',
-        usuario: 'Carlos_Premium',
-        conteudo: 'Eu moro perto! Vamos tomar um café? ☕',
-        tipo: 'texto',
-        timestamp: new Date(Date.now() - 240000),
-        premium: true
-      },
-      {
-        id: '3',
-        usuario: 'Maria',
-        conteudo: '🎉',
-        tipo: 'emoji',
-        timestamp: new Date(Date.now() - 180000),
-        premium: false
-      }
-    ];
-    
-    setMensagens(mensagensIniciais);
-  }, [navigate]);
+    // Inicializar chat em tempo real
+    initializeChat();
+
+    // Listener para mensagens locais (fallback)
+    const handleLocalMessage = (event: any) => {
+      const newMessage: ChatMessage = {
+        ...event.detail,
+        id: Date.now().toString(),
+      };
+      setMensagens(prev => [...prev, newMessage]);
+    };
+
+    window.addEventListener('local-message', handleLocalMessage);
+
+    // Cleanup ao sair da página
+    return () => {
+      chatService.leaveRoom();
+      window.removeEventListener('local-message', handleLocalMessage);
+    };
+  }, [navigate, salaId]);
+
+  const initializeChat = async () => {
+    if (!salaId) return;
+
+    try {
+      console.log('🚀 Inicializando chat para sala:', salaId);
+      
+      // Inicializar tabelas se necessário
+      await chatService.initializeTables();
+      
+      // Buscar mensagens existentes
+      const mensagensExistentes = await chatService.getMessages(salaId);
+      setMensagens(mensagensExistentes);
+      
+      // Conectar ao chat em tempo real
+      const connected = await chatService.joinRoom(salaId, (novaMsg) => {
+        setMensagens(prev => {
+          // Evitar mensagens duplicadas
+          const exists = prev.some(msg => msg.id === novaMsg.id);
+          if (!exists) {
+            return [...prev, novaMsg];
+          }
+          return prev;
+        });
+      });
+      
+      setIsConnected(connected);
+      
+      // Simular usuários online
+      const randomUsers = Math.floor(Math.random() * 500) + 100;
+      setUsuariosOnline(randomUsers);
+      await chatService.updateOnlineUsers(salaId, randomUsers);
+      
+    } catch (error) {
+      console.error('❌ Erro ao inicializar chat:', error);
+    }
+  };
 
   useEffect(() => {
     scrollToBottom();
@@ -90,75 +109,63 @@ const ChatPage: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleEnviarMensagem = () => {
-    if (!mensagem.trim() || !usuario) return;
+  const handleEnviarMensagem = async () => {
+    if (!mensagem.trim() || !usuario || !salaId) return;
 
-    const novaMensagem: Mensagem = {
-      id: Date.now().toString(),
-      usuario: usuario.nome,
-      conteudo: mensagem,
-      tipo: 'texto',
-      timestamp: new Date(),
-      premium: usuario.tipo === 'premium'
-    };
+    const success = await chatService.sendMessage(
+      salaId,
+      usuario.nome,
+      mensagem,
+      'texto',
+      usuario.tipo === 'premium'
+    );
 
-    setMensagens(prev => [...prev, novaMensagem]);
-    setMensagem('');
+    if (success) {
+      setMensagem('');
+    }
   };
 
-  const handleEnviarEmoji = (emoji: string) => {
-    const novaMensagem: Mensagem = {
-      id: Date.now().toString(),
-      usuario: usuario.nome,
-      conteudo: emoji,
-      tipo: 'emoji',
-      timestamp: new Date(),
-      premium: usuario.tipo === 'premium'
-    };
+  const handleEnviarEmoji = async (emoji: string) => {
+    if (!usuario || !salaId) return;
 
-    setMensagens(prev => [...prev, novaMensagem]);
-    setShowEmojis(false);
+    const success = await chatService.sendMessage(
+      salaId,
+      usuario.nome,
+      emoji,
+      'emoji',
+      usuario.tipo === 'premium'
+    );
+
+    if (success) {
+      setShowEmojis(false);
+    }
   };
 
-  const handleFileUpload = (tipo: 'imagem' | 'video') => {
+  const handleFileUpload = async (tipo: 'imagem' | 'video') => {
     if (usuario?.tipo !== 'premium') {
       alert('Funcionalidade exclusiva para usuários Premium! Faça upgrade para enviar fotos e vídeos.');
       return;
     }
 
-    // Simular upload de arquivo
-    const novaMensagem: Mensagem = {
-      id: Date.now().toString(),
-      usuario: usuario.nome,
-      conteudo: tipo === 'imagem' ? '📷 Foto enviada' : '🎥 Vídeo enviado',
-      tipo,
-      timestamp: new Date(),
-      premium: true
-    };
+    if (!salaId) return;
 
-    setMensagens(prev => [...prev, novaMensagem]);
+    const conteudo = tipo === 'imagem' ? '📷 Foto enviada' : '🎥 Vídeo enviado';
+    await chatService.sendMessage(salaId, usuario.nome, conteudo, tipo, true);
   };
 
-  const handleAudioRecord = () => {
+  const handleAudioRecord = async () => {
     if (usuario?.tipo !== 'premium') {
       alert('Funcionalidade exclusiva para usuários Premium! Faça upgrade para enviar áudios.');
       return;
     }
 
-    // Simular gravação de áudio
-    const novaMensagem: Mensagem = {
-      id: Date.now().toString(),
-      usuario: usuario.nome,
-      conteudo: '🎤 Áudio enviado',
-      tipo: 'audio',
-      timestamp: new Date(),
-      premium: true
-    };
+    if (!salaId) return;
 
-    setMensagens(prev => [...prev, novaMensagem]);
+    await chatService.sendMessage(salaId, usuario.nome, '🎤 Áudio enviado', 'audio', true);
   };
 
-  const formatTime = (date: Date) => {
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
     return date.toLocaleTimeString('pt-BR', { 
       hour: '2-digit', 
       minute: '2-digit' 
@@ -184,14 +191,16 @@ const ChatPage: React.FC = () => {
         <div className="header-left">
           <button onClick={handleVoltar} className="btn-voltar">
             <FiArrowLeft />
-            </button>
+          </button>
           <div className="sala-info">
             <h2>{nomeSala}</h2>
             <span className="usuarios-online">
               <FiUsers /> {usuariosOnline} online
+              {isConnected && <span className="status-connected">🟢</span>}
+              {!isConnected && <span className="status-disconnected">🔴</span>}
             </span>
+          </div>
         </div>
-      </div>
 
         <div className="header-right">
           <div className="user-badge">
@@ -199,114 +208,112 @@ const ChatPage: React.FC = () => {
             {usuario.tipo === 'premium' ? (
               <span className="badge premium">⭐ Premium</span>
             ) : (
-              <span className="badge gratuito">🆓 Gratuito</span>
+              <button onClick={handleUpgradePremium} className="badge upgrade">
+                Ser Premium
+              </button>
             )}
           </div>
-          
-          {usuario.tipo !== 'premium' && (
-            <button onClick={handleUpgradePremium} className="btn-upgrade-small">
-              <FiStar /> Upgrade
-            </button>
-          )}
         </div>
       </header>
 
-      {/* Área de Mensagens */}
+      {/* Lista de Mensagens */}
       <div className="chat-messages">
         {mensagens.map((msg) => (
-          <div
-            key={msg.id}
-            className={`message ${msg.usuario === usuario.nome ? 'own' : 'other'}`}
-          >
+          <div key={msg.id} className={`message ${msg.user_name === usuario.nome ? 'own-message' : ''}`}>
             <div className="message-header">
-              <span className="message-user">
-                {msg.usuario}
-                {msg.premium && <FiStar className="premium-icon" />}
+              <span className={`user-name ${msg.is_premium ? 'premium' : ''}`}>
+                {msg.user_name}
+                {msg.is_premium && <FiStar className="premium-icon" />}
               </span>
-              <span className="message-time">
-                <FiClock size={12} />
-                {formatTime(msg.timestamp)}
+              <span className="timestamp">
+                <FiClock /> {formatTime(msg.created_at)}
               </span>
             </div>
-            
-            <div className={`message-content ${msg.tipo}`}>
-              {msg.tipo === 'emoji' && (
-                <span className="emoji-message">{msg.conteudo}</span>
+            <div className="message-content">
+              {msg.message_type === 'emoji' ? (
+                <span className="emoji-message">{msg.content}</span>
+              ) : (
+                <span>{msg.content}</span>
               )}
-              {msg.tipo === 'texto' && (
-                <p>{msg.conteudo}</p>
-              )}
-              {(msg.tipo === 'imagem' || msg.tipo === 'video' || msg.tipo === 'audio') && (
-                <div className="media-message">
-                  <span>{msg.conteudo}</span>
-                  <small>Funcionalidade Premium</small>
-                </div>
-                    )}
-                  </div>
-                  
-            <div className="message-status">
-              <FiCheck size={12} />
-                </div>
+            </div>
+            {msg.user_name === usuario.nome && (
+              <div className="message-status">
+                <FiCheck className="sent-icon" />
               </div>
-            ))}
-            <div ref={messagesEndRef} />
+            )}
           </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
 
-      {/* Picker de Emojis */}
-      {showEmojis && (
-        <div className="emoji-picker">
-          <div className="emoji-grid">
+      {/* Area de envio de mensagem */}
+      <div className="chat-input-area">
+        {usuario.tipo !== 'premium' && (
+          <div className="premium-banner">
+            <span>💎 Com Premium você pode enviar fotos, vídeos e áudios!</span>
+            <button onClick={handleUpgradePremium} className="btn-premium">
+              Seja Premium
+            </button>
+          </div>
+        )}
+
+        {/* Painel de Emojis */}
+        {showEmojis && (
+          <div className="emoji-panel">
             {emojis.map((emoji, index) => (
               <button
                 key={index}
                 onClick={() => handleEnviarEmoji(emoji)}
-                className="emoji-button"
+                className="emoji-btn"
               >
                 {emoji}
               </button>
             ))}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Área de Input */}
-      <div className="chat-input-area">
-        {usuario.tipo !== 'premium' && (
-          <div className="premium-notice">
-            <p>💡 Com Premium você pode enviar fotos, vídeos e áudios!</p>
-            <button onClick={handleUpgradePremium} className="btn-upgrade-notice">
-              Seja Premium
-                </button>
-              </div>
-            )}
-            
-        <div className="chat-input-container">
+        <div className="input-container">
           <div className="media-buttons">
-              <button
-              onClick={() => handleFileUpload('imagem')}
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={() => handleFileUpload('imagem')}
+              style={{ display: 'none' }}
+            />
+            <input
+              type="file"
+              accept="video/*"
+              ref={videoInputRef}
+              onChange={() => handleFileUpload('video')}
+              style={{ display: 'none' }}
+            />
+            
+            <button 
+              onClick={() => fileInputRef.current?.click()}
               className="media-btn"
               title="Enviar foto"
             >
               <FiImage />
-              </button>
-
-              <button
-              onClick={() => handleFileUpload('video')}
+            </button>
+            
+            <button 
+              onClick={() => videoInputRef.current?.click()}
               className="media-btn"
               title="Enviar vídeo"
             >
               <FiVideo />
-              </button>
+            </button>
             
-              <button
-                onClick={handleAudioRecord}
+            <button 
+              onClick={handleAudioRecord}
               className="media-btn"
               title="Gravar áudio"
             >
               <FiMic />
-              </button>
+            </button>
             
-            <button
+            <button 
               onClick={() => setShowEmojis(!showEmojis)}
               className="media-btn"
               title="Emojis"
@@ -315,43 +322,24 @@ const ChatPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="input-container">
-              <input
-                type="text"
-              value={mensagem}
-              onChange={(e) => setMensagem(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleEnviarMensagem()}
-                placeholder="Digite sua mensagem..."
-              className="message-input"
-              />
-
-              <button
-              onClick={handleEnviarMensagem}
-              className="send-button"
-              disabled={!mensagem.trim()}
-            >
-              <FiSend />
-              </button>
-          </div>
+          <input
+            type="text"
+            value={mensagem}
+            onChange={(e) => setMensagem(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleEnviarMensagem()}
+            placeholder="Digite sua mensagem..."
+            className="message-input"
+          />
+          
+          <button 
+            onClick={handleEnviarMensagem}
+            className="send-btn"
+            disabled={!mensagem.trim()}
+          >
+            <FiSend />
+          </button>
         </div>
       </div>
-
-      {/* Inputs ocultos para upload */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        style={{ display: 'none' }}
-        onChange={() => handleFileUpload('imagem')}
-      />
-      
-      <input
-        ref={videoInputRef}
-        type="file"
-        accept="video/*"
-        style={{ display: 'none' }}
-        onChange={() => handleFileUpload('video')}
-      />
     </div>
   );
 };

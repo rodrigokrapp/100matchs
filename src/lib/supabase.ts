@@ -1,12 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Configuração do Supabase - PRODUÇÃO
-const supabaseUrl = 'https://twygtrvzltsptytkgooor.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3eWd0cnZ6bHRzcHl0a2dvb29yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTg0NTM0MSwiZXhwIjoyMDY1NDIxMzQxfQ.TAFfn9Iy1eWT-CxuBHeEDY6aHCqS4Dt2VImJCETd7Yc';
+const supabaseUrl = 'https://rhajnkrvdytbbihwfqgxu.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoYWpua3J2ZHl0YmJpaHdmcWd4dSIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE3NTAxMDA0MDQsImV4cCI6MjA2NTY3NjQwNH0.W97Mu6K_3vScej6u1z3ozFYegSP4cb6Ao5syFO47dHQ';
 
 console.log('🔧 Supabase configurado para produção:', { url: supabaseUrl, hasKey: !!supabaseKey });
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
+  },
+});
 
 // Função para testar conexão
 export const testSupabaseConnection = async () => {

@@ -441,4 +441,32 @@
 
 .message {
   animation: messageAppear 0.3s ease-out;
+}
+
+/* Status de conexão */
+.status-connected {
+  margin-left: 5px;
+  font-size: 0.8rem;
+  color: #00ff88;
+}
+
+.status-disconnected {
+  margin-left: 5px;
+  font-size: 0.8rem;
+  color: #ff4444;
+}
+
+/* Melhorias para mensagens próprias vs outras */
+.own-message {
+  align-self: flex-end;
+}
+
+.own-message .message-content {
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  color: white !important;
+}
+
+.message:not(.own-message) .message-content {
+  background: white !important;
+  color: #333 !important;
 } 
