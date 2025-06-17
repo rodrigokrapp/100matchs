@@ -1,4 +1,4 @@
-/* App.css - Estilos globais com tema azul */
+/* App.css - Estilos globais com tema rosa moderno */
 * {
   margin: 0;
   padding: 0;
@@ -9,24 +9,24 @@ html, body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: white !important;
+  background: linear-gradient(135deg, #FF1744 0%, #9C27B0 50%, #FF6D00 100%) !important;
   min-height: 100vh;
 }
 
 body {
-  background: white !important;
+  background: linear-gradient(135deg, #FF1744 0%, #9C27B0 50%, #FF6D00 100%) !important;
   min-height: 100vh;
 }
 
 .App {
   min-height: 100vh;
   width: 100%;
-  background: white !important;
+  background: linear-gradient(135deg, #FF1744 0%, #9C27B0 50%, #FF6D00 100%) !important;
 }
 
-/* Força o fundo branco em todas as páginas */
+/* Força o fundo rosa em todas as páginas */
 #root {
-  background: white !important;
+  background: linear-gradient(135deg, #FF1744 0%, #9C27B0 50%, #FF6D00 100%) !important;
   min-height: 100vh;
 }
 
@@ -46,7 +46,7 @@ a {
   color: inherit;
 }
 
-/* Scrollbar personalizada com tema azul */
+/* Scrollbar personalizada com tema rosa */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -56,12 +56,12 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(37, 99, 235, 0.6);
+  background: rgba(255, 23, 68, 0.6);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(37, 99, 235, 0.8);
+  background: rgba(255, 23, 68, 0.8);
 }
 
 /* Animação de loading */

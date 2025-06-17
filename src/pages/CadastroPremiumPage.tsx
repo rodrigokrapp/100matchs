@@ -67,13 +67,18 @@ export const CadastroPremiumPage: React.FC = () => {
       const usuarioPremium = {
         nome: formData.nome,
         email: formData.email,
+        tipo: 'premium',
         isPremium: true,
         dataAtivacao: new Date().toISOString(),
         id: Date.now().toString()
       };
       
+      // Salvar nas chaves corretas que o sistema usa
+      localStorage.setItem('usuario', JSON.stringify(usuarioPremium));
       localStorage.setItem('usuarioPremium', JSON.stringify(usuarioPremium));
       localStorage.setItem('isPremium', 'true');
+      
+      console.log('✅ Usuário Premium ativado:', usuarioPremium);
       
       setSucesso(true);
       
