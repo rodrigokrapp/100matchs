@@ -7,8 +7,8 @@ import InicioPage from './pages/InicioPage';
 import SalasPage from './pages/SalasPage';
 import ChatPage from './pages/ChatPage';
 import MeuPerfilPage from './pages/MeuPerfilPage';
-import SuportePage from './pages/SuportePage';
-import CadastroPremiumPage from './pages/CadastroPremiumPage';
+import { SuportePage } from './pages/SuportePage';
+import { CadastroPremiumPage } from './pages/CadastroPremiumPage';
 import CriarSalaPage from './pages/CriarSalaPage';
 import LoginPremiumPage from './pages/LoginPremiumPage';
 
@@ -28,7 +28,7 @@ function App() {
           <Route path="/" element={<InicioPage />} />
           <Route path="/inicio" element={<InicioPage />} />
           <Route path="/salas" element={<SalasPage />} />
-          <Route path="/chat/:salaId" element={<ChatPage />} />
+          <Route path="/chat/:roomId" element={<ChatPage />} />
           <Route path="/meu-perfil" element={<MeuPerfilPage />} />
           <Route path="/suporte6828" element={<SuportePage />} />
           <Route path="/cadastropremium6838k" element={<CadastroPremiumPage />} />

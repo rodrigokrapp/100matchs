@@ -78,28 +78,43 @@ const InicioPage: React.FC = () => {
             </div>
 
             <div className="hero-text">
-              <h2 className="hero-title">Conheça pessoas do seu bairro!</h2>
+              <h1 className="hero-title">100 MATCHS</h1>
               <p className="hero-subtitle">
-                Aqui o usuário FREE conhece alguém da sua cidade todo dia!
+                Conecte-se com pessoas incríveis da sua região e encontre seu match perfeito!
               </p>
-
+              
               <div className="features-grid">
                 <div className="feature">
-                  <span className="feature-icon">💬</span>
-                  <span>Chat em tempo real</span>
+                  <span className="feature-icon">💝</span>
+                  <span>Matches Instantâneos</span>
                 </div>
                 <div className="feature">
-                  <span className="feature-icon">📍</span>
-                  <span>Por localização</span>
+                  <span className="feature-icon">🎯</span>
+                  <span>100% Grátis</span>
                 </div>
                 <div className="feature">
-                  <span className="feature-icon">🎉</span>
-                  <span>100% gratuito</span>
+                  <span className="feature-icon">🔥</span>
+                  <span>Chat em Tempo Real</span>
                 </div>
                 <div className="feature">
-                  <span className="feature-icon">⭐</span>
-                  <span>Premium disponível</span>
+                  <span className="feature-icon">🌟</span>
+                  <span>Perfis Verificados</span>
                 </div>
+              </div>
+
+              <div className="action-buttons">
+                <button 
+                  className="btn-suporte"
+                  onClick={() => navigate('/suporte6828')}
+                >
+                  🛠️ Suporte
+                </button>
+                <button 
+                  className="btn-seja-premium"
+                  onClick={() => window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank')}
+                >
+                  👑 Seja Premium
+                </button>
               </div>
             </div>
           </div>

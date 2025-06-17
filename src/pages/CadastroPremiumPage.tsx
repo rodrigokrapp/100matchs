@@ -1,178 +1,223 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiLock, FiArrowLeft, FiStar } from 'react-icons/fi';
-import { supabase } from '../lib/supabase';
 import './CadastroPremiumPage.css';
 
-const CadastroPremiumPage: React.FC = () => {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [loading, setLoading] = useState(false);
+export const CadastroPremiumPage: React.FC = () => {
+  const navigate = useNavigate();
+  
+  const [formData, setFormData] = useState({
+    nome: '',
+    email: '',
+    senha: '',
+    confirmarSenha: ''
+  });
+  
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState(false);
-  const navigate = useNavigate();
-
-    const handleCadastro = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const [carregando, setCarregando] = useState(false);
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
     setErro('');
+  };
+  
+  const validarFormulario = () => {
+    if (!formData.nome.trim()) {
+      setErro('Nome é obrigatório');
+      return false;
+    }
+    
+    if (!formData.email.trim()) {
+      setErro('Email é obrigatório');
+      return false;
+    }
+    
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      setErro('Email inválido');
+      return false;
+    }
+    
+    if (formData.senha.length < 6) {
+      setErro('Senha deve ter pelo menos 6 caracteres');
+      return false;
+    }
+    
+    if (formData.senha !== formData.confirmarSenha) {
+      setErro('Senhas não conferem');
+      return false;
+    }
+    
+    return true;
+  };
+  
+  const handleCadastrar = async () => {
+    if (!validarFormulario()) return;
+    
+    setCarregando(true);
     
     try {
-      console.log('🔄 Iniciando cadastro no Supabase...');
+      // Simular processo de cadastro
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Criar usuário no Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password: senha,
-        options: {
-          data: {
-            name: nome,
-            tipo: 'premium'
-          }
-        }
-      });
-
-      if (authError) {
-        console.error('❌ Erro no auth:', authError);
-        throw authError;
-      }
-
-      console.log('✅ Usuário criado no Supabase Auth:', authData.user?.id);
-
-      // Salvar dados localmente também
-      const userData = {
-        nome,
-        email,
-        tipo: 'premium',
-        id: authData.user?.id || Date.now().toString(),
-        supabaseId: authData.user?.id
+      // Salvar dados do usuário premium no localStorage
+      const usuarioPremium = {
+        nome: formData.nome,
+        email: formData.email,
+        isPremium: true,
+        dataAtivacao: new Date().toISOString(),
+        id: Date.now().toString()
       };
       
-      localStorage.setItem('usuario', JSON.stringify(userData));
+      localStorage.setItem('usuarioPremium', JSON.stringify(usuarioPremium));
+      localStorage.setItem('isPremium', 'true');
       
       setSucesso(true);
       
-      // Redirecionar após 2 segundos
+      // Redirecionar para salas após 3 segundos
       setTimeout(() => {
         navigate('/salas');
-    }, 2000);
-
-    } catch (error: any) {
-      console.error('❌ Erro no cadastro:', error);
-      setErro(error.message || 'Erro ao criar conta. Tente novamente.');
+      }, 3000);
+      
+    } catch (error) {
+      setErro('Erro ao processar cadastro. Tente novamente.');
     } finally {
-      setLoading(false);
+      setCarregando(false);
     }
   };
-
-  const handleVoltar = () => {
-    navigate('/suporte6828');
-  };
-
+  
   if (sucesso) {
     return (
-      <div className="cadastro-page">
-        <div className="cadastro-container">
-          <div className="sucesso-content">
-            <div className="sucesso-icon">
-              <FiStar size={80} />
-        </div>
-            <h1>Bem-vindo ao Premium!</h1>
-            <p>Sua conta premium foi criada com sucesso!</p>
-            <div className="loading-redirect">
-              <div className="spinner"></div>
-              <p>Redirecionando para as salas...</p>
-            </div>
+      <div className="cadastro-premium-page">
+        <div className="sucesso-container">
+          <div className="sucesso-icon">🎉</div>
+          <h1>Cadastro Premium Realizado!</h1>
+          <p>Parabéns! Sua conta premium foi ativada com sucesso.</p>
+          <div className="redirect-info">
+            <span>Redirecionando para as salas...</span>
+            <div className="loading-bar"></div>
           </div>
         </div>
       </div>
     );
   }
-
+  
   return (
-    <div className="cadastro-page">
+    <div className="cadastro-premium-page">
       <div className="cadastro-container">
-        <button onClick={handleVoltar} className="btn-voltar">
-          <FiArrowLeft /> Voltar
-        </button>
-
+        <div className="cadastro-header">
+          <button className="btn-voltar" onClick={() => navigate('/suporte6828')}>
+            ← Voltar
+          </button>
+          <h1>👑 Cadastro Premium</h1>
+        </div>
+        
         <div className="cadastro-content">
-          <div className="premium-header">
-            <FiStar size={60} />
-            <h1>Cadastro Premium</h1>
-            <p>Complete seu cadastro para ter acesso total à plataforma</p>
+          <div className="premium-features">
+            <h3>🚀 Recursos Premium Inclusos</h3>
+            <div className="features-list">
+              <div className="feature-item">
+                <span className="feature-icon">✨</span>
+                <span>Perfil destacado nos resultados</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">💬</span>
+                <span>Chat ilimitado e prioritário</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">🎯</span>
+                <span>Super likes e boosts diários</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">👻</span>
+                <span>Modo invisível disponível</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">🔥</span>
+                <span>Boost de visibilidade automático</span>
+              </div>
+            </div>
           </div>
-
-          <form onSubmit={handleCadastro} className="cadastro-form">
-            <div className="input-group">
-              <FiUser className="input-icon" />
+          
+          <div className="form-section">
+            <h2>Dados para Ativação</h2>
+            <p>Preencha seus dados para ativar sua conta premium:</p>
+            
+            <div className="form-group">
+              <label>Nome Completo</label>
               <input
                 type="text"
-                placeholder="Seu nome completo"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                required
-                disabled={loading}
+                name="nome"
+                value={formData.nome}
+                onChange={handleInputChange}
+                placeholder="Digite seu nome completo"
+                className="form-input"
               />
             </div>
-
-            <div className="input-group">
-              <FiMail className="input-icon" />
+            
+            <div className="form-group">
+              <label>Email</label>
               <input
                 type="email"
-                placeholder="Seu email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Digite seu email"
+                className="form-input"
               />
             </div>
-
-            <div className="input-group">
-              <FiLock className="input-icon" />
+            
+            <div className="form-group">
+              <label>Senha</label>
               <input
                 type="password"
-                placeholder="Sua senha (mínimo 6 caracteres)"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                minLength={6}
-                required
-                disabled={loading}
+                name="senha"
+                value={formData.senha}
+                onChange={handleInputChange}
+                placeholder="Digite sua senha (mín. 6 caracteres)"
+                className="form-input"
               />
             </div>
-
-            {erro && <p className="erro-msg">{erro}</p>}
-
-            <button type="submit" className="btn-cadastrar" disabled={loading}>
-              {loading ? (
+            
+            <div className="form-group">
+              <label>Confirmar Senha</label>
+              <input
+                type="password"
+                name="confirmarSenha"
+                value={formData.confirmarSenha}
+                onChange={handleInputChange}
+                placeholder="Confirme sua senha"
+                className="form-input"
+              />
+            </div>
+            
+            {erro && <div className="erro-message">{erro}</div>}
+            
+            <button 
+              className="btn-cadastrar"
+              onClick={handleCadastrar}
+              disabled={carregando}
+            >
+              {carregando ? (
                 <>
-                  <div className="spinner-small"></div>
-                  Criando conta...
+                  <div className="spinner"></div>
+                  Processando...
                 </>
               ) : (
-                              <>
-                <FiStar />
-                Cadastrar Premium
-                  </>
-                )}
-              </button>
-          </form>
-
-          <div className="premium-benefits">
-            <h3>Benefícios Premium:</h3>
-            <ul>
-              <li>✅ Acesso a todas as salas de chat</li>
-              <li>✅ Envio de fotos e vídeos</li>
-              <li>✅ Mensagens de áudio</li>
-              <li>✅ Emoticons exclusivos</li>
-              <li>✅ Suporte prioritário</li>
-            </ul>
+                '🚀 Cadastrar Premium'
+              )}
+            </button>
+            
+            <div className="garantia-info">
+              <p>✅ Ativação imediata após cadastro</p>
+              <p>🔒 Seus dados estão seguros conosco</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-export default CadastroPremiumPage;
