@@ -327,20 +327,27 @@ class ChatService {
 
       console.log('📤 Enviando mensagem:', message);
 
-      let success = false;
+      // MÉTODO PRIORITÁRIO: Adicionar à lista local imediatamente
+      this.addToLocalStorage(roomId, message);
+      console.log('✅ Mensagem salva no localStorage');
 
-      // Método 1: BroadcastChannel (PRIORITÁRIO para mesmo navegador)
+      // Callback local imediato (para mostrar no chat do usuário)
+      if (this.messageCallback) {
+        this.messageCallback(message);
+        console.log('✅ Callback executado - mensagem deve aparecer no chat');
+      }
+
+      // Método 2: BroadcastChannel (para outras abas)
       if (this.broadcastChannel) {
         try {
           this.broadcastChannel.postMessage(message);
-          success = true;
           console.log('✅ Mensagem enviada via BroadcastChannel');
         } catch (bcError) {
           console.warn('⚠️ Falha no BroadcastChannel:', bcError);
         }
       }
 
-      // Método 2: Broadcast via Supabase (para outros navegadores/dispositivos)
+      // Método 3: Broadcast via Supabase (para outros usuários)
       if (this.channel && this.isConnected) {
         try {
           await this.channel.send({
@@ -348,19 +355,13 @@ class ChatService {
             event: 'new_message',
             payload: message
           });
-          success = true;
           console.log('✅ Mensagem enviada via Supabase broadcast');
         } catch (broadcastError) {
           console.warn('⚠️ Falha no Supabase broadcast:', broadcastError);
         }
       }
 
-      // Método 3: Salvar no localStorage (ESSENCIAL para persistência)
-      this.addToLocalStorage(roomId, message);
-      success = true;
-      console.log('✅ Mensagem salva no localStorage');
-
-      // Método 4: Tentar Supabase database (persistência no servidor)
+      // Método 4: Tentar Supabase database (persistência)
       try {
         const { error } = await supabase
           .from('chat_messages')
@@ -373,16 +374,9 @@ class ChatService {
         console.warn('⚠️ Falha no database (não crítico):', dbError);
       }
 
-      // Método 5: Callback local imediato (para o próprio usuário)
-      if (this.messageCallback) {
-        setTimeout(() => {
-          this.messageCallback!(message);
-        }, 50);
-      }
-
-      return success;
+      return true; // SEMPRE retorna true se chegou até aqui
     } catch (error) {
-      console.error('❌ Erro ao enviar mensagem:', error);
+      console.error('❌ Erro crítico ao enviar mensagem:', error);
       return false;
     }
   }
