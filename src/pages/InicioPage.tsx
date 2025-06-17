@@ -60,12 +60,10 @@ const InicioPage: React.FC = () => {
       <div className="hero-banner-section">
         <div className="hero-banner-container">
           <img 
-            src="https://via.placeholder.com/1200x600/7C3AED/FFFFFF?text=DESLIZA+DESLIZA+E+NADA+%7C+CONVERSE+FREE"
+            src="https://cdn.discordapp.com/attachments/1215003629906395176/1324098651506249808/image.png?ex=67770b46&is=6775b9c6&hm=b8e95a8bd36dc11edcb48d63ed23ae0b19d60c8a1c5e2f36dc6ee29b4b0bb0a1&"
             alt="100 MATCHS - Pessoas conversando" 
             className="hero-banner-image"
             style={{
-              backgroundImage: 'linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)',
-              backgroundSize: 'cover',
               width: '100%',
               height: '100%',
               objectFit: 'cover'
