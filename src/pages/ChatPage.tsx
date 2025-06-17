@@ -27,8 +27,38 @@ const ChatPage: React.FC = () => {
   const [tempMediaUrls, setTempMediaUrls] = useState<Map<string, string>>(new Map());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [showUserSim, setShowUserSim] = useState(false);
 
   const nomeSala = location.state?.nomeSala || 'Chat';
+
+  // Simular outros usuários para demonstração
+  const simulateOtherUsers = () => {
+    const otherUsers = ['Ana', 'Carlos', 'Maria', 'João', 'Paula', 'Bruno'];
+    const sampleMessages = [
+      'Oi pessoal! Como vocês estão?',
+      'Alguém da região aqui?',
+      'Bom dia! ☀️',
+      'Vamos marcar algo?',
+      'Que legal esse chat!',
+      'Oi! Acabei de entrar 👋',
+      'Como está o tempo aí?',
+      'Alguém conhece um lugar legal para ir?'
+    ];
+
+    const randomUser = otherUsers[Math.floor(Math.random() * otherUsers.length)];
+    const randomMessage = sampleMessages[Math.floor(Math.random() * sampleMessages.length)];
+
+    if (usuario && usuario.nome !== randomUser) {
+      console.log(`🤖 Simulando mensagem de ${randomUser}: ${randomMessage}`);
+      chatService.sendMessage(
+        salaId || 'default',
+        randomUser,
+        randomMessage,
+        'texto',
+        false
+      );
+    }
+  };
 
   // Cleanup ao sair da página
   useEffect(() => {
@@ -575,6 +605,29 @@ const ChatPage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Ferramentas de simulação */}
+      {showUserSim && (
+        <div className="simulation-panel">
+          <h4>🤖 Simulação de Usuários</h4>
+          <p>Teste o chat em tempo real com usuários simulados</p>
+          <button 
+            className="btn-simulate"
+            onClick={simulateOtherUsers}
+          >
+            Simular mensagem de outro usuário
+          </button>
+          <button 
+            className="btn-simulate"
+            onClick={() => {
+              const interval = setInterval(simulateOtherUsers, 5000);
+              setTimeout(() => clearInterval(interval), 30000);
+            }}
+          >
+            Ativar chat automático (30s)
+          </button>
+        </div>
+      )}
     </div>
   );
 };
