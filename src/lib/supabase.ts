@@ -5,6 +5,7 @@ const supabaseUrl = 'https://shjhfnnxaxotpyebiijp.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoamhmbm54YXhvdHB5ZWJpaWpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDEyNzUzMSwiZXhwIjoyMDY1NzAzNTMxfQ.Rhoa0ycynAH3NWCULQMWOYDAIX7oQZhPVvet0oaZ7Fo';
 
 console.log('🔧 Supabase configurado para produção:', { url: supabaseUrl, hasKey: !!supabaseKey });
+// Conexão atualizada
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   realtime: {
