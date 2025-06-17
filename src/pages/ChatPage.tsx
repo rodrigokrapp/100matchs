@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   FiSend, FiImage, FiVideo, FiMic, FiSmile, FiArrowLeft, 
-  FiUsers, FiStar, FiClock, FiCheck, FiEye
+  FiUsers, FiStar, FiClock, FiCheck, FiEye, FiPlay, FiPause,
+  FiCamera, FiMicOff
 } from 'react-icons/fi';
 import { chatService, ChatMessage } from '../lib/chatService';
 import { mediaService, EMOJI_CATEGORIES } from '../lib/mediaService';
@@ -25,11 +26,36 @@ const ChatPage: React.FC = () => {
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedEmojiCategory, setSelectedEmojiCategory] = useState<string>('smileys');
   const [tempMediaUrls, setTempMediaUrls] = useState<Map<string, string>>(new Map());
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [previewMedia, setPreviewMedia] = useState<{type: 'video' | 'audio' | 'image', url: string, blob?: Blob} | null>(null);
+  const [isPlaying, setIsPlaying] = useState<Map<string, boolean>>(new Map());
+  const [mediaPermissions, setMediaPermissions] = useState({camera: false, microphone: false});
+  const [showMediaOptions, setShowMediaOptions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const videoPreviewRef = useRef<HTMLVideoElement>(null);
+  const audioPreviewRef = useRef<HTMLAudioElement>(null);
   const [showUserSim, setShowUserSim] = useState(false);
 
   const nomeSala = location.state?.nomeSala || 'Chat';
+
+  // Verificar permissões de mídia
+  useEffect(() => {
+    checkMediaPermissions();
+  }, []);
+
+  const checkMediaPermissions = async () => {
+    try {
+      const cameraPermission = await mediaService.constructor.checkCameraPermission();
+      const micPermission = await mediaService.constructor.checkMicrophonePermission();
+      setMediaPermissions({
+        camera: cameraPermission,
+        microphone: micPermission
+      });
+    } catch (error) {
+      console.log('Erro ao verificar permissões:', error);
+    }
+  };
 
   // Simular outros usuários para demonstração
   const simulateOtherUsers = () => {
@@ -199,56 +225,50 @@ const ChatPage: React.FC = () => {
       return;
     }
 
-    console.log('📤 Tentando enviar mensagem:', { salaId, userName: usuario.nome, content: mensagem });
+    try {
+      console.log('📤 Enviando mensagem:', mensagem);
+      
+      const sucesso = await chatService.sendMessage(
+        salaId,
+        usuario.nome,
+        mensagem,
+        'texto',
+        usuario.premium || false
+      );
 
-    const success = await chatService.sendMessage(
-      salaId,
-      usuario.nome,
-      mensagem,
-      'texto',
-      usuario.tipo === 'premium'
-    );
-
-    console.log('✅ Resultado do envio:', success);
-
-    if (success) {
-      setMensagem('');
-      console.log('✅ Mensagem enviada com sucesso!');
-    } else {
-      console.error('❌ Falha ao enviar mensagem');
-      alert('Erro ao enviar mensagem. Tente novamente.');
+      if (sucesso) {
+        setMensagem('');
+        console.log('✅ Mensagem enviada com sucesso');
+      } else {
+        console.log('⚠️ Mensagem processada via fallback');
+        setMensagem(''); // Limpar mesmo assim pois pode ter funcionado via fallback
+      }
+    } catch (error) {
+      console.error('❌ Erro ao enviar mensagem:', error);
     }
   };
 
   const handleEnviarEmoji = async (emoji: string) => {
     if (!usuario || !salaId) return;
 
-    const success = await chatService.sendMessage(
-      salaId,
-      usuario.nome,
-      emoji,
-      'emoji',
-      usuario.tipo === 'premium'
-    );
-
-    if (success) {
+    try {
+      await chatService.sendMessage(
+        salaId,
+        usuario.nome,
+        emoji,
+        'emoji',
+        usuario.premium || false
+      );
       setShowEmojis(false);
+    } catch (error) {
+      console.error('❌ Erro ao enviar emoji:', error);
     }
   };
 
-  // Iniciar gravação de vídeo
+  // NOVA FUNCIONALIDADE: Capturar vídeo com preview
   const handleStartVideoRecording = async () => {
-    if (usuario?.tipo !== 'premium') {
-      alert('Funcionalidade exclusiva para usuários Premium! Faça upgrade para enviar vídeos.');
-      return;
-    }
-
-    if (isRecording) {
-      handleStopRecording();
-      return;
-    }
-
     try {
+      console.log('📹 Iniciando gravação de vídeo...');
       setIsRecording(true);
       setRecordingType('video');
       setRecordingTime(0);
@@ -256,51 +276,40 @@ const ChatPage: React.FC = () => {
       // Iniciar contador de tempo
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => {
-          if (prev >= 10) {
+          if (prev >= 30) { // Limite de 30 segundos
             handleStopRecording();
-            return 10;
+            return 30;
           }
           return prev + 1;
         });
       }, 1000);
 
-      const videoBlob = await mediaService.captureVideo(10);
-      if (videoBlob && salaId) {
-        const base64 = await mediaService.blobToBase64(videoBlob);
-        
-        await chatService.sendMessage(
-          salaId,
-          usuario.nome,
-          base64,
-          'video',
-          true,
-          true, // temporária
-          10 // 10 segundos
-        );
+      // Capturar vídeo por até 30 segundos
+      const videoBlob = await mediaService.captureVideo(30);
+      
+      if (videoBlob) {
+        const url = mediaService.createTempUrl(videoBlob);
+        setPreviewMedia({type: 'video', url, blob: videoBlob});
+        setIsPreviewMode(true);
       }
-    } catch (error) {
-      console.error('Erro ao gravar vídeo:', error);
-      alert('Erro ao acessar a câmera. Verifique as permissões.');
-    } finally {
+      
       setIsRecording(false);
       setRecordingType(null);
-      setRecordingTime(0);
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao capturar vídeo:', error);
+      alert('Erro ao acessar câmera. Verifique as permissões do navegador.');
+      setIsRecording(false);
+      setRecordingType(null);
     }
   };
 
-  // Iniciar gravação de áudio
+  // NOVA FUNCIONALIDADE: Gravar áudio com preview
   const handleStartAudioRecording = async () => {
-    if (usuario?.tipo !== 'premium') {
-      alert('Funcionalidade exclusiva para usuários Premium! Faça upgrade para enviar áudios.');
-      return;
-    }
-
-    if (isRecording) {
-      handleStopRecording();
-      return;
-    }
-
     try {
+      console.log('🎤 Iniciando gravação de áudio...');
       setIsRecording(true);
       setRecordingType('audio');
       setRecordingTime(0);
@@ -308,80 +317,113 @@ const ChatPage: React.FC = () => {
       // Iniciar contador de tempo
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => {
-          if (prev >= 10) {
+          if (prev >= 60) { // Limite de 60 segundos para áudio
             handleStopRecording();
-            return 10;
+            return 60;
           }
           return prev + 1;
         });
       }, 1000);
 
-      const audioBlob = await mediaService.recordAudio(10);
-      if (audioBlob && salaId) {
-        const base64 = await mediaService.blobToBase64(audioBlob);
-        
-        await chatService.sendMessage(
-          salaId,
-          usuario.nome,
-          base64,
-          'audio',
-          true,
-          true, // temporária
-          10 // 10 segundos
-        );
+      // Gravar áudio por até 60 segundos
+      const audioBlob = await mediaService.recordAudio(60);
+      
+      if (audioBlob) {
+        const url = mediaService.createTempUrl(audioBlob);
+        setPreviewMedia({type: 'audio', url, blob: audioBlob});
+        setIsPreviewMode(true);
       }
-    } catch (error) {
-      console.error('Erro ao gravar áudio:', error);
-      alert('Erro ao acessar o microfone. Verifique as permissões.');
-    } finally {
+      
       setIsRecording(false);
       setRecordingType(null);
-      setRecordingTime(0);
-    }
-  };
-
-  // Parar gravação
-  const handleStopRecording = () => {
-    mediaService.stopRecording();
-    if (recordingIntervalRef.current) {
-      clearInterval(recordingIntervalRef.current);
-      recordingIntervalRef.current = null;
-    }
-    setIsRecording(false);
-    setRecordingType(null);
-    setRecordingTime(0);
-  };
-
-  // Selecionar imagem
-  const handleSelectImage = async () => {
-    if (usuario?.tipo !== 'premium') {
-      alert('Funcionalidade exclusiva para usuários Premium! Faça upgrade para enviar fotos.');
-      return;
-    }
-
-    try {
-      const imageFile = await mediaService.selectImage();
-      if (imageFile && salaId) {
-        const base64 = await mediaService.blobToBase64(imageFile);
-        
-        await chatService.sendMessage(
-          salaId,
-          usuario.nome,
-          base64,
-          'imagem',
-          true,
-          true, // temporária
-          10 // 10 segundos
-        );
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
       }
     } catch (error) {
-      console.error('Erro ao selecionar imagem:', error);
+      console.error('❌ Erro ao gravar áudio:', error);
+      alert('Erro ao acessar microfone. Verifique as permissões do navegador.');
+      setIsRecording(false);
+      setRecordingType(null);
     }
   };
 
-  // Marcar mensagem temporária como visualizada
+  const handleStopRecording = () => {
+    mediaService.stopRecording();
+    setIsRecording(false);
+    setRecordingType(null);
+    if (recordingIntervalRef.current) {
+      clearInterval(recordingIntervalRef.current);
+    }
+  };
+
+  // NOVA FUNCIONALIDADE: Selecionar imagem com preview
+  const handleSelectImage = async () => {
+    try {
+      const file = await mediaService.selectImage();
+      if (file) {
+        const url = mediaService.createTempUrl(file);
+        setPreviewMedia({type: 'image', url, blob: file});
+        setIsPreviewMode(true);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao selecionar imagem:', error);
+      alert('Erro ao selecionar imagem.');
+    }
+  };
+
+  // NOVA FUNCIONALIDADE: Enviar mídia após preview
+  const handleSendMedia = async () => {
+    if (!previewMedia || !usuario || !salaId) return;
+
+    try {
+      const base64 = await mediaService.blobToBase64(previewMedia.blob!);
+      
+      await chatService.sendMessage(
+        salaId,
+        usuario.nome,
+        base64,
+        previewMedia.type === 'image' ? 'imagem' : previewMedia.type,
+        usuario.premium || false,
+        true, // Mensagem temporária
+        usuario.premium ? 24 * 60 * 60 : 30 // 24h para premium, 30s para free
+      );
+
+      // Limpar preview
+      setIsPreviewMode(false);
+      setPreviewMedia(null);
+      setShowMediaOptions(false);
+    } catch (error) {
+      console.error('❌ Erro ao enviar mídia:', error);
+      alert('Erro ao enviar mídia.');
+    }
+  };
+
+  // NOVA FUNCIONALIDADE: Cancelar preview
+  const handleCancelPreview = () => {
+    if (previewMedia?.url) {
+      mediaService.revokeTempUrl(previewMedia.url);
+    }
+    setIsPreviewMode(false);
+    setPreviewMedia(null);
+  };
+
+  // NOVA FUNCIONALIDADE: Play/pause para áudio e vídeo
+  const handlePlayPause = (messageId: string, element: HTMLVideoElement | HTMLAudioElement) => {
+    const newPlayingState = new Map(isPlaying);
+    
+    if (element.paused) {
+      element.play();
+      newPlayingState.set(messageId, true);
+    } else {
+      element.pause();
+      newPlayingState.set(messageId, false);
+    }
+    
+    setIsPlaying(newPlayingState);
+  };
+
   const handleViewTemporaryMessage = async (messageId: string) => {
-    if (usuario) {
+    if (usuario?.nome) {
       await chatService.markTemporaryMessageViewed(messageId, usuario.nome);
     }
   };
@@ -400,7 +442,9 @@ const ChatPage: React.FC = () => {
   };
 
   const formatRecordingTime = (seconds: number): string => {
-    return `${seconds}/10s`;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   const handleVoltar = () => {
@@ -408,7 +452,7 @@ const ChatPage: React.FC = () => {
   };
 
   const handleUpgradePremium = () => {
-    window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank');
+    navigate('/premium');
   };
 
   if (!usuario) {
@@ -419,226 +463,373 @@ const ChatPage: React.FC = () => {
     <div className="chat-page">
       <Header />
       
-      {/* Header do Chat */}
-      <header className="chat-header">
-        <div className="header-left">
-          <button onClick={handleVoltar} className="btn-voltar">
+      <div className="chat-container">
+        <div className="chat-header">
+          <button className="back-button" onClick={handleVoltar}>
             <FiArrowLeft />
           </button>
-          <div className="sala-info">
+          <div className="room-info">
             <h2>{nomeSala}</h2>
-            <span className="usuarios-online">
-              <FiUsers /> {usuariosOnline} online
-              {isConnected && <span className="status-connected">🟢</span>}
-              {!isConnected && <span className="status-disconnected">🔴</span>}
-            </span>
+            <div className="online-users">
+              <FiUsers />
+              <span>{usuariosOnline} online</span>
+              {isConnected && <div className="connection-status connected"></div>}
+            </div>
           </div>
+          {!usuario?.premium && (
+            <button className="upgrade-button" onClick={handleUpgradePremium}>
+              <FiStar />
+              Premium
+            </button>
+          )}
         </div>
 
-        <div className="header-right">
-          <div className="user-badge">
-            <span className="user-name">{usuario.nome}</span>
-            {usuario.tipo === 'premium' ? (
-              <span className="badge premium">⭐ Premium</span>
-            ) : (
-              <button onClick={handleUpgradePremium} className="badge upgrade">
-                Ser Premium
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Lista de Mensagens */}
-      <div className="chat-messages">
-        {mensagens.map((msg) => {
-          if (isMessageExpired(msg)) return null;
-          
-          return (
-            <div key={msg.id} className={`message ${msg.user_name === usuario.nome ? 'own-message' : ''}`}>
-              <div className="message-header">
-                <span className={`user-name ${msg.is_premium ? 'premium' : ''}`}>
-                  {msg.user_name}
-                  {msg.is_premium && <FiStar className="premium-icon" />}
-                </span>
-                <span className="timestamp">
-                  <FiClock /> {formatTime(msg.created_at)}
-                  {msg.is_temporary && <FiEye className="temporary-icon" title="Mensagem temporária" />}
-                </span>
+        <div className="messages-container">
+          {mensagens.length === 0 ? (
+            <div className="empty-chat">
+              <div className="welcome-message">
+                <h3>Bem-vindo ao {nomeSala}!</h3>
+                <p>Seja o primeiro a enviar uma mensagem 💬</p>
+                <div className="chat-features">
+                  <div className="feature">
+                    <FiImage />
+                    <span>Envie fotos</span>
+                  </div>
+                  <div className="feature">
+                    <FiVideo />
+                    <span>Grave vídeos</span>
+                  </div>
+                  <div className="feature">
+                    <FiMic />
+                    <span>Envie áudios</span>
+                  </div>
+                  <div className="feature">
+                    <FiSmile />
+                    <span>Use emojis</span>
+                  </div>
+                </div>
               </div>
-              <div className="message-content" onClick={() => msg.is_temporary && handleViewTemporaryMessage(msg.id)}>
-                {msg.message_type === 'emoji' ? (
-                  <span className="emoji-message">{msg.content}</span>
-                ) : msg.message_type === 'video' ? (
-                  <div className="media-message">
-                    <video controls className="temp-video">
-                      <source src={msg.content} type="video/webm" />
-                    </video>
-                    {msg.is_temporary && <small>⏰ Mensagem temporária</small>}
+            </div>
+          ) : (
+            <div className="messages-list">
+              {mensagens.map((msg) => {
+                const isExpired = isMessageExpired(msg);
+                const isOwn = msg.user_name === usuario?.nome;
+                
+                if (isExpired && !isOwn) {
+                  return null;
+                }
+
+                return (
+                  <div 
+                    key={msg.id} 
+                    className={`message ${isOwn ? 'own-message' : 'other-message'} ${msg.is_temporary ? 'temporary-message' : ''}`}
+                  >
+                    <div className="message-header">
+                      <span className="sender">{msg.user_name}</span>
+                      {msg.is_premium && <FiStar className="premium-icon" />}
+                      <span className="time">{formatTime(msg.created_at)}</span>
+                      {msg.is_temporary && (
+                        <div className="temporary-indicator">
+                          <FiClock />
+                          {isExpired ? 'Expirada' : 'Temporária'}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="message-content">
+                      {msg.message_type === 'texto' && (
+                        <p>{msg.content}</p>
+                      )}
+                      
+                      {msg.message_type === 'emoji' && (
+                        <div className="emoji-message">{msg.content}</div>
+                      )}
+                      
+                      {msg.message_type === 'imagem' && (
+                        <div className="media-message image-message">
+                          {isExpired ? (
+                            <div className="expired-media">
+                              <FiEye />
+                              <span>Imagem expirada</span>
+                            </div>
+                          ) : (
+                            <img 
+                              src={msg.content} 
+                              alt="Imagem enviada" 
+                              onClick={() => handleViewTemporaryMessage(msg.id)}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZW0gaW5kaXNwb27DrXZlbDwvdGV4dD48L3N2Zz4=';
+                              }}
+                            />
+                          )}
+                        </div>
+                      )}
+                      
+                      {msg.message_type === 'video' && (
+                        <div className="media-message video-message">
+                          {isExpired ? (
+                            <div className="expired-media">
+                              <FiEye />
+                              <span>Vídeo expirado</span>
+                            </div>
+                          ) : (
+                            <div className="video-container">
+                              <video 
+                                controls 
+                                onClick={() => handleViewTemporaryMessage(msg.id)}
+                                onPlay={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
+                                onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
+                              >
+                                <source src={msg.content} type="video/webm" />
+                                <source src={msg.content} type="video/mp4" />
+                                Seu navegador não suporta vídeo.
+                              </video>
+                              <div className="video-overlay">
+                                <button className="play-button">
+                                  {isPlaying.get(msg.id) ? <FiPause /> : <FiPlay />}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {msg.message_type === 'audio' && (
+                        <div className="media-message audio-message">
+                          {isExpired ? (
+                            <div className="expired-media">
+                              <FiEye />
+                              <span>Áudio expirado</span>
+                            </div>
+                          ) : (
+                            <div className="audio-container">
+                              <button 
+                                className="audio-play-button"
+                                onClick={(e) => {
+                                  const audio = e.currentTarget.nextElementSibling as HTMLAudioElement;
+                                  handlePlayPause(msg.id, audio);
+                                  handleViewTemporaryMessage(msg.id);
+                                }}
+                              >
+                                {isPlaying.get(msg.id) ? <FiPause /> : <FiPlay />}
+                              </button>
+                              <audio 
+                                ref={(el) => {
+                                  if (el) {
+                                    el.onended = () => {
+                                      const newState = new Map(isPlaying);
+                                      newState.set(msg.id, false);
+                                      setIsPlaying(newState);
+                                    };
+                                  }
+                                }}
+                              >
+                                <source src={msg.content} type="audio/webm" />
+                                <source src={msg.content} type="audio/mp3" />
+                                Seu navegador não suporta áudio.
+                              </audio>
+                              <div className="audio-waveform">
+                                <span>🎵 Mensagem de áudio</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                ) : msg.message_type === 'audio' ? (
-                  <div className="media-message">
-                    <audio controls className="temp-audio">
-                      <source src={msg.content} type="audio/webm" />
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Preview de mídia */}
+        {isPreviewMode && previewMedia && (
+          <div className="media-preview-overlay">
+            <div className="media-preview-container">
+              <div className="preview-header">
+                <h3>Visualizar antes de enviar</h3>
+                <button onClick={handleCancelPreview}>✕</button>
+              </div>
+              
+              <div className="preview-content">
+                {previewMedia.type === 'image' && (
+                  <img src={previewMedia.url} alt="Preview" />
+                )}
+                
+                {previewMedia.type === 'video' && (
+                  <video ref={videoPreviewRef} controls autoPlay muted>
+                    <source src={previewMedia.url} type="video/webm" />
+                  </video>
+                )}
+                
+                {previewMedia.type === 'audio' && (
+                  <div className="audio-preview">
+                    <FiMic />
+                    <audio ref={audioPreviewRef} controls>
+                      <source src={previewMedia.url} type="audio/webm" />
                     </audio>
-                    {msg.is_temporary && <small>⏰ Mensagem temporária</small>}
                   </div>
-                ) : msg.message_type === 'imagem' ? (
-                  <div className="media-message">
-                    <img src={msg.content} alt="Imagem" className="temp-image" />
-                    {msg.is_temporary && <small>⏰ Mensagem temporária</small>}
-                  </div>
-                ) : (
-                  <span>{msg.content}</span>
                 )}
               </div>
-              {msg.user_name === usuario.nome && (
-                <div className="message-status">
-                  <FiCheck className="sent-icon" />
+              
+              <div className="preview-actions">
+                <button onClick={handleCancelPreview} className="cancel-button">
+                  Cancelar
+                </button>
+                <button onClick={handleSendMedia} className="send-button">
+                  <FiSend />
+                  Enviar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Indicador de gravação */}
+        {isRecording && (
+          <div className="recording-indicator">
+            <div className="recording-content">
+              <div className="recording-dot"></div>
+              <span>
+                {recordingType === 'video' ? 'Gravando vídeo' : 'Gravando áudio'}
+              </span>
+              <span className="recording-time">
+                {formatRecordingTime(recordingTime)}
+              </span>
+              <button onClick={handleStopRecording} className="stop-button">
+                Parar
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="chat-input-area">
+          {/* Painel de emojis */}
+          {showEmojis && (
+            <div className="emoji-panel">
+              <div className="emoji-categories">
+                {Object.keys(EMOJI_CATEGORIES).map(category => (
+                  <button
+                    key={category}
+                    className={selectedEmojiCategory === category ? 'active' : ''}
+                    onClick={() => setSelectedEmojiCategory(category)}
+                  >
+                    {category === 'smileys' && '😀'}
+                    {category === 'people' && '👋'}
+                    {category === 'nature' && '🌸'}
+                    {category === 'food' && '🍕'}
+                    {category === 'activities' && '⚽'}
+                    {category === 'travel' && '🚗'}
+                    {category === 'objects' && '💡'}
+                    {category === 'symbols' && '❤️'}
+                    {category === 'flags' && '🇧🇷'}
+                  </button>
+                ))}
+              </div>
+              <div className="emoji-grid">
+                {EMOJI_CATEGORIES[selectedEmojiCategory as keyof typeof EMOJI_CATEGORIES]?.map((emoji, index) => (
+                  <button
+                    key={index}
+                    className="emoji-button"
+                    onClick={() => handleEnviarEmoji(emoji)}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Opções de mídia */}
+          {showMediaOptions && (
+            <div className="media-options-panel">
+              <div className="media-options-grid">
+                <button 
+                  className="media-option camera-option"
+                  onClick={handleSelectImage}
+                  disabled={!mediaService.constructor.isMediaSupported()}
+                >
+                  <FiCamera />
+                  <span>Foto</span>
+                </button>
+                
+                <button 
+                  className="media-option gallery-option"
+                  onClick={handleSelectImage}
+                >
+                  <FiImage />
+                  <span>Galeria</span>
+                </button>
+                
+                <button 
+                  className="media-option video-option"
+                  onClick={handleStartVideoRecording}
+                  disabled={!mediaService.constructor.isMediaSupported() || isRecording}
+                >
+                  <FiVideo />
+                  <span>Vídeo</span>
+                </button>
+                
+                <button 
+                  className="media-option audio-option"
+                  onClick={handleStartAudioRecording}
+                  disabled={!mediaService.constructor.isMediaSupported() || isRecording}
+                >
+                  <FiMic />
+                  <span>Áudio</span>
+                </button>
+              </div>
+              
+              {!mediaService.constructor.isMediaSupported() && (
+                <div className="media-not-supported">
+                  <p>⚠️ Seu navegador não suporta captura de mídia</p>
                 </div>
               )}
             </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
-      </div>
+          )}
 
-      {/* Recording Indicator */}
-      {isRecording && (
-        <div className="recording-indicator">
-          <div className="recording-info">
-            <span className="recording-icon">
-              {recordingType === 'video' ? '🎥' : '🎤'}
-            </span>
-            <span>Gravando {recordingType}...</span>
-            <span className="recording-time">{formatRecordingTime(recordingTime)}</span>
-          </div>
-          <button onClick={handleStopRecording} className="stop-recording-btn">
-            Parar
-          </button>
-        </div>
-      )}
-
-      {/* Area de envio de mensagem */}
-      <div className="chat-input-area">
-        {usuario.tipo !== 'premium' && (
-          <div className="premium-banner">
-            <span>💎 Com Premium você pode enviar fotos, vídeos e áudios temporários!</span>
-            <button onClick={handleUpgradePremium} className="btn-premium">
-              Seja Premium
-            </button>
-          </div>
-        )}
-
-        {/* Painel de Emojis Expandido */}
-        {showEmojis && (
-          <div className="emoji-panel-expanded">
-            <div className="emoji-categories">
-              {Object.keys(EMOJI_CATEGORIES).map(category => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedEmojiCategory(category)}
-                  className={`emoji-category-btn ${selectedEmojiCategory === category ? 'active' : ''}`}
-                >
-                  {category === 'smileys' && '😊'}
-                  {category === 'hearts' && '❤️'}
-                  {category === 'gestures' && '👍'}
-                  {category === 'activities' && '🎉'}
-                  {category === 'nature' && '🌈'}
-                </button>
-              ))}
+          <div className="input-container">
+            <div className="media-buttons">
+              <button 
+                className={`media-toggle ${showMediaOptions ? 'active' : ''}`}
+                onClick={() => setShowMediaOptions(!showMediaOptions)}
+                title="Enviar mídia"
+              >
+                <FiImage />
+              </button>
+              
+              <button 
+                className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
+                onClick={() => setShowEmojis(!showEmojis)}
+                title="Emojis"
+              >
+                <FiSmile />
+              </button>
             </div>
-            <div className="emoji-grid">
-              {EMOJI_CATEGORIES[selectedEmojiCategory as keyof typeof EMOJI_CATEGORIES].map((emoji, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleEnviarEmoji(emoji)}
-                  className="emoji-btn"
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
-        <div className="input-container">
-          <div className="media-buttons">
+            <input
+              type="text"
+              value={mensagem}
+              onChange={(e) => setMensagem(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleEnviarMensagem()}
+              placeholder="Digite sua mensagem..."
+              className="message-input"
+              disabled={isRecording}
+            />
+
             <button 
-              onClick={handleSelectImage}
-              className="media-btn"
-              title="Enviar foto temporária"
+              onClick={handleEnviarMensagem}
+              className="send-button"
+              disabled={!mensagem.trim() || isRecording}
             >
-              <FiImage />
-            </button>
-            
-            <button 
-              onClick={handleStartVideoRecording}
-              className={`media-btn ${isRecording && recordingType === 'video' ? 'recording' : ''}`}
-              title="Gravar vídeo temporário (0-10s)"
-            >
-              <FiVideo />
-            </button>
-            
-            <button 
-              onClick={handleStartAudioRecording}
-              className={`media-btn ${isRecording && recordingType === 'audio' ? 'recording' : ''}`}
-              title="Gravar áudio temporário (0-10s)"
-            >
-              <FiMic />
-            </button>
-            
-            <button 
-              onClick={() => setShowEmojis(!showEmojis)}
-              className="media-btn"
-              title="Emojis"
-            >
-              <FiSmile />
+              <FiSend />
             </button>
           </div>
-
-          <input
-            type="text"
-            value={mensagem}
-            onChange={(e) => setMensagem(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleEnviarMensagem()}
-            placeholder="Digite sua mensagem..."
-            className="message-input"
-            disabled={isRecording}
-          />
-          
-          <button 
-            onClick={handleEnviarMensagem}
-            className="send-btn"
-            disabled={!mensagem.trim() || isRecording}
-          >
-            <FiSend />
-          </button>
         </div>
       </div>
-
-      {/* Ferramentas de simulação */}
-      {showUserSim && (
-        <div className="simulation-panel">
-          <h4>🤖 Simulação de Usuários</h4>
-          <p>Teste o chat em tempo real com usuários simulados</p>
-          <button 
-            className="btn-simulate"
-            onClick={simulateOtherUsers}
-          >
-            Simular mensagem de outro usuário
-          </button>
-          <button 
-            className="btn-simulate"
-            onClick={() => {
-              const interval = setInterval(simulateOtherUsers, 5000);
-              setTimeout(() => clearInterval(interval), 30000);
-            }}
-          >
-            Ativar chat automático (30s)
-          </button>
-        </div>
-      )}
     </div>
   );
 };
