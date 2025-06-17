@@ -277,7 +277,6 @@ const ChatPage: React.FC = () => {
     if (!usuario || !salaId) return;
 
     try {
-      console.log('😀 Enviando emoji:', emoji);
       await chatService.sendMessage(
         salaId,
         usuario.nome,
@@ -286,10 +285,8 @@ const ChatPage: React.FC = () => {
         usuario.premium || false
       );
       setShowEmojis(false);
-      console.log('✅ Emoji enviado com sucesso!');
     } catch (error) {
       console.error('❌ Erro ao enviar emoji:', error);
-      alert('Erro ao enviar emoji. Tente novamente.');
     }
   };
 
@@ -304,26 +301,38 @@ const ChatPage: React.FC = () => {
 
       // Iniciar contador de tempo
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        setRecordingTime(prev => {
+          if (prev >= 30) { // Limite de 30 segundos
+            handleStopRecording();
+            return 30;
+          }
+          return prev + 1;
+        });
       }, 1000);
 
-      // Capturar vídeo por até 10 segundos
-      const videoBlob = await mediaService.captureVideo(10);
-      
-      // Parar contador
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-      }
-      
-      if (videoBlob) {
-        const url = mediaService.createTempUrl(videoBlob);
-        setPreviewMedia({type: 'video', url, blob: videoBlob});
-        setIsPreviewMode(true);
-        console.log('✅ Vídeo capturado com sucesso');
-      }
-      
-      setIsRecording(false);
-      setRecordingType(null);
+      // Capturar vídeo por até 30 segundos - aguarda o resultado
+      setTimeout(async () => {
+        try {
+          const videoBlob = await mediaService.captureVideo(30);
+          
+          if (videoBlob) {
+            const url = mediaService.createTempUrl(videoBlob);
+            setPreviewMedia({type: 'video', url, blob: videoBlob});
+            setIsPreviewMode(true);
+            console.log('✅ Vídeo capturado com sucesso');
+          }
+          
+          setIsRecording(false);
+          setRecordingType(null);
+          if (recordingIntervalRef.current) {
+            clearInterval(recordingIntervalRef.current);
+          }
+        } catch (error) {
+          console.error('❌ Erro ao processar vídeo:', error);
+          setIsRecording(false);
+          setRecordingType(null);
+        }
+      }, 100); // Pequeno delay para dar tempo do estado ser atualizado
       
     } catch (error) {
       console.error('❌ Erro ao capturar vídeo:', error);
@@ -347,26 +356,38 @@ const ChatPage: React.FC = () => {
 
       // Iniciar contador de tempo
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        setRecordingTime(prev => {
+          if (prev >= 60) { // Limite de 60 segundos para áudio
+            handleStopRecording();
+            return 60;
+          }
+          return prev + 1;
+        });
       }, 1000);
 
-      // Gravar áudio por até 10 segundos
-      const audioBlob = await mediaService.recordAudio(10);
-      
-      // Parar contador
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-      }
-      
-      if (audioBlob) {
-        const url = mediaService.createTempUrl(audioBlob);
-        setPreviewMedia({type: 'audio', url, blob: audioBlob});
-        setIsPreviewMode(true);
-        console.log('✅ Áudio gravado com sucesso');
-      }
-      
-      setIsRecording(false);
-      setRecordingType(null);
+      // Gravar áudio por até 60 segundos - aguarda o resultado
+      setTimeout(async () => {
+        try {
+          const audioBlob = await mediaService.recordAudio(60);
+          
+          if (audioBlob) {
+            const url = mediaService.createTempUrl(audioBlob);
+            setPreviewMedia({type: 'audio', url, blob: audioBlob});
+            setIsPreviewMode(true);
+            console.log('✅ Áudio gravado com sucesso');
+          }
+          
+          setIsRecording(false);
+          setRecordingType(null);
+          if (recordingIntervalRef.current) {
+            clearInterval(recordingIntervalRef.current);
+          }
+        } catch (error) {
+          console.error('❌ Erro ao processar áudio:', error);
+          setIsRecording(false);
+          setRecordingType(null);
+        }
+      }, 100); // Pequeno delay para dar tempo do estado ser atualizado
       
     } catch (error) {
       console.error('❌ Erro ao gravar áudio:', error);
@@ -380,11 +401,9 @@ const ChatPage: React.FC = () => {
   };
 
   const handleStopRecording = () => {
-    console.log('⏹️ Parando gravação...');
     mediaService.stopRecording();
     setIsRecording(false);
     setRecordingType(null);
-    setRecordingTime(0);
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
     }
@@ -500,23 +519,16 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="chat-page" style={{
-      background: 'linear-gradient(135deg, #831843 0%, #be185d 30%, #1e40af 70%, #ffffff 100%)'
-    }}>
+    <div className="chat-page">
       <Header />
       
       <div className="chat-container">
-        <div className="chat-header" style={{
-          borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
-          <button className="back-button" onClick={handleVoltar} style={{
-            background: 'rgba(190, 24, 93, 0.2)',
-            border: '1px solid rgba(190, 24, 93, 0.3)'
-          }}>
+        <div className="chat-header">
+          <button className="back-button" onClick={handleVoltar}>
             <FiArrowLeft />
           </button>
           <div className="room-info">
-            <h2 style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)' }}>{nomeSala}</h2>
+            <h2>{nomeSala}</h2>
             <div className="online-users">
               <FiUsers />
               <span>{usuariosOnline} online</span>
@@ -524,21 +536,14 @@ const ChatPage: React.FC = () => {
             </div>
           </div>
           {!usuario?.premium && (
-            <button className="upgrade-button" onClick={handleUpgradePremium} style={{
-              background: 'linear-gradient(45deg, #be185d, #831843)',
-              boxShadow: '0 4px 15px rgba(190, 24, 93, 0.3)'
-            }}>
+            <button className="upgrade-button" onClick={handleUpgradePremium}>
               <FiStar />
               Premium
             </button>
           )}
         </div>
 
-        <div className="messages-container" style={{
-          background: 'rgba(255, 255, 255, 0.15)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
+        <div className="messages-container">
           {mensagens.length === 0 ? (
             <div className="empty-chat">
               <div className="welcome-message">
@@ -763,24 +768,13 @@ const ChatPage: React.FC = () => {
         <div className="chat-input-area">
           {/* Painel de emojis */}
           {showEmojis && (
-            <div className="emoji-panel" style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              border: '1px solid rgba(190, 24, 93, 0.2)',
-              backdropFilter: 'blur(15px)'
-            }}>
+            <div className="emoji-panel">
               <div className="emoji-categories">
                 {Object.keys(EMOJI_CATEGORIES).map(category => (
                   <button
                     key={category}
                     className={selectedEmojiCategory === category ? 'active' : ''}
                     onClick={() => setSelectedEmojiCategory(category)}
-                    style={{
-                      background: selectedEmojiCategory === category 
-                        ? 'linear-gradient(135deg, #be185d, #831843)' 
-                        : 'rgba(190, 24, 93, 0.1)',
-                      border: '1px solid rgba(190, 24, 93, 0.3)',
-                      color: selectedEmojiCategory === category ? 'white' : '#831843'
-                    }}
                   >
                     {category === 'smileys' && '😀'}
                     {category === 'hearts' && '❤️'}
@@ -806,25 +800,20 @@ const ChatPage: React.FC = () => {
 
           {/* Opções de mídia */}
           {showMediaOptions && (
-            <div className="media-options-panel" style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              border: '1px solid rgba(30, 64, 175, 0.2)',
-              backdropFilter: 'blur(15px)'
-            }}>
-              <div className="media-options-grid" style={{
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '20px'
-              }}>
+            <div className="media-options-panel">
+              <div className="media-options-grid">
                 <button 
-                  className="media-option image-option"
-                  onClick={() => {
-                    console.log('🖼️ Clicou na opção Galeria');
-                    handleSelectImage();
-                  }}
-                  style={{
-                    background: 'rgba(30, 64, 175, 0.1)',
-                    border: '1px solid rgba(30, 64, 175, 0.3)'
-                  }}
+                  className="media-option camera-option"
+                  onClick={handleSelectImage}
+                  disabled={!MediaService.isMediaSupported()}
+                >
+                  <FiCamera />
+                  <span>Foto</span>
+                </button>
+                
+                <button 
+                  className="media-option gallery-option"
+                  onClick={handleSelectImage}
                 >
                   <FiImage />
                   <span>Galeria</span>
@@ -832,31 +821,17 @@ const ChatPage: React.FC = () => {
                 
                 <button 
                   className="media-option video-option"
-                  onClick={() => {
-                    console.log('🎥 Clicou na opção Câmera');
-                    handleStartVideoRecording();
-                  }}
+                  onClick={handleStartVideoRecording}
                   disabled={!MediaService.isMediaSupported() || isRecording}
-                  style={{
-                    background: 'rgba(190, 24, 93, 0.1)',
-                    border: '1px solid rgba(190, 24, 93, 0.3)'
-                  }}
                 >
                   <FiVideo />
-                  <span>Câmera</span>
+                  <span>Vídeo</span>
                 </button>
                 
                 <button 
                   className="media-option audio-option"
-                  onClick={() => {
-                    console.log('🎤 Clicou na opção Áudio');
-                    handleStartAudioRecording();
-                  }}
+                  onClick={handleStartAudioRecording}
                   disabled={!MediaService.isMediaSupported() || isRecording}
-                  style={{
-                    background: 'rgba(131, 24, 67, 0.1)',
-                    border: '1px solid rgba(131, 24, 67, 0.3)'
-                  }}
                 >
                   <FiMic />
                   <span>Áudio</span>
@@ -871,46 +846,20 @@ const ChatPage: React.FC = () => {
             </div>
           )}
 
-          <div className="input-container" style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(15px)',
-            border: '1px solid rgba(255, 255, 255, 0.3)'
-          }}>
+          <div className="input-container">
             <div className="media-buttons">
               <button 
                 className={`media-toggle ${showMediaOptions ? 'active' : ''}`}
-                onClick={() => {
-                  console.log('📷 Clicou no botão de mídia');
-                  setShowMediaOptions(!showMediaOptions);
-                  setShowEmojis(false);
-                }}
+                onClick={() => setShowMediaOptions(!showMediaOptions)}
                 title="Enviar mídia"
-                style={{
-                  background: showMediaOptions 
-                    ? 'linear-gradient(135deg, #1e40af, #3b82f6)' 
-                    : 'rgba(30, 64, 175, 0.1)',
-                  border: '1px solid rgba(30, 64, 175, 0.3)',
-                  color: showMediaOptions ? 'white' : '#1e40af'
-                }}
               >
                 <FiImage />
               </button>
               
               <button 
                 className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
-                onClick={() => {
-                  console.log('😀 Clicou no botão de emoji');
-                  setShowEmojis(!showEmojis);
-                  setShowMediaOptions(false);
-                }}
+                onClick={() => setShowEmojis(!showEmojis)}
                 title="Emojis"
-                style={{
-                  background: showEmojis 
-                    ? 'linear-gradient(135deg, #be185d, #831843)' 
-                    : 'rgba(190, 24, 93, 0.1)',
-                  border: '1px solid rgba(190, 24, 93, 0.3)',
-                  color: showEmojis ? 'white' : '#be185d'
-                }}
               >
                 <FiSmile />
               </button>
@@ -924,24 +873,12 @@ const ChatPage: React.FC = () => {
               placeholder="Digite sua mensagem..."
               className="message-input"
               disabled={isRecording}
-              style={{
-                background: 'transparent',
-                color: '#1f2937'
-              }}
             />
 
             <button 
               onClick={handleEnviarMensagem}
               className="send-button"
               disabled={!mensagem.trim() || isRecording}
-              style={{
-                background: !mensagem.trim() || isRecording 
-                  ? '#9ca3af' 
-                  : 'linear-gradient(135deg, #be185d, #831843)',
-                boxShadow: !mensagem.trim() || isRecording 
-                  ? 'none' 
-                  : '0 4px 15px rgba(190, 24, 93, 0.3)'
-              }}
             >
               <FiSend />
             </button>

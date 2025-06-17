@@ -1,7 +1,7 @@
 /* InicioPage.css - Design Moderno e Ousado */
 .inicio-page {
   min-height: 100vh;
-  background: #1e3a8a; /* Fundo azul sólido */
+  background: linear-gradient(135deg, #831843 0%, #be185d 30%, #1e40af 70%, #ffffff 100%);
   color: white;
   position: relative;
 }
@@ -48,9 +48,9 @@
   bottom: 0;
   background: linear-gradient(
     135deg,
-    rgba(30, 58, 138, 0.7) 0%,
-    rgba(37, 99, 235, 0.6) 50%,
-    rgba(59, 130, 246, 0.7) 100%
+    rgba(131, 24, 67, 0.7) 0%,
+    rgba(190, 24, 93, 0.6) 50%,
+    rgba(30, 64, 175, 0.7) 100%
   );
   display: flex;
   align-items: center;

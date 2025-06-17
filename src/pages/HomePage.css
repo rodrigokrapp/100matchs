@@ -1,7 +1,7 @@
-/* HomePage.css - Design Moderno Azul */
+/* HomePage.css - Design Moderno Rosa Escuro, Azul e Branco */
 .homepage {
   min-height: 100vh;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
+  background: linear-gradient(135deg, #831843 0%, #be185d 30%, #1e40af 70%, #ffffff 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   position: relative;
   overflow-x: hidden;
@@ -15,15 +15,15 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(147, 197, 253, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.2) 0%, transparent 70%);
+    radial-gradient(circle at 20% 80%, rgba(190, 24, 93, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(244, 114, 182, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(30, 64, 175, 0.2) 0%, transparent 70%);
   pointer-events: none;
 }
 
 /* Header */
 .header {
-  background: rgba(37, 99, 235, 0.15);
+  background: rgba(131, 24, 67, 0.2);
   backdrop-filter: blur(15px);
   padding: 1.5rem 0;
   position: fixed;
@@ -31,7 +31,7 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .header .container {
@@ -56,7 +56,7 @@
 }
 
 .btn-suporte {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(147, 197, 253, 0.2) 100%);
+  background: linear-gradient(135deg, rgba(190, 24, 93, 0.2) 0%, rgba(244, 114, 182, 0.2) 100%);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 12px 24px;
@@ -67,13 +67,13 @@
   align-items: center;
   gap: 8px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(131, 24, 67, 0.2);
 }
 
 .btn-suporte:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(147, 197, 253, 0.3) 100%);
+  background: linear-gradient(135deg, rgba(190, 24, 93, 0.3) 0%, rgba(244, 114, 182, 0.3) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 20px rgba(131, 24, 67, 0.3);
 }
 
 /* Hero Section */
@@ -136,11 +136,11 @@
 }
 
 .sad-side .image-container {
-  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #831843 0%, #be185d 100%);
 }
 
 .happy-side .image-container {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
 }
 
 .person-icon {
@@ -184,13 +184,13 @@
 }
 
 .sad-bubble {
-  color: #1e40af;
+  color: #831843;
   font-weight: 700;
   font-size: 1.1rem;
 }
 
 .happy-bubble {
-  color: #2563eb;
+  color: #1e40af;
   font-weight: 700;
   font-size: 1.1rem;
 }

@@ -113,7 +113,7 @@ class MediaService {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
-      input.capture = 'environment'; // Para abrir câmera no mobile
+      input.multiple = false;
 
       input.onchange = (event) => {
         const file = (event.target as HTMLInputElement).files?.[0];
@@ -124,7 +124,15 @@ class MediaService {
         resolve(null);
       };
 
+      // Adicionar ao DOM temporariamente para funcionar em todos os browsers
+      input.style.display = 'none';
+      document.body.appendChild(input);
       input.click();
+      
+      // Remover do DOM após uso
+      setTimeout(() => {
+        document.body.removeChild(input);
+      }, 1000);
     });
   }
 
