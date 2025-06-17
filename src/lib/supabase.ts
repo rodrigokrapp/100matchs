@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Configuração do Supabase - PRODUÇÃO
-const supabaseUrl = 'https://rhajnkrvdytbbihwfqgxu.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoYWpua3J2ZHl0YmJpaHdmcWd4dSIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE3NTAxMDA0MDQsImV4cCI6MjA2NTY3NjQwNH0.W97Mu6K_3vScej6u1z3ozFYegSP4cb6Ao5syFO47dHQ';
+const supabaseUrl = 'https://shjhfnnxaxotpyebiijp.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoamhmbm54YXhvdHB5ZWJpaWpwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDEyNzUzMSwiZXhwIjoyMDY1NzAzNTMxfQ.Rhoa0ycynAH3NWCULQMWOYDAIX7oQZhPVvet0oaZ7Fo';
 
 console.log('🔧 Supabase configurado para produção:', { url: supabaseUrl, hasKey: !!supabaseKey });
 
