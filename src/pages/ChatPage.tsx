@@ -599,63 +599,6 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Hero Banner Section */}
-        <div className="hero-banner-section" style={{
-          width: '100%',
-          height: '300px',
-          background: 'linear-gradient(135deg, #6a0572 0%, #ab83a1 50%, #ffeaa7 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '20px',
-          borderRadius: '0 0 25px 25px',
-          overflow: 'hidden',
-          position: 'relative'
-        }}>
-          <img 
-            src="/hero-banner.jpg" 
-            alt="Banner 100 Matchs"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center'
-            }}
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(135deg, rgba(106, 5, 114, 0.7) 0%, rgba(171, 131, 161, 0.5) 50%, rgba(255, 234, 167, 0.3) 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <div style={{ textAlign: 'center', color: 'white' }}>
-              <h1 style={{
-                fontSize: '3rem',
-                fontWeight: '900',
-                margin: '0',
-                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)'
-              }}>
-                CONECTE-SE AGORA!
-              </h1>
-              <p style={{
-                fontSize: '1.2rem',
-                margin: '10px 0 0 0',
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.7)'
-              }}>
-                Converse grátis com pessoas incríveis
-              </p>
-            </div>
-          </div>
-        </div>
-
         <div className="messages-container" style={{
           background: 'rgba(255, 255, 255, 0.15)',
           backdropFilter: 'blur(10px)',
@@ -666,24 +609,7 @@ const ChatPage: React.FC = () => {
               <div className="welcome-message">
                 <h3>Bem-vindo ao {nomeSala}!</h3>
                 <p>Seja o primeiro a enviar uma mensagem 💬</p>
-                <div className="chat-features">
-                  <div className="feature">
-                    <FiImage />
-                    <span>Envie fotos</span>
-                  </div>
-                  <div className="feature">
-                    <FiVideo />
-                    <span>Grave vídeos</span>
-                  </div>
-                  <div className="feature">
-                    <FiMic />
-                    <span>Envie áudios</span>
-                  </div>
-                  <div className="feature">
-                    <FiSmile />
-                    <span>Use emojis</span>
-                  </div>
-                </div>
+                <p>Use os botões abaixo para enviar fotos, vídeos, áudios e emojis!</p>
               </div>
             </div>
           ) : (
