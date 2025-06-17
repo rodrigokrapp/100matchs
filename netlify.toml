@@ -1,11 +1,12 @@
 [build]
   publish = "dist"
-  command = "npm install --force && npm run build"
+  command = "npm run build:netlify"
 
 [build.environment]
   NODE_VERSION = "20.15.1"
-  NPM_VERSION = "10.2.4"
-  NPM_FLAGS = "--legacy-peer-deps"
+  NPM_VERSION = "10.8.0"
+  NODE_ENV = "production"
+  NETLIFY_USE_ESBUILD = "true"
 
 [[redirects]]
   from = "/*"
