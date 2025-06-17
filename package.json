@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build:netlify": "npm install --no-optional && npm install @rollup/rollup-linux-x64-gnu@latest --save-optional --silent && npm run build",
+    "build:netlify": "npm install && npm install @rollup/rollup-linux-x64-gnu@latest --save-optional --silent && npm run build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -16,7 +16,9 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
     "react-router-dom": "^6.21.1",
-    "socket.io-client": "^4.7.4"
+    "socket.io-client": "^4.7.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.4.19"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
@@ -26,9 +28,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "eslint": "^8.55.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
-    "typescript": "^5.2.2",
-    "vite": "^5.4.19"
+    "eslint-plugin-react-refresh": "^0.4.5"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.14.0",
