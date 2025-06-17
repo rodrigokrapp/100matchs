@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   FiSend, FiImage, FiVideo, FiMic, FiSmile, FiArrowLeft, 
-  FiUsers, FiStar, FiClock, FiCheck, FiPlay, FiPause, FiEye
+  FiUsers, FiStar, FiClock, FiCheck, FiEye
 } from 'react-icons/fi';
 import { chatService, ChatMessage } from '../lib/chatService';
 import { mediaService, EMOJI_CATEGORIES } from '../lib/mediaService';
