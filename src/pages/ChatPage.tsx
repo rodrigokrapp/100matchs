@@ -501,7 +501,7 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="chat-page" style={{
-      background: 'linear-gradient(135deg, #831843 0%, #be185d 30%, #1e40af 70%, #ffffff 100%)'
+      background: 'linear-gradient(135deg, #6a0572 0%, #ab83a1 30%, #ffeaa7 70%, #ffffff 100%)'
     }}>
       <Header />
       
@@ -532,6 +532,128 @@ const ChatPage: React.FC = () => {
               Premium
             </button>
           )}
+        </div>
+
+        {/* Hero Banner Section */}
+        <div className="hero-banner-section" style={{
+          width: '100%',
+          height: '300px',
+          background: 'linear-gradient(135deg, #6a0572 0%, #ab83a1 50%, #ffeaa7 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '20px',
+          borderRadius: '0 0 25px 25px',
+          overflow: 'hidden',
+          position: 'relative'
+        }}>
+          <img 
+            src="/hero-banner.jpg" 
+            alt="Banner 100 Matchs"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center'
+            }}
+            onError={(e) => {
+              // Se a imagem não carregar, mostra um fundo com as cores da foto original
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(135deg, rgba(106, 5, 114, 0.7) 0%, rgba(171, 131, 161, 0.5) 50%, rgba(255, 234, 167, 0.3) 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <div style={{
+              textAlign: 'center',
+              color: 'white'
+            }}>
+              <h1 style={{
+                fontSize: '3rem',
+                fontWeight: '900',
+                margin: '0',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)',
+                background: 'linear-gradient(135deg, #ffeaa7 0%, #fd79a8 50%, #6c5ce7 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                CONECTE-SE AGORA!
+              </h1>
+              <p style={{
+                fontSize: '1.2rem',
+                margin: '10px 0 0 0',
+                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.7)'
+              }}>
+                Converse grátis com pessoas incríveis
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Hero Banner Section */}
+        <div className="hero-banner-section" style={{
+          width: '100%',
+          height: '300px',
+          background: 'linear-gradient(135deg, #6a0572 0%, #ab83a1 50%, #ffeaa7 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '20px',
+          borderRadius: '0 0 25px 25px',
+          overflow: 'hidden',
+          position: 'relative'
+        }}>
+          <img 
+            src="/hero-banner.jpg" 
+            alt="Banner 100 Matchs"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center'
+            }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(135deg, rgba(106, 5, 114, 0.7) 0%, rgba(171, 131, 161, 0.5) 50%, rgba(255, 234, 167, 0.3) 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <div style={{ textAlign: 'center', color: 'white' }}>
+              <h1 style={{
+                fontSize: '3rem',
+                fontWeight: '900',
+                margin: '0',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)'
+              }}>
+                CONECTE-SE AGORA!
+              </h1>
+              <p style={{
+                fontSize: '1.2rem',
+                margin: '10px 0 0 0',
+                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.7)'
+              }}>
+                Converse grátis com pessoas incríveis
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="messages-container" style={{
