@@ -60,7 +60,7 @@ const InicioPage: React.FC = () => {
       <div className="hero-banner-section">
         <div className="hero-banner-container">
           <img 
-            src="https://cdn.discordapp.com/attachments/1215003629906395176/1324098651506249808/image.png?ex=67770b46&is=6775b9c6&hm=b8e95a8bd36dc11edcb48d63ed23ae0b19d60c8a1c5e2f36dc6ee29b4b0bb0a1&"
+            src="https://cdn.discordapp.com/attachments/1215003629906395176/1324099074508083230/image.png?ex=67770ba9&is=6775ba29&hm=ee4f8c4c6e5e0f2c3e4c3e9e2f5f8c2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f&"
             alt="100 MATCHS - Pessoas conversando" 
             className="hero-banner-image"
             style={{
