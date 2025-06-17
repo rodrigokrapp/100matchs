@@ -194,7 +194,12 @@ const ChatPage: React.FC = () => {
   };
 
   const handleEnviarMensagem = async () => {
-    if (!mensagem.trim() || !usuario || !salaId) return;
+    if (!mensagem.trim() || !usuario || !salaId) {
+      console.log('❌ Condições não atendidas:', { mensagem: mensagem.trim(), usuario, salaId });
+      return;
+    }
+
+    console.log('📤 Tentando enviar mensagem:', { salaId, userName: usuario.nome, content: mensagem });
 
     const success = await chatService.sendMessage(
       salaId,
@@ -204,8 +209,14 @@ const ChatPage: React.FC = () => {
       usuario.tipo === 'premium'
     );
 
+    console.log('✅ Resultado do envio:', success);
+
     if (success) {
       setMensagem('');
+      console.log('✅ Mensagem enviada com sucesso!');
+    } else {
+      console.error('❌ Falha ao enviar mensagem');
+      alert('Erro ao enviar mensagem. Tente novamente.');
     }
   };
 
@@ -406,7 +417,7 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="chat-page">
-      <Header showSupport={false} />
+      <Header />
       
       {/* Header do Chat */}
       <header className="chat-header">
