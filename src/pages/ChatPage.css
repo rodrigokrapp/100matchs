@@ -1,7 +1,7 @@
 /* ChatPage.css */
 .chat-page {
   min-height: 100vh;
-  background: white;
+  background: #E91E63;
   display: flex;
   flex-direction: column;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

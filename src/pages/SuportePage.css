@@ -1,8 +1,8 @@
 /* SuportePage.css - Design Moderno e Ousado */
 .suporte-page {
   min-height: 100vh;
-  background: white;
-  color: #333333;
+  background: #E91E63;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
