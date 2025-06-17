@@ -1,8 +1,8 @@
 /* InicioPage.css - Design Moderno e Ousado */
 .inicio-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #831843 0%, #be185d 30%, #1e40af 70%, #ffffff 100%);
-  color: white;
+  background: white;
+  color: #333333;
   position: relative;
 }
 

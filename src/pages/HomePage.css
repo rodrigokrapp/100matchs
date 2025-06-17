@@ -1,7 +1,7 @@
 /* HomePage.css - Design Moderno Rosa Escuro, Azul e Branco */
 .homepage {
   min-height: 100vh;
-  background: linear-gradient(135deg, #831843 0%, #be185d 30%, #1e40af 70%, #ffffff 100%);
+  background: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   position: relative;
   overflow-x: hidden;
