@@ -105,13 +105,20 @@ const InicioPage: React.FC = () => {
               <div className="action-buttons">
                 <button 
                   className="btn-suporte"
-                  onClick={() => navigate('/suporte6828')}
+                  onClick={() => {
+                    console.log('🛠️ Botão Suporte clicado');
+                    navigate('/suporte6828');
+                  }}
                 >
                   🛠️ Suporte
                 </button>
                 <button 
                   className="btn-seja-premium"
-                  onClick={() => window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank')}
+                  onClick={() => {
+                    console.log('👑 Botão Seja Premium clicado');
+                    console.log('🔗 Abrindo link:', 'https://pay.kiwify.com.br/E2Y9N6m');
+                    window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank');
+                  }}
                 >
                   👑 Seja Premium
                 </button>
