@@ -57,16 +57,40 @@ const InicioPage: React.FC = () => {
     <div className="inicio-page">
       <Header />
       
+      <div className="hero-banner-section">
+        <div className="hero-banner-container">
+          <img 
+            src="https://images.unsplash.com/photo-1556656793-08538906a9f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&h=600&q=80"
+            alt="Pessoas felizes conversando - Desliza, Desliza e Nada! Converse Free" 
+            className="hero-banner-image"
+          />
+          <div className="hero-banner-overlay">
+            <div className="hero-banner-content">
+              <div className="banner-text-overlay">
+                <div className="left-text">
+                  <h2>DESLIZA</h2>
+                  <h2>DESLIZA E</h2>
+                  <h2>NADA!</h2>
+                </div>
+                <div className="right-text">
+                  <h1>CONVERSE</h1>
+                  <h1>FREE</h1>
+                </div>
+              </div>
+              <h1 className="hero-banner-title">100 MATCHS</h1>
+              <p className="hero-banner-subtitle">
+                Conecte-se com pessoas incríveis da sua região e encontre seu match perfeito!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <div className="inicio-container">
         <div className="hero-section">
           <div className="hero-content">
             <div className="hero-icon">
               <div className="hero-image">
-                <img 
-                  src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAP..."
-                  alt="Pessoas felizes conversando" 
-                  className="conversation-image"
-                />
                 <div className="image-overlay">
                   <div className="overlay-text">
                     <h3>DESLIZA, DESLIZA E NADA!</h3>
@@ -77,11 +101,6 @@ const InicioPage: React.FC = () => {
             </div>
 
             <div className="hero-text">
-              <h1 className="hero-title">100 MATCHS</h1>
-              <p className="hero-subtitle">
-                Conecte-se com pessoas incríveis da sua região e encontre seu match perfeito!
-              </p>
-              
               <div className="features-grid">
                 <div className="feature">
                   <span className="feature-icon">💝</span>
