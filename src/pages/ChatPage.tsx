@@ -7,6 +7,31 @@ import {
 } from 'react-icons/fi';
 import { chatService, ChatMessage } from '../lib/chatService';
 import { mediaService, EMOJI_CATEGORIES } from '../lib/mediaService';
+
+// Importar a classe MediaService para acessar métodos estáticos
+class MediaService {
+  static isMediaSupported(): boolean {
+    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  }
+
+  static async checkCameraPermission(): Promise<boolean> {
+    try {
+      const result = await navigator.permissions.query({ name: 'camera' as PermissionName });
+      return result.state === 'granted';
+    } catch {
+      return false;
+    }
+  }
+
+  static async checkMicrophonePermission(): Promise<boolean> {
+    try {
+      const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      return result.state === 'granted';
+    } catch {
+      return false;
+    }
+  }
+}
 import { testChatConnection } from '../lib/supabase';
 import Header from '../components/Header';
 import './ChatPage.css';
@@ -46,8 +71,8 @@ const ChatPage: React.FC = () => {
 
   const checkMediaPermissions = async () => {
     try {
-      const cameraPermission = await mediaService.constructor.checkCameraPermission();
-      const micPermission = await mediaService.constructor.checkMicrophonePermission();
+      const cameraPermission = await MediaService.checkCameraPermission();
+      const micPermission = await MediaService.checkMicrophonePermission();
       setMediaPermissions({
         camera: cameraPermission,
         microphone: micPermission
@@ -750,7 +775,7 @@ const ChatPage: React.FC = () => {
                 <button 
                   className="media-option camera-option"
                   onClick={handleSelectImage}
-                  disabled={!mediaService.constructor.isMediaSupported()}
+                  disabled={!MediaService.isMediaSupported()}
                 >
                   <FiCamera />
                   <span>Foto</span>
@@ -767,7 +792,7 @@ const ChatPage: React.FC = () => {
                 <button 
                   className="media-option video-option"
                   onClick={handleStartVideoRecording}
-                  disabled={!mediaService.constructor.isMediaSupported() || isRecording}
+                  disabled={!MediaService.isMediaSupported() || isRecording}
                 >
                   <FiVideo />
                   <span>Vídeo</span>
@@ -776,14 +801,14 @@ const ChatPage: React.FC = () => {
                 <button 
                   className="media-option audio-option"
                   onClick={handleStartAudioRecording}
-                  disabled={!mediaService.constructor.isMediaSupported() || isRecording}
+                  disabled={!MediaService.isMediaSupported() || isRecording}
                 >
                   <FiMic />
                   <span>Áudio</span>
                 </button>
               </div>
               
-              {!mediaService.constructor.isMediaSupported() && (
+              {!MediaService.isMediaSupported() && (
                 <div className="media-not-supported">
                   <p>⚠️ Seu navegador não suporta captura de mídia</p>
                 </div>
