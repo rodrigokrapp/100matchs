@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fi';
 import { chatService, ChatMessage } from '../lib/chatService';
 import { mediaService, EMOJI_CATEGORIES } from '../lib/mediaService';
+import { testChatConnection } from '../lib/supabase';
 import Header from '../components/Header';
 import './ChatPage.css';
 
@@ -83,6 +84,10 @@ const ChatPage: React.FC = () => {
     try {
       console.log('🚀 Inicializando chat para sala:', salaId);
       
+      // Testar conexão específica do chat
+      const connectionTest = await testChatConnection(salaId);
+      console.log('🧪 Resultado do teste de conexão:', connectionTest);
+      
       // Inicializar tabelas se necessário
       await chatService.initializeTables();
       
@@ -91,14 +96,23 @@ const ChatPage: React.FC = () => {
       const mensagensValidas = chatService.filterValidMessages(mensagensExistentes);
       setMensagens(mensagensValidas);
       
-      // Conectar ao chat em tempo real
+      // Conectar ao chat em tempo real com callback melhorado
       const connected = await chatService.joinRoom(salaId, (novaMsg) => {
+        console.log('📨 Nova mensagem recebida:', novaMsg);
         setMensagens(prev => {
-          // Evitar mensagens duplicadas
-          const exists = prev.some(msg => msg.id === novaMsg.id);
+          // Evitar mensagens duplicadas baseado no ID
+          const exists = prev.some(msg => 
+            msg.id === novaMsg.id || 
+            (msg.content === novaMsg.content && 
+             msg.user_name === novaMsg.user_name && 
+             Math.abs(new Date(msg.created_at).getTime() - new Date(novaMsg.created_at).getTime()) < 2000)
+          );
+          
           if (!exists) {
             const allMessages = [...prev, novaMsg];
-            return chatService.filterValidMessages(allMessages);
+            return chatService.filterValidMessages(allMessages).sort(
+              (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            );
           }
           return prev;
         });
@@ -106,18 +120,35 @@ const ChatPage: React.FC = () => {
       
       setIsConnected(connected);
       
-      // Simular usuários online
-      const randomUsers = Math.floor(Math.random() * 500) + 100;
-      setUsuariosOnline(randomUsers);
-      await chatService.updateOnlineUsers(salaId, randomUsers);
+      // Simular usuários online baseado na sala (mais realista)
+      const baseUsers = Math.floor(Math.random() * 100) + 50; // Entre 50-150
+      const roomMultiplier = salaId === 'sao-paulo' ? 3 : salaId === 'rio-de-janeiro' ? 2.5 : 1.5;
+      const finalCount = Math.floor(baseUsers * roomMultiplier);
+      
+      setUsuariosOnline(finalCount);
+      await chatService.updateOnlineUsers(salaId, finalCount);
+      
+      // Atualizar contagem de usuários periodicamente
+      const userCountInterval = setInterval(async () => {
+        const variation = Math.floor(Math.random() * 10) - 5; // Variação de -5 a +5
+        const newCount = Math.max(10, finalCount + variation);
+        setUsuariosOnline(newCount);
+        await chatService.updateOnlineUsers(salaId, newCount);
+      }, 15000); // A cada 15 segundos
       
       // Limpar mensagens expiradas periodicamente
-      setInterval(async () => {
+      const cleanupInterval = setInterval(async () => {
         if (salaId) {
           await chatService.cleanExpiredMessages(salaId);
           setMensagens(prev => chatService.filterValidMessages(prev));
         }
       }, 30000); // A cada 30 segundos
+      
+      // Cleanup ao desmontar
+      return () => {
+        clearInterval(userCountInterval);
+        clearInterval(cleanupInterval);
+      };
       
     } catch (error) {
       console.error('❌ Erro ao inicializar chat:', error);

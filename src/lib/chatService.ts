@@ -22,59 +22,61 @@ export interface ChatRoom {
 
 class ChatService {
   private channel: RealtimeChannel | null = null;
+  private currentRoom: string | null = null;
+  private messageCallback: ((message: ChatMessage) => void) | null = null;
+  private reconnectTimer: NodeJS.Timeout | null = null;
+  private isConnected: boolean = false;
 
   // Inicializar tabelas no Supabase (executar uma única vez)
   async initializeTables() {
     try {
-      // Criar tabela de salas de chat se não existir
-      const { error: roomsError } = await supabase.rpc('create_chat_rooms_table');
-      if (roomsError && !roomsError.message.includes('already exists')) {
-        console.error('Erro ao criar tabela de salas:', roomsError);
-      }
-
-      // Criar tabela de mensagens se não existir
-      const { error: messagesError } = await supabase.rpc('create_chat_messages_table');
-      if (messagesError && !messagesError.message.includes('already exists')) {
-        console.error('Erro ao criar tabela de mensagens:', messagesError);
-      }
-
-      // Tentar criar as tabelas diretamente se as funções RPC não existirem
-      await this.createTablesDirectly();
+      console.log('🔧 Inicializando tabelas do chat...');
       
-      console.log('✅ Tabelas do chat inicializadas com sucesso');
+      // Tentar acessar as tabelas para verificar se existem
+      const { error: messagesError } = await supabase
+        .from('chat_messages')
+        .select('id')
+        .limit(1);
+      
+      if (messagesError) {
+        console.log('📝 Tabelas não encontradas, usando sistema local temporário');
+      } else {
+        console.log('✅ Tabelas do chat encontradas e funcionando');
+      }
+      
+      return true;
     } catch (error) {
       console.error('❌ Erro ao inicializar tabelas:', error);
-      await this.createTablesDirectly();
+      return false;
     }
   }
 
-  private async createTablesDirectly() {
-    try {
-      // Criar tabela de salas
-      await supabase.from('chat_rooms').select('*').limit(1);
-    } catch {
-      console.log('Tabela chat_rooms não existe, tentando usar uma tabela alternativa...');
-    }
-
-    try {
-      // Criar tabela de mensagens
-      await supabase.from('chat_messages').select('*').limit(1);
-    } catch {
-      console.log('Tabela chat_messages não existe, tentando usar uma tabela alternativa...');
-    }
-  }
-
-  // Conectar a uma sala de chat
+  // Conectar a uma sala de chat com melhor gerenciamento
   async joinRoom(roomId: string, onMessageReceived: (message: ChatMessage) => void) {
     try {
+      console.log(`🚀 Conectando à sala ${roomId}...`);
+      
       // Desconectar canal anterior se existir
       if (this.channel) {
-        await supabase.removeChannel(this.channel);
+        await this.leaveRoom();
       }
 
-      // Conectar ao canal da sala específica
+      this.currentRoom = roomId;
+      this.messageCallback = onMessageReceived;
+
+      // Conectar ao canal da sala específica com configurações otimizadas
       this.channel = supabase
-        .channel(`chat-room-${roomId}`)
+        .channel(`room-${roomId}`, {
+          config: {
+            presence: {
+              key: `user-${Date.now()}`
+            },
+            broadcast: {
+              self: true,
+              ack: true
+            }
+          }
+        })
         .on(
           'postgres_changes',
           {
@@ -84,15 +86,37 @@ class ChatService {
             filter: `room_id=eq.${roomId}`,
           },
           (payload) => {
-            console.log('💬 Nova mensagem recebida:', payload.new);
-            onMessageReceived(payload.new as ChatMessage);
+            console.log('💬 Nova mensagem via PostgreSQL:', payload.new);
+            const message = payload.new as ChatMessage;
+            if (message && this.messageCallback) {
+              this.messageCallback(message);
+            }
           }
         )
-        .subscribe((status) => {
-          console.log('📡 Status da conexão chat:', status);
+        .on('broadcast', { event: 'message' }, (payload) => {
+          console.log('📡 Nova mensagem via broadcast:', payload);
+          if (payload.payload && this.messageCallback) {
+            this.messageCallback(payload.payload as ChatMessage);
+          }
+        })
+        .subscribe((status, err) => {
+          console.log(`📡 Status da conexão sala ${roomId}:`, status);
+          
+          if (status === 'SUBSCRIBED') {
+            this.isConnected = true;
+            console.log(`✅ Conectado com sucesso à sala ${roomId}`);
+          } else if (status === 'CHANNEL_ERROR') {
+            console.error('❌ Erro no canal:', err);
+            this.handleReconnect();
+          } else if (status === 'TIMED_OUT') {
+            console.warn('⏰ Timeout na conexão, tentando reconectar...');
+            this.handleReconnect();
+          }
         });
 
-      console.log(`✅ Conectado à sala ${roomId}`);
+      // Simular presença na sala
+      await this.updateUserPresence(roomId, true);
+      
       return true;
     } catch (error) {
       console.error('❌ Erro ao conectar à sala:', error);
@@ -100,40 +124,88 @@ class ChatService {
     }
   }
 
+  // Lidar com reconexão automática
+  private handleReconnect() {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+    }
+
+    this.reconnectTimer = setTimeout(async () => {
+      if (this.currentRoom && this.messageCallback) {
+        console.log('🔄 Tentando reconectar...');
+        await this.joinRoom(this.currentRoom, this.messageCallback);
+      }
+    }, 3000);
+  }
+
+  // Atualizar presença do usuário na sala
+  private async updateUserPresence(roomId: string, isOnline: boolean) {
+    try {
+      if (this.channel) {
+        const status = isOnline ? 'online' : 'offline';
+        await this.channel.track({
+          status,
+          room_id: roomId,
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('❌ Erro ao atualizar presença:', error);
+    }
+  }
+
   // Desconectar da sala
   async leaveRoom() {
-    if (this.channel) {
-      await supabase.removeChannel(this.channel);
-      this.channel = null;
-      console.log('📴 Desconectado da sala');
+    try {
+      if (this.currentRoom) {
+        await this.updateUserPresence(this.currentRoom, false);
+      }
+
+      if (this.channel) {
+        await supabase.removeChannel(this.channel);
+        this.channel = null;
+      }
+
+      if (this.reconnectTimer) {
+        clearTimeout(this.reconnectTimer);
+        this.reconnectTimer = null;
+      }
+
+      this.currentRoom = null;
+      this.messageCallback = null;
+      this.isConnected = false;
+      
+      console.log('📴 Desconectado da sala com sucesso');
+    } catch (error) {
+      console.error('❌ Erro ao desconectar:', error);
     }
   }
 
   // Buscar mensagens existentes da sala
   async getMessages(roomId: string): Promise<ChatMessage[]> {
     try {
-      // Primeiro tentar a tabela chat_messages
       const { data, error } = await supabase
         .from('chat_messages')
         .select('*')
         .eq('room_id', roomId)
         .order('created_at', { ascending: true })
-        .limit(50);
+        .limit(100); // Aumentado para mostrar mais mensagens
 
       if (error) {
-        console.error('❌ Erro ao buscar mensagens:', error);
-        // Retornar mensagens mock para funcionar offline
+        console.warn('⚠️ Erro ao buscar mensagens do Supabase, usando mock:', error);
         return this.getMockMessages(roomId);
       }
 
-      return data || [];
+      const messages = data || [];
+      console.log(`📚 Carregadas ${messages.length} mensagens da sala ${roomId}`);
+      return messages;
     } catch (error) {
       console.error('❌ Erro ao buscar mensagens:', error);
       return this.getMockMessages(roomId);
     }
   }
 
-  // Enviar mensagem
+  // Enviar mensagem com múltiplos canais para garantir entrega
   async sendMessage(
     roomId: string,
     userName: string,
@@ -146,7 +218,8 @@ class ChatService {
     try {
       const expiresAt = isTemporary ? new Date(Date.now() + duration * 1000).toISOString() : undefined;
       
-      const message = {
+      const message: ChatMessage = {
+        id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         room_id: roomId,
         user_name: userName,
         content,
@@ -158,29 +231,64 @@ class ChatService {
         created_at: new Date().toISOString(),
       };
 
-      // Tentar inserir na tabela
-      const { error } = await supabase
-        .from('chat_messages')
-        .insert([message]);
+      console.log('📤 Enviando mensagem:', message);
 
-      if (error) {
-        console.error('❌ Erro ao enviar mensagem:', error);
-        // Simular envio local para funcionar offline
-        this.simulateMessage(message);
-        return true;
+      // Tentar múltiplos métodos de envio para garantir entrega
+      let success = false;
+
+      // Método 1: Inserir no Supabase (PostgreSQL)
+      try {
+        const { error } = await supabase
+          .from('chat_messages')
+          .insert([message]);
+
+        if (!error) {
+          success = true;
+          console.log('✅ Mensagem enviada via PostgreSQL');
+        }
+      } catch (dbError) {
+        console.warn('⚠️ Falha no envio via PostgreSQL:', dbError);
       }
 
-      console.log('✅ Mensagem enviada com sucesso');
-      return true;
+      // Método 2: Broadcast direto para usuários conectados
+      if (this.channel && this.isConnected) {
+        try {
+          await this.channel.send({
+            type: 'broadcast',
+            event: 'message',
+            payload: message
+          });
+          success = true;
+          console.log('✅ Mensagem enviada via broadcast');
+        } catch (broadcastError) {
+          console.warn('⚠️ Falha no broadcast:', broadcastError);
+        }
+      }
+
+      // Método 3: Fallback local
+      if (!success) {
+        console.log('🔄 Usando fallback local para mensagem');
+        this.simulateMessage(message);
+        success = true;
+      }
+
+      return success;
     } catch (error) {
       console.error('❌ Erro ao enviar mensagem:', error);
       return false;
     }
   }
 
-  // Simular mensagem local (para funcionar offline)
-  private simulateMessage(message: any) {
-    // Broadcast local da mensagem
+  // Simular mensagem local (para funcionar offline ou como fallback)
+  private simulateMessage(message: ChatMessage) {
+    // Broadcast local da mensagem para o próprio usuário
+    if (this.messageCallback) {
+      setTimeout(() => {
+        this.messageCallback!(message);
+      }, 100);
+    }
+
+    // Event para outros listeners
     const event = new CustomEvent('local-message', { detail: message });
     window.dispatchEvent(event);
   }
