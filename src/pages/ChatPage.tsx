@@ -750,6 +750,7 @@ const ChatPage: React.FC = () => {
                                 preload="auto"
                                 playsInline
                                 muted={false}
+                                poster=""
                                 onClick={() => {
                                   handleViewTemporaryMessage(msg.id);
                                   const video = document.querySelector(`video[data-msg-id="${msg.id}"]`) as HTMLVideoElement;
@@ -764,6 +765,11 @@ const ChatPage: React.FC = () => {
                                 onPlay={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
                                 onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
                                 onLoadedData={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  video.playbackRate = 1.0;
+                                  video.defaultPlaybackRate = 1.0;
+                                }}
+                                onCanPlay={(e) => {
                                   const video = e.target as HTMLVideoElement;
                                   video.playbackRate = 1.0;
                                 }}

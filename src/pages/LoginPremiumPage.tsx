@@ -7,7 +7,8 @@ const LoginPremiumPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
-    senha: ''
+    senha: '',
+    aceitarTermos: false
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
@@ -21,6 +22,11 @@ const LoginPremiumPage: React.FC = () => {
 
     if (!formData.senha) {
       newErrors.senha = 'Senha é obrigatória';
+    }
+
+    // Validar termos
+    if (!formData.aceitarTermos) {
+      newErrors.aceitarTermos = 'Você deve aceitar os termos de políticas e privacidade';
     }
 
     setErrors(newErrors);
@@ -109,6 +115,18 @@ const LoginPremiumPage: React.FC = () => {
                 onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
               />
               {errors.senha && <span className="error-message">{errors.senha}</span>}
+            </div>
+
+            <div className="terms-checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={formData.aceitarTermos}
+                  onChange={(e) => handleInputChange('aceitarTermos', e.target.checked.toString())}
+                />
+                <span>Aceito os termos de políticas e privacidade de imagem, dados básicos e respeito aos usuários do chat</span>
+              </label>
+              {errors.aceitarTermos && <span className="error-message">{errors.aceitarTermos}</span>}
             </div>
           </div>
 

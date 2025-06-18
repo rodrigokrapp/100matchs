@@ -9,7 +9,8 @@ const CadastroPremiumPage: React.FC = () => {
     nome: '',
     email: '',
     senha: '',
-    confirmarSenha: ''
+    confirmarSenha: '',
+    aceitarTermos: false
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
@@ -42,6 +43,11 @@ const CadastroPremiumPage: React.FC = () => {
     // Confirmar senha
     if (formData.senha !== formData.confirmarSenha) {
       newErrors.confirmarSenha = 'Senhas não coincidem';
+    }
+
+    // Validar termos
+    if (!formData.aceitarTermos) {
+      newErrors.aceitarTermos = 'Você deve aceitar os termos de políticas e privacidade';
     }
 
     setErrors(newErrors);
@@ -188,6 +194,18 @@ const CadastroPremiumPage: React.FC = () => {
                 className={`input ${errors.confirmarSenha ? 'input-error' : ''}`}
               />
               {errors.confirmarSenha && <span className="error-message">{errors.confirmarSenha}</span>}
+            </div>
+
+            <div className="terms-checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={formData.aceitarTermos || false}
+                  onChange={(e) => handleInputChange('aceitarTermos', e.target.checked.toString())}
+                />
+                <span>Aceito os termos de políticas e privacidade de imagem, dados básicos e respeito aos usuários do chat</span>
+              </label>
+              {errors.aceitarTermos && <span className="error-message">{errors.aceitarTermos}</span>}
             </div>
           </div>
 

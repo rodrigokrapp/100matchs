@@ -318,6 +318,9 @@
   -webkit-backface-visibility: hidden;
   perspective: 1000px;
   -webkit-perspective: 1000px;
+  -webkit-video-format: auto;
+  video-optimized-playback: true;
+  object-fit: cover;
 }
 
 .video-overlay {
