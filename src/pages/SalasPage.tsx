@@ -7,7 +7,7 @@ import './SalasPage.css';
 interface Sala {
   id: string;
   nome: string;
-  tipo: 'capital' | 'personalizada';
+  tipo: 'capital' | 'personalizada' | 'premium' | 'chat';
   usuarios: number;
   criada_em?: string;
 }
@@ -31,13 +31,31 @@ const SalasPage: React.FC = () => {
 
   useEffect(() => {
     // Verificar se usuário está logado
+    const usuarioPremium = localStorage.getItem('usuarioPremium');
+    const usuarioChat = localStorage.getItem('usuarioChat');
     const visitante = localStorage.getItem('visitante');
-    const usuarioPremium = localStorage.getItem('usuario');
     
-    if (visitante) {
+    if (usuarioPremium) {
+      setUsuario({ ...JSON.parse(usuarioPremium), tipo: 'premium' });
+    } else if (usuarioChat) {
+      const userChat = JSON.parse(usuarioChat);
+      
+      // Verificar se o tempo de 15 minutos expirou
+      const agora = new Date().getTime();
+      const tempoDecorrido = agora - userChat.inicioSessao;
+      
+      if (tempoDecorrido > userChat.limiteTempo) {
+        // Tempo expirado, fazer logout automático
+        localStorage.removeItem('usuarioChat');
+        localStorage.removeItem(`acesso_${userChat.email}`);
+        alert('Seu tempo de acesso de 15 minutos expirou. Faça login novamente.');
+        navigate('/inicio');
+        return;
+      }
+      
+      setUsuario({ ...userChat, tipo: 'chat' });
+    } else if (visitante) {
       setUsuario(JSON.parse(visitante));
-    } else if (usuarioPremium) {
-      setUsuario(JSON.parse(usuarioPremium));
     } else {
       navigate('/inicio');
       return;

@@ -1,0 +1,275 @@
+.meu-perfil-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6B46C1 0%, #8B5CF6 50%, #A855F7 100%);
+  padding-bottom: 2rem;
+}
+
+.perfil-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.perfil-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.premium-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.perfil-header h1 {
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.perfil-header p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+}
+
+.perfil-content {
+  display: grid;
+  gap: 2rem;
+}
+
+.fotos-section,
+.descricao-section,
+.preview-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.fotos-section h2,
+.descricao-section h2,
+.preview-section h2 {
+  color: #1e3a8a;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.fotos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.foto-slot {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  border: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.foto-slot.principal {
+  border-color: #f59e0b;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+}
+
+.foto-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.foto-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.foto-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.foto-container:hover .foto-overlay {
+  opacity: 1;
+}
+
+.btn-principal,
+.btn-remover {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-principal {
+  background: #f59e0b;
+  color: white;
+}
+
+.btn-principal:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+}
+
+.btn-remover {
+  background: #dc2626;
+  color: white;
+}
+
+.foto-upload {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #6b7280;
+}
+
+.foto-upload:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.foto-upload svg {
+  font-size: 2rem;
+}
+
+.principal-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: #f59e0b;
+  color: white;
+  padding: 0.3rem;
+  border-radius: 50%;
+  font-size: 0.8rem;
+}
+
+.descricao-edit textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.descricao-edit textarea:focus {
+  outline: none;
+  border-color: #1e3a8a;
+}
+
+.descricao-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.descricao-view p {
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  min-height: 3rem;
+}
+
+.preview-section .perfil-preview {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.preview-header {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.foto-principal-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #f59e0b;
+}
+
+.preview-info h3 {
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.premium-icon {
+  color: #f59e0b;
+}
+
+.preview-descricao {
+  color: #6b7280;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+  font-size: 1.2rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .perfil-container {
+    padding: 1rem;
+  }
+  
+  .fotos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  
+  .perfil-header h1 {
+    font-size: 2rem;
+  }
+  
+  .descricao-actions {
+    flex-direction: column;
+  }
+  
+  .preview-header {
+    flex-direction: column;
+    text-align: center;
+  }
+} 

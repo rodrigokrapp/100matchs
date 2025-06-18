@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import MenuHamburguer from './MenuHamburguer';
 import './Header.css';
 
 const Header: React.FC = () => {
@@ -19,6 +20,7 @@ const Header: React.FC = () => {
         />
         <h1 className="site-title">100 Matchs</h1>
       </div>
+      <MenuHamburguer />
     </header>
   );
 };

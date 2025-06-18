@@ -6,21 +6,71 @@ import './InicioPage.css';
 const InicioPage: React.FC = () => {
   const navigate = useNavigate();
   const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [nomePremium, setNomePremium] = useState('');
+  const [emailPremium, setEmailPremium] = useState('');
+  const [senhaPremium, setSenhaPremium] = useState('');
 
-  const handleEntrar = () => {
-    if (!nome.trim()) {
-      alert('Por favor, digite seu nome');
+  const handleEntrarChat = () => {
+    if (!nome.trim() || !email.trim()) {
+      alert('Por favor, digite seu nome e email');
       return;
     }
 
-    // Salvar como visitante
-    const visitante = {
+    // Verificar se já usou este email nas últimas 24 horas
+    const ultimoAcesso = localStorage.getItem(`acesso_${email}`);
+    if (ultimoAcesso) {
+      const agora = new Date().getTime();
+      const ultimoAcessoTime = parseInt(ultimoAcesso);
+      const diferencaHoras = (agora - ultimoAcessoTime) / (1000 * 60 * 60);
+      
+      if (diferencaHoras < 24) {
+        const horasRestantes = Math.ceil(24 - diferencaHoras);
+        alert(`Você já usou este email hoje. Tente novamente em ${horasRestantes} horas.`);
+        return;
+      }
+    }
+
+    // Salvar usuário de chat gratuito com limite de 15 minutos
+    const usuarioChat = {
       nome: nome.trim(),
+      email: email.trim(),
       premium: false,
-      tipo: 'visitante'
+      tipo: 'chat',
+      inicioSessao: new Date().getTime(),
+      limiteTempo: 15 * 60 * 1000 // 15 minutos em ms
     };
 
-    localStorage.setItem('visitante', JSON.stringify(visitante));
+    localStorage.setItem('usuarioChat', JSON.stringify(usuarioChat));
+    localStorage.setItem(`acesso_${email}`, new Date().getTime().toString());
+    navigate('/salas');
+  };
+
+  const handleEntrarPremium = () => {
+    if (!nomePremium.trim() || !emailPremium.trim() || !senhaPremium.trim()) {
+      alert('Por favor, preencha nome, email e senha');
+      return;
+    }
+
+    // Verificar se usuário premium existe
+    const usuariosPremium = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
+    const usuarioPremium = usuariosPremium.find((u: any) => 
+      u.email === emailPremium.trim() && u.senha === senhaPremium.trim()
+    );
+
+    if (!usuarioPremium) {
+      alert('Email ou senha incorretos');
+      return;
+    }
+
+    // Login bem-sucedido
+    const usuarioLogado = {
+      ...usuarioPremium,
+      premium: true,
+      tipo: 'premium'
+    };
+
+    localStorage.setItem('usuarioPremium', JSON.stringify(usuarioLogado));
     navigate('/salas');
   };
 
@@ -30,10 +80,6 @@ const InicioPage: React.FC = () => {
 
   const handleSupporte = () => {
     navigate('/suporte6828');
-  };
-
-  const handleEntrarPremium = () => {
-    navigate('/loginpremium');
   };
 
   return (
@@ -48,9 +94,10 @@ const InicioPage: React.FC = () => {
         </div>
 
         <div className="main-content">
+          {/* Formulário Entrar Chat */}
           <div className="entrada-card card">
             <h2>Entrar no Chat</h2>
-            <p>Digite seu nome e comece a conversar agora mesmo</p>
+            <p>Acesso gratuito por 15 minutos (apenas texto e emoticons)</p>
             
             <div className="input-group">
               <input
@@ -59,10 +106,49 @@ const InicioPage: React.FC = () => {
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
                 className="input"
-                onKeyPress={(e) => e.key === 'Enter' && handleEntrar()}
               />
-              <button onClick={handleEntrar} className="btn btn-primary">
-                Entrar
+              <input
+                type="email"
+                placeholder="Digite seu email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input"
+              />
+              <button onClick={handleEntrarChat} className="btn btn-primary">
+                Entrar Chat
+              </button>
+            </div>
+          </div>
+
+          {/* Formulário Entrar Usuário Premium */}
+          <div className="entrada-card card premium-login-card">
+            <h2>Entrar Usuário Premium</h2>
+            <p>Acesso completo e ilimitado (vídeo, áudio, imagem, texto e emoticons)</p>
+            
+            <div className="input-group">
+              <input
+                type="text"
+                placeholder="Digite seu nome"
+                value={nomePremium}
+                onChange={(e) => setNomePremium(e.target.value)}
+                className="input"
+              />
+              <input
+                type="email"
+                placeholder="Digite seu email"
+                value={emailPremium}
+                onChange={(e) => setEmailPremium(e.target.value)}
+                className="input"
+              />
+              <input
+                type="password"
+                placeholder="Digite sua senha"
+                value={senhaPremium}
+                onChange={(e) => setSenhaPremium(e.target.value)}
+                className="input"
+              />
+              <button onClick={handleEntrarPremium} className="btn btn-premium">
+                Entrar Premium
               </button>
             </div>
           </div>
@@ -73,14 +159,6 @@ const InicioPage: React.FC = () => {
               <div>
                 <h3>SEJA PREMIUM</h3>
                 <p>Acesso completo a todas as funcionalidades</p>
-              </div>
-            </button>
-
-            <button onClick={handleEntrarPremium} className="btn btn-secondary">
-              <div className="login-icon">🔑</div>
-              <div>
-                <h3>Entrar Premium</h3>
-                <p>Já tem conta premium? Faça login</p>
               </div>
             </button>
 
@@ -100,22 +178,22 @@ const InicioPage: React.FC = () => {
             <div className="feature-card card">
               <div className="feature-icon">🎥</div>
               <h3>Vídeo</h3>
-              <p>Grave vídeos de até 10 segundos</p>
+              <p>Grave vídeos de até 10 segundos (Premium)</p>
             </div>
             <div className="feature-card card">
               <div className="feature-icon">🎤</div>
               <h3>Áudio</h3>
-              <p>Envie mensagens de voz</p>
+              <p>Envie mensagens de voz (Premium)</p>
             </div>
             <div className="feature-card card">
               <div className="feature-icon">📷</div>
               <h3>Fotos</h3>
-              <p>Compartilhe imagens da galeria</p>
+              <p>Compartilhe imagens (Premium)</p>
             </div>
             <div className="feature-card card">
               <div className="feature-icon">😀</div>
               <h3>Emoticons</h3>
-              <p>Expresse-se com emojis</p>
+              <p>Expresse-se com emojis (Todos)</p>
             </div>
           </div>
         </div>
