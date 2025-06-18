@@ -86,6 +86,14 @@ const MeuPerfilPremiumPage: React.FC = () => {
     setEditandoDescricao(false);
   };
 
+  const handleSalvarEIrParaSalas = () => {
+    const novoPerfilAtualizado = { ...perfil, descricao: novaDescricao };
+    setPerfil(novoPerfilAtualizado);
+    salvarPerfil(novoPerfilAtualizado);
+    setEditandoDescricao(false);
+    navigate('/salas');
+  };
+
   const salvarPerfil = (perfilAtualizado: PerfilPremium) => {
     localStorage.setItem(`perfil_${perfilAtualizado.email}`, JSON.stringify(perfilAtualizado));
   };
@@ -188,6 +196,10 @@ const MeuPerfilPremiumPage: React.FC = () => {
                   <button onClick={handleSalvarDescricao} className="btn btn-primary">
                     <FiSave />
                     Salvar
+                  </button>
+                  <button onClick={handleSalvarEIrParaSalas} className="btn btn-success">
+                    <FiSave />
+                    Salvar e Ir para Salas
                   </button>
                   <button 
                     onClick={() => {
