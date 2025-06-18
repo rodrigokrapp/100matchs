@@ -220,31 +220,56 @@ const ChatPage: React.FC = () => {
   };
 
   const handleEnviarMensagem = async () => {
-    if (!mensagem.trim() || !usuario || !salaId) {
-      console.log('❌ Condições não atendidas:', { mensagem: mensagem.trim(), usuario, salaId });
+    console.log('🔄 handleEnviarMensagem chamado');
+    console.log('📝 Mensagem atual:', mensagem);
+    console.log('👤 Usuário atual:', usuario);
+    console.log('🏠 Sala atual:', salaId);
+    
+    if (!mensagem.trim()) {
+      console.log('❌ Mensagem vazia');
+      return;
+    }
+    
+    if (!usuario) {
+      console.log('❌ Usuário não encontrado');
+      return;
+    }
+    
+    if (!salaId) {
+      console.log('❌ ID da sala não encontrado');
       return;
     }
 
     try {
       console.log('📤 Enviando mensagem:', mensagem);
       
+      // Limpar mensagem imediatamente para melhor UX
+      const mensagemParaEnviar = mensagem.trim();
+      setMensagem('');
+      
       const sucesso = await chatService.sendMessage(
         salaId,
         usuario.nome,
-        mensagem,
+        mensagemParaEnviar,
         'texto',
         usuario.premium || false
       );
 
       if (sucesso) {
-        setMensagem('');
         console.log('✅ Mensagem enviada com sucesso');
       } else {
         console.log('⚠️ Mensagem processada via fallback');
-        setMensagem(''); // Limpar mesmo assim pois pode ter funcionado via fallback
       }
+      
+      // Scroll para o final após enviar
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+      
     } catch (error) {
       console.error('❌ Erro ao enviar mensagem:', error);
+      // Restaurar mensagem em caso de erro
+      setMensagem(mensagemParaEnviar);
     }
   };
 
@@ -958,7 +983,10 @@ const ChatPage: React.FC = () => {
             />
 
             <button 
-              onClick={handleEnviarMensagem}
+              onClick={() => {
+                console.log('🖱️ Botão de envio clicado!');
+                handleEnviarMensagem();
+              }}
               className="send-button"
               disabled={!mensagem.trim() || isRecording}
               style={{
