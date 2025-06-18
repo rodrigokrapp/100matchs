@@ -16,16 +16,18 @@ const Header: React.FC = () => {
 
   return (
     <header className="header">
-      <div className="logo-container" onClick={handleLogoClick}>
-        <img 
-          src="/logo-coracao-rosa.png" 
-          alt="100 Matchs Logo" 
-          className="logo" 
-        />
-        <h1 className="site-title">100 Matchs</h1>
-      </div>
-      <div className="salas-link" onClick={handleSalasClick}>
-        salas
+      <div className="header-left">
+        <div className="logo-container" onClick={handleLogoClick}>
+          <img 
+            src="/logo-roxa.svg" 
+            alt="100 Matchs Logo" 
+            className="logo" 
+          />
+          <h1 className="site-title">100 Matchs</h1>
+        </div>
+        <div className="salas-link" onClick={handleSalasClick}>
+          salas
+        </div>
       </div>
       <MenuHamburguer />
     </header>

@@ -66,7 +66,7 @@ const SalasPage: React.FC = () => {
       id: capital.toLowerCase().replace(/\s/g, '-').replace(/[^a-z0-9-]/g, ''),
       nome: capital,
       tipo: 'capital' as const,
-      usuarios: Math.floor(Math.random() * 500) + 50 // Simular usuários online
+      usuarios: 0 // Apenas usuários reais conectados
     }));
 
     setSalasCapitais(capitais);
