@@ -810,17 +810,15 @@ const ChatPage: React.FC = () => {
                                 }}
                                 onEnded={(e) => {
                                   // Quando o vídeo termina, marca como visualizado e some
-                                  setTimeout(() => {
-                                    const videoElement = e.target as HTMLVideoElement;
-                                    const videoContainer = videoElement.closest('.video-message') as HTMLElement;
-                                    if (videoContainer) {
-                                      videoContainer.style.opacity = '0';
-                                      videoContainer.style.transition = 'opacity 0.5s ease';
-                                      setTimeout(() => {
-                                        videoContainer.style.display = 'none';
-                                      }, 500);
-                                    }
-                                  }, 1000);
+                                  const videoElement = e.target as HTMLVideoElement;
+                                  const videoContainer = videoElement.closest('.video-message') as HTMLElement;
+                                  if (videoContainer) {
+                                    videoContainer.style.opacity = '0';
+                                    videoContainer.style.transition = 'opacity 0.5s ease';
+                                    setTimeout(() => {
+                                      videoContainer.style.display = 'none';
+                                    }, 500);
+                                  }
                                 }}
                                 data-msg-id={msg.id}
                               >
