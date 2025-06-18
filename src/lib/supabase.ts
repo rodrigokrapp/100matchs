@@ -110,4 +110,41 @@ export const initializeDatabase = async () => {
     console.error('❌ Erro ao inicializar banco:', error);
     return false;
   }
+};
+
+// Função para agendar remoção de mídia após 10 segundos
+export const scheduleMediaDeletion = (mediaUrl: string, messageId: string) => {
+  setTimeout(async () => {
+    try {
+      // Remover do storage se for URL do Supabase
+      if (mediaUrl.includes('supabase.co/storage')) {
+        const path = mediaUrl.split('/storage/v1/object/public/')[1];
+        if (path) {
+          const { error: storageError } = await supabase.storage
+            .from('chat-media')
+            .remove([path]);
+          
+          if (storageError) {
+            console.warn('⚠️ Erro ao remover mídia do storage:', storageError);
+          } else {
+            console.log('✅ Mídia removida do storage:', path);
+          }
+        }
+      }
+
+      // Remover mensagem do banco de dados
+      const { error: dbError } = await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('id', messageId);
+
+      if (dbError) {
+        console.warn('⚠️ Erro ao remover mensagem do DB:', dbError);
+      } else {
+        console.log('✅ Mensagem removida do BD:', messageId);
+      }
+    } catch (error) {
+      console.error('❌ Erro na remoção automática de mídia:', error);
+    }
+  }, 10000); // 10 segundos
 }; 

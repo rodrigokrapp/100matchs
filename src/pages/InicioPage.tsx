@@ -10,10 +10,17 @@ const InicioPage: React.FC = () => {
   const [nomePremium, setNomePremium] = useState('');
   const [emailPremium, setEmailPremium] = useState('');
   const [senhaPremium, setSenhaPremium] = useState('');
+  const [aceitarTermos, setAceitarTermos] = useState(false);
+  const [aceitarTermosPremium, setAceitarTermosPremium] = useState(false);
 
   const handleEntrarChat = () => {
     if (!nome.trim()) {
       alert('Por favor, digite seu nome');
+      return;
+    }
+
+    if (!aceitarTermos) {
+      alert('Por favor, aceite os termos de políticas e privacidade');
       return;
     }
 
@@ -31,6 +38,11 @@ const InicioPage: React.FC = () => {
   const handleEntrarPremium = () => {
     if (!nomePremium.trim() || !emailPremium.trim() || !senhaPremium.trim()) {
       alert('Por favor, preencha nome, email e senha');
+      return;
+    }
+
+    if (!aceitarTermosPremium) {
+      alert('Por favor, aceite os termos de políticas e privacidade');
       return;
     }
 
@@ -89,6 +101,16 @@ const InicioPage: React.FC = () => {
                 onChange={(e) => setNome(e.target.value)}
                 className="input"
               />
+              <div className="terms-checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={aceitarTermos}
+                    onChange={(e) => setAceitarTermos(e.target.checked)}
+                  />
+                  <span>Aceito os termos de políticas e privacidade de imagem, dados básicos e respeito aos usuários do chat</span>
+                </label>
+              </div>
               <button onClick={handleEntrarChat} className="btn btn-primary">
                 Entrar Chat
               </button>
@@ -122,6 +144,16 @@ const InicioPage: React.FC = () => {
                 onChange={(e) => setSenhaPremium(e.target.value)}
                 className="input"
               />
+              <div className="terms-checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={aceitarTermosPremium}
+                    onChange={(e) => setAceitarTermosPremium(e.target.checked)}
+                  />
+                  <span>Aceito os termos de políticas e privacidade de imagem, dados básicos e respeito aos usuários do chat</span>
+                </label>
+              </div>
               <button onClick={handleEntrarPremium} className="btn btn-premium">
                 Entrar Premium
               </button>
