@@ -304,26 +304,25 @@ const ChatPage: React.FC = () => {
 
       // Iniciar contador de tempo
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        setRecordingTime(prev => {
+          const newTime = prev + 1;
+          // Parar automaticamente aos 10 segundos
+          if (newTime >= 10) {
+            handleStopRecording();
+          }
+          return newTime;
+        });
       }, 1000);
 
-      // Capturar vídeo por até 10 segundos
-      const videoBlob = await mediaService.captureVideo(10);
-      
-      // Parar contador
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-      }
+      // Capturar vídeo
+      const videoBlob = await MediaService.captureVideo(10);
       
       if (videoBlob) {
-        const url = mediaService.createTempUrl(videoBlob);
+        const url = MediaService.createTempUrl(videoBlob);
         setPreviewMedia({type: 'video', url, blob: videoBlob});
         setIsPreviewMode(true);
         console.log('✅ Vídeo capturado com sucesso');
       }
-      
-      setIsRecording(false);
-      setRecordingType(null);
       
     } catch (error) {
       console.error('❌ Erro ao capturar vídeo:', error);
@@ -347,26 +346,25 @@ const ChatPage: React.FC = () => {
 
       // Iniciar contador de tempo
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        setRecordingTime(prev => {
+          const newTime = prev + 1;
+          // Parar automaticamente aos 10 segundos
+          if (newTime >= 10) {
+            handleStopRecording();
+          }
+          return newTime;
+        });
       }, 1000);
 
-      // Gravar áudio por até 10 segundos
-      const audioBlob = await mediaService.recordAudio(10);
-      
-      // Parar contador
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-      }
+      // Gravar áudio
+      const audioBlob = await MediaService.recordAudio(10);
       
       if (audioBlob) {
-        const url = mediaService.createTempUrl(audioBlob);
+        const url = MediaService.createTempUrl(audioBlob);
         setPreviewMedia({type: 'audio', url, blob: audioBlob});
         setIsPreviewMode(true);
         console.log('✅ Áudio gravado com sucesso');
       }
-      
-      setIsRecording(false);
-      setRecordingType(null);
       
     } catch (error) {
       console.error('❌ Erro ao gravar áudio:', error);
@@ -381,12 +379,13 @@ const ChatPage: React.FC = () => {
 
   const handleStopRecording = () => {
     console.log('⏹️ Parando gravação...');
-    mediaService.stopRecording();
+    MediaService.stopRecording();
     setIsRecording(false);
     setRecordingType(null);
     setRecordingTime(0);
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
+      recordingIntervalRef.current = null;
     }
   };
 
@@ -396,10 +395,10 @@ const ChatPage: React.FC = () => {
       console.log('📷 Selecionando imagem...');
       setShowMediaOptions(false);
       
-      const file = await mediaService.selectImage();
+      const file = await MediaService.selectImage();
       if (file) {
         console.log('✅ Imagem selecionada:', file.name);
-        const url = mediaService.createTempUrl(file);
+        const url = MediaService.createTempUrl(file);
         setPreviewMedia({type: 'image', url, blob: file});
         setIsPreviewMode(true);
       } else {
@@ -416,17 +415,22 @@ const ChatPage: React.FC = () => {
     if (!previewMedia || !usuario || !salaId) return;
 
     try {
-      const base64 = await mediaService.blobToBase64(previewMedia.blob!);
+      console.log('📤 Enviando mídia:', previewMedia.type);
+      const base64 = await MediaService.blobToBase64(previewMedia.blob!);
       
-      await chatService.sendMessage(
+      const sucesso = await chatService.sendMessage(
         salaId,
         usuario.nome,
         base64,
         previewMedia.type === 'image' ? 'imagem' : previewMedia.type,
         usuario.premium || false,
         true, // Mensagem temporária
-        usuario.premium ? 24 * 60 * 60 : 30 // 24h para premium, 30s para free
+        10 // 10 segundos para todas as mídias
       );
+
+      if (sucesso) {
+        console.log('✅ Mídia enviada com sucesso!');
+      }
 
       // Limpar preview
       setIsPreviewMode(false);
@@ -441,7 +445,7 @@ const ChatPage: React.FC = () => {
   // NOVA FUNCIONALIDADE: Cancelar preview
   const handleCancelPreview = () => {
     if (previewMedia?.url) {
-      mediaService.revokeTempUrl(previewMedia.url);
+      MediaService.revokeTempUrl(previewMedia.url);
     }
     setIsPreviewMode(false);
     setPreviewMedia(null);

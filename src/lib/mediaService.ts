@@ -8,14 +8,14 @@ export interface MediaMessage {
 }
 
 class MediaService {
-  private mediaRecorder: MediaRecorder | null = null;
-  private stream: MediaStream | null = null;
-  private chunks: Blob[] = [];
+  private static mediaRecorder: MediaRecorder | null = null;
+  private static stream: MediaStream | null = null;
+  private static chunks: Blob[] = [];
 
   // Capturar vídeo de 0-10 segundos
-  async captureVideo(duration: number = 10): Promise<Blob | null> {
+  static async captureVideo(duration: number = 10): Promise<Blob | null> {
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
+      MediaService.stream = await navigator.mediaDevices.getUserMedia({
         video: { 
           width: { ideal: 1280 },
           height: { ideal: 720 },
@@ -25,32 +25,32 @@ class MediaService {
       });
 
       return new Promise((resolve, reject) => {
-        this.mediaRecorder = new MediaRecorder(this.stream!);
-        this.chunks = [];
+        MediaService.mediaRecorder = new MediaRecorder(MediaService.stream!);
+        MediaService.chunks = [];
 
-        this.mediaRecorder.ondataavailable = (event) => {
+        MediaService.mediaRecorder.ondataavailable = (event: BlobEvent) => {
           if (event.data.size > 0) {
-            this.chunks.push(event.data);
+            MediaService.chunks.push(event.data);
           }
         };
 
-        this.mediaRecorder.onstop = () => {
-          const blob = new Blob(this.chunks, { type: 'video/webm' });
-          this.cleanup();
+        MediaService.mediaRecorder.onstop = () => {
+          const blob = new Blob(MediaService.chunks, { type: 'video/webm' });
+          MediaService.cleanup();
           resolve(blob);
         };
 
-        this.mediaRecorder.onerror = (event) => {
-          this.cleanup();
+        MediaService.mediaRecorder.onerror = (event: Event) => {
+          MediaService.cleanup();
           reject(event);
         };
 
-        this.mediaRecorder.start();
+        MediaService.mediaRecorder.start();
 
         // Parar gravação automaticamente após a duração especificada
         setTimeout(() => {
-          if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-            this.mediaRecorder.stop();
+          if (MediaService.mediaRecorder && MediaService.mediaRecorder.state === 'recording') {
+            MediaService.mediaRecorder.stop();
           }
         }, duration * 1000);
       });
@@ -61,9 +61,9 @@ class MediaService {
   }
 
   // Gravar áudio de 0-10 segundos
-  async recordAudio(duration: number = 10): Promise<Blob | null> {
+  static async recordAudio(duration: number = 10): Promise<Blob | null> {
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
+      MediaService.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
@@ -72,32 +72,32 @@ class MediaService {
       });
 
       return new Promise((resolve, reject) => {
-        this.mediaRecorder = new MediaRecorder(this.stream!);
-        this.chunks = [];
+        MediaService.mediaRecorder = new MediaRecorder(MediaService.stream!);
+        MediaService.chunks = [];
 
-        this.mediaRecorder.ondataavailable = (event) => {
+        MediaService.mediaRecorder.ondataavailable = (event: BlobEvent) => {
           if (event.data.size > 0) {
-            this.chunks.push(event.data);
+            MediaService.chunks.push(event.data);
           }
         };
 
-        this.mediaRecorder.onstop = () => {
-          const blob = new Blob(this.chunks, { type: 'audio/webm' });
-          this.cleanup();
+        MediaService.mediaRecorder.onstop = () => {
+          const blob = new Blob(MediaService.chunks, { type: 'audio/webm' });
+          MediaService.cleanup();
           resolve(blob);
         };
 
-        this.mediaRecorder.onerror = (event) => {
-          this.cleanup();
+        MediaService.mediaRecorder.onerror = (event: Event) => {
+          MediaService.cleanup();
           reject(event);
         };
 
-        this.mediaRecorder.start();
+        MediaService.mediaRecorder.start();
 
         // Parar gravação automaticamente após a duração especificada
         setTimeout(() => {
-          if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-            this.mediaRecorder.stop();
+          if (MediaService.mediaRecorder && MediaService.mediaRecorder.state === 'recording') {
+            MediaService.mediaRecorder.stop();
           }
         }, duration * 1000);
       });
@@ -108,7 +108,7 @@ class MediaService {
   }
 
   // Selecionar imagem da galeria
-  async selectImage(): Promise<File | null> {
+  static async selectImage(): Promise<File | null> {
     return new Promise((resolve) => {
       const input = document.createElement('input');
       input.type = 'file';
@@ -137,24 +137,24 @@ class MediaService {
   }
 
   // Parar gravação manualmente
-  stopRecording() {
-    if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-      this.mediaRecorder.stop();
+  static stopRecording() {
+    if (MediaService.mediaRecorder && MediaService.mediaRecorder.state === 'recording') {
+      MediaService.mediaRecorder.stop();
     }
   }
 
   // Limpar recursos
-  private cleanup() {
-    if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
-      this.stream = null;
+  private static cleanup() {
+    if (MediaService.stream) {
+      MediaService.stream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+      MediaService.stream = null;
     }
-    this.mediaRecorder = null;
-    this.chunks = [];
+    MediaService.mediaRecorder = null;
+    MediaService.chunks = [];
   }
 
   // Converter blob para base64 para envio
-  blobToBase64(blob: Blob): Promise<string> {
+  static blobToBase64(blob: Blob): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result as string);
@@ -164,12 +164,12 @@ class MediaService {
   }
 
   // Criar URL temporária para visualização
-  createTempUrl(blob: Blob): string {
+  static createTempUrl(blob: Blob): string {
     return URL.createObjectURL(blob);
   }
 
   // Revogar URL temporária
-  revokeTempUrl(url: string) {
+  static revokeTempUrl(url: string) {
     URL.revokeObjectURL(url);
   }
 
