@@ -13,6 +13,12 @@
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
 .logo-container {
   display: flex;
   align-items: center;
@@ -93,6 +99,10 @@
 @media (max-width: 768px) {
   .header {
     padding: 1rem;
+  }
+  
+  .header-left {
+    gap: 1rem;
   }
   
   .site-title {

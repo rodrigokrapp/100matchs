@@ -27,7 +27,7 @@ const CriarSalaPage: React.FC = () => {
         id: salaId,
         nome: `${nome} - ${bairro}, ${cidade}`,
         tipo: 'personalizada',
-        usuarios: Math.floor(Math.random() * 20) + 1,
+        usuarios: 0,
         criada_em: new Date().toISOString(),
         criador: JSON.parse(localStorage.getItem('visitante') || localStorage.getItem('usuario') || '{}').nome
       };
