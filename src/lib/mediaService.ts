@@ -199,7 +199,7 @@ class MediaService {
   }
 }
 
-export const mediaService = new MediaService();
+export default MediaService;
 
 // Emojis expandidos para seleção
 export const EMOJI_CATEGORIES = {

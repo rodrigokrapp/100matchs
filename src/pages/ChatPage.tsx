@@ -6,32 +6,7 @@ import {
   FiCamera, FiMicOff
 } from 'react-icons/fi';
 import { chatService, ChatMessage } from '../lib/chatService';
-import { mediaService, EMOJI_CATEGORIES } from '../lib/mediaService';
-
-// Importar a classe MediaService para acessar métodos estáticos
-class MediaService {
-  static isMediaSupported(): boolean {
-    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-  }
-
-  static async checkCameraPermission(): Promise<boolean> {
-    try {
-      const result = await navigator.permissions.query({ name: 'camera' as PermissionName });
-      return result.state === 'granted';
-    } catch {
-      return false;
-    }
-  }
-
-  static async checkMicrophonePermission(): Promise<boolean> {
-    try {
-      const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-      return result.state === 'granted';
-    } catch {
-      return false;
-    }
-  }
-}
+import MediaService, { EMOJI_CATEGORIES } from '../lib/mediaService';
 import { testChatConnection } from '../lib/supabase';
 import Header from '../components/Header';
 import './ChatPage.css';
@@ -115,12 +90,12 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     return () => {
       chatService.leaveRoom();
-      mediaService.stopRecording();
+      MediaService.stopRecording();
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
       }
       // Limpar URLs temporárias
-      tempMediaUrls.forEach(url => mediaService.revokeTempUrl(url));
+      tempMediaUrls.forEach(url => MediaService.revokeTempUrl(url));
     };
   }, [tempMediaUrls]);
 
