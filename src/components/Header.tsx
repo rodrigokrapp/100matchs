@@ -19,7 +19,7 @@ const Header: React.FC = () => {
       <div className="header-left">
         <div className="logo-container" onClick={handleLogoClick}>
           <img 
-            src="/logo-roxa.svg" 
+            src="/logo-nova.svg" 
             alt="100 Matchs Logo" 
             className="logo" 
           />

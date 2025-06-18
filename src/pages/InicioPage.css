@@ -213,6 +213,63 @@
   grid-template-columns: 1fr 1fr;
 }
 
+/* Melhorias para Desktop */
+@media (min-width: 1200px) {
+  .inicio-container {
+    max-width: 1400px;
+    padding: 3rem 2rem;
+  }
+  
+  .main-content {
+    gap: 3rem;
+    margin-bottom: 4rem;
+  }
+  
+  .entrada-card {
+    padding: 3rem;
+    border-radius: 20px;
+  }
+  
+  .entrada-card h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .entrada-card p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .input-group .input {
+    padding: 1.2rem;
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .btn {
+    padding: 1.2rem 2rem;
+    font-size: 1.1rem;
+  }
+  
+  .features-section {
+    margin-top: 4rem;
+  }
+  
+  .features-grid {
+    gap: 2rem;
+  }
+  
+  .feature-card {
+    padding: 2.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+}
+
 .entrada-card {
   text-align: center;
 }
@@ -236,6 +293,37 @@
   display: flex;
   gap: 1rem;
   flex-direction: column;
+}
+
+.terms-checkbox {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.terms-checkbox label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  cursor: pointer;
+  color: white;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.terms-checkbox input[type="checkbox"] {
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: #E91E63;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.terms-checkbox span {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .input-group .input {
@@ -737,10 +825,26 @@
   }
 }
 
+/* Responsividade Mobile */
 @media (max-width: 768px) {
-  .inicio-container {
-    padding: 1rem 0.75rem;
+  .inicio-page {
+    padding: 0;
   }
+<<<<<<< HEAD
+
+  .inicio-container {
+    padding: 0 10px;
+    gap: 15px;
+  }
+
+  .hero-section {
+    height: 200px;
+    margin-bottom: 15px;
+  }
+
+  .banner-image {
+    height: 100%;
+=======
   
   .main-content {
     grid-template-columns: 1fr;
@@ -748,117 +852,197 @@
   
   .hero-banner-container {
     height: 400px;
+>>>>>>> eaed69a4b8e3cac33451c81b251277fb72e9e63a
     border-radius: 0 0 20px 20px;
   }
 
-  .left-text h2 {
-    font-size: 1.8rem;
+  .main-content {
+    grid-template-columns: 1fr;
+    gap: 15px;
   }
 
-  .right-text h1 {
-    font-size: 2.5rem;
+  .entrada-card {
+    padding: 20px 15px;
+    margin: 0;
   }
 
-  .hero-banner-title {
-    font-size: 2.8rem;
-    letter-spacing: -1px;
+  .entrada-card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
   }
 
-  .hero-banner-subtitle {
-    font-size: 1.1rem;
-    padding: 0 1rem;
-    line-height: 1.5;
-  }
-
-  .banner-text-overlay {
-    padding: 0 1rem;
-    text-align: center;
-  }
-
-  .hero-title {
-    font-size: 2.8rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.1rem;
-    padding: 0 1rem;
-  }
-  
-  .form-container {
-    padding: 1.75rem;
-    margin: 0.5rem;
-    border-radius: 15px;
+  .entrada-card p {
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+    line-height: 1.4;
   }
 
   .input-group {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .actions-grid {
-    grid-template-columns: 1fr;
-    margin-top: 1.5rem;
-  }
-  
-  .features-grid {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: 12px;
   }
 
-  .feature-card {
-    padding: 1.5rem;
-    text-align: center;
-  }
-
-  .premium-card {
-    padding: 1.5rem;
+  .input {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+    border-radius: 10px;
   }
 
   .btn {
-    min-height: 50px;
-    font-size: 1rem;
-    padding: 0.875rem 1.25rem;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  .actions-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .btn.btn-premium.premium-card,
+  .btn.btn-secondary {
+    padding: 20px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .premium-icon,
+  .support-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .btn.btn-premium.premium-card h3,
+  .btn.btn-secondary h3 {
+    font-size: 1.1rem;
+    margin: 0 0 5px 0;
+  }
+
+  .btn.btn-premium.premium-card p,
+  .btn.btn-secondary p {
+    font-size: 0.8rem;
+    margin: 0;
+    opacity: 0.9;
+  }
+
+  .features-section {
+    margin-top: 30px;
+  }
+
+  .features-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .feature-card {
+    padding: 15px;
+  }
+
+  .feature-icon {
+    font-size: 1.5rem;
+  }
+
+  .feature-card h3 {
+    font-size: 0.9rem;
+  }
+
+  .feature-card p {
+    font-size: 0.75rem;
   }
 }
 
 @media (max-width: 480px) {
   .inicio-container {
-    padding: 0.75rem 0.5rem;
+    padding: 0 8px;
   }
 
-  .hero-banner-container {
-    height: 350px;
+  .hero-section {
+    height: 180px;
+    margin-bottom: 12px;
   }
 
-  .left-text h2 {
-    font-size: 1.5rem;
+  .entrada-card {
+    padding: 15px 12px;
+    border-radius: 15px;
   }
 
-  .right-text h1 {
-    font-size: 2rem;
+  .entrada-card h2 {
+    font-size: 1.2rem;
   }
 
-  .hero-banner-title {
-    font-size: 2.2rem;
+  .entrada-card p {
+    font-size: 0.8rem;
   }
 
-  .hero-banner-subtitle {
-    font-size: 1rem;
-  }
-
-  .form-container {
-    padding: 1.5rem;
-    margin: 0.25rem;
+  .input {
+    padding: 10px 12px;
+    font-size: 0.85rem;
   }
 
   .btn {
-    width: 100%;
-    min-height: 48px;
-    font-size: 0.95rem;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+
+  .btn.btn-premium.premium-card,
+  .btn.btn-secondary {
+    padding: 15px;
+    gap: 12px;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .premium-icon,
+  .support-icon {
+    font-size: 1.3rem;
+  }
+
+  .btn.btn-premium.premium-card h3,
+  .btn.btn-secondary h3 {
+    font-size: 1rem;
+  }
+
+  .btn.btn-premium.premium-card p,
+  .btn.btn-secondary p {
+    font-size: 0.75rem;
   }
 
   .features-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .feature-card {
+    padding: 12px;
+    text-align: center;
+  }
+
+  .feature-icon {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+  }
+
+  .feature-card h3 {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+  }
+
+  .feature-card p {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+
+  .features-section h2 {
+    font-size: 1.2rem;
+    text-align: center;
   }
 }
 

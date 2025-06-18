@@ -12,16 +12,22 @@ class MediaService {
   private static stream: MediaStream | null = null;
   private static chunks: Blob[] = [];
 
-  // Capturar vídeo de 0-10 segundos
+  // Capturar vídeo de 0-10 segundos com qualidade melhorada
   static async captureVideo(duration: number = 10): Promise<Blob | null> {
     try {
       MediaService.stream = await navigator.mediaDevices.getUserMedia({
         video: { 
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user'
+          width: { ideal: 1920, min: 1280 },
+          height: { ideal: 1080, min: 720 },
+          facingMode: 'user',
+          frameRate: { ideal: 30, min: 24 }
         },
-        audio: true
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 48000
+        }
       });
 
       return new Promise((resolve, reject) => {
