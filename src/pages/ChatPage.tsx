@@ -304,7 +304,7 @@ const ChatPage: React.FC = () => {
       setRecordingTime(0);
       setShowMediaOptions(false);
 
-      // Primeiro, obter o stream da câmera para mostrar preview
+      // Obter stream da câmera
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { 
           width: { ideal: 1280 },
@@ -321,37 +321,54 @@ const ChatPage: React.FC = () => {
       }
 
       // Iniciar contador de tempo
+      let timeCount = 0;
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingTime(prev => {
-          const newTime = prev + 1;
-          return newTime;
-        });
+        timeCount++;
+        setRecordingTime(timeCount);
+        
+        // Parar automaticamente aos 10 segundos
+        if (timeCount >= 10) {
+          clearInterval(recordingIntervalRef.current!);
+          finalizarGravacao();
+        }
       }, 1000);
 
-      // Capturar vídeo - aguardar a gravação completa
-      const videoBlob = await MediaService.captureVideo(10);
-      
-      // Parar o stream da câmera após a gravação
-      stream.getTracks().forEach(track => track.stop());
-      
-      // Parar o contador
-      setIsRecording(false);
-      setRecordingType(null);
-      setRecordingTime(0);
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-        recordingIntervalRef.current = null;
-      }
-      
-      if (videoBlob) {
-        const url = MediaService.createTempUrl(videoBlob);
-        setPreviewMedia({type: 'video', url, blob: videoBlob});
-        setIsPreviewMode(true);
-        console.log('✅ Vídeo capturado com sucesso:', videoBlob);
-      } else {
-        console.error('❌ Falha ao gerar blob do vídeo');
-        alert('Erro ao processar vídeo. Tente novamente.');
-      }
+      // Função para finalizar gravação
+      const finalizarGravacao = async () => {
+        try {
+          MediaService.stopRecording();
+          
+          // Aguardar um pouco para garantir que o blob seja criado
+          setTimeout(async () => {
+            const videoBlob = await MediaService.getLastRecordedBlob();
+            
+            // Parar stream
+            stream.getTracks().forEach(track => track.stop());
+            
+            // Reset states
+            setIsRecording(false);
+            setRecordingType(null);
+            setRecordingTime(0);
+            
+            if (videoBlob && videoBlob.size > 0) {
+              const url = MediaService.createTempUrl(videoBlob);
+              setPreviewMedia({type: 'video', url, blob: videoBlob});
+              setIsPreviewMode(true);
+              console.log('✅ Vídeo capturado:', videoBlob.size, 'bytes');
+            } else {
+              console.error('❌ Blob inválido');
+              alert('Erro ao processar vídeo. Tente novamente.');
+            }
+          }, 500);
+          
+        } catch (error) {
+          console.error('❌ Erro ao finalizar:', error);
+          alert('Erro ao processar vídeo. Tente novamente.');
+        }
+      };
+
+      // Iniciar gravação no MediaService
+      MediaService.startVideoRecording(stream);
       
     } catch (error) {
       console.error('❌ Erro ao capturar vídeo:', error);
@@ -408,16 +425,33 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  const handleStopRecording = () => {
+  const handleStopRecording = async () => {
     console.log('⏹️ Parando gravação...');
     MediaService.stopRecording();
-    setIsRecording(false);
-    setRecordingType(null);
-    setRecordingTime(0);
+    
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
       recordingIntervalRef.current = null;
     }
+    
+    // Aguardar blob e criar preview
+    setTimeout(async () => {
+      const blob = await MediaService.getLastRecordedBlob();
+      
+      setIsRecording(false);
+      setRecordingType(null);
+      setRecordingTime(0);
+      
+      if (blob && blob.size > 0) {
+        const url = MediaService.createTempUrl(blob);
+        setPreviewMedia({type: recordingType || 'video', url, blob});
+        setIsPreviewMode(true);
+        console.log('✅ Preview criado:', blob.size, 'bytes');
+      } else {
+        console.error('❌ Erro ao obter blob');
+        alert('Erro ao processar mídia. Tente novamente.');
+      }
+    }, 1000);
   };
 
   // NOVA FUNCIONALIDADE: Selecionar imagem com preview
@@ -772,6 +806,20 @@ const ChatPage: React.FC = () => {
                                 onCanPlay={(e) => {
                                   const video = e.target as HTMLVideoElement;
                                   video.playbackRate = 1.0;
+                                }}
+                                onEnded={(e) => {
+                                  // Quando o vídeo termina, marca como visualizado e some
+                                  setTimeout(() => {
+                                    const videoElement = e.target as HTMLVideoElement;
+                                    const videoContainer = videoElement.closest('.video-message') as HTMLElement;
+                                    if (videoContainer) {
+                                      videoContainer.style.opacity = '0';
+                                      videoContainer.style.transition = 'opacity 0.5s ease';
+                                      setTimeout(() => {
+                                        videoContainer.style.display = 'none';
+                                      }, 500);
+                                    }
+                                  }, 1000);
                                 }}
                                 data-msg-id={msg.id}
                               >

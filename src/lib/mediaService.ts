@@ -11,6 +11,7 @@ class MediaService {
   private static mediaRecorder: MediaRecorder | null = null;
   private static stream: MediaStream | null = null;
   private static chunks: Blob[] = [];
+  private static lastBlob: Blob | null = null;
 
   // Capturar vídeo de 0-10 segundos com qualidade melhorada
   static async captureVideo(duration: number = 10): Promise<Blob | null> {
@@ -42,6 +43,7 @@ class MediaService {
 
         MediaService.mediaRecorder.onstop = () => {
           const blob = new Blob(MediaService.chunks, { type: 'video/webm' });
+          MediaService.lastBlob = blob;
           MediaService.cleanup();
           resolve(blob);
         };
@@ -202,6 +204,38 @@ class MediaService {
     } catch {
       return false;
     }
+  }
+
+  // Novo método para iniciar gravação
+  static startVideoRecording(stream: MediaStream) {
+    try {
+      MediaService.stream = stream;
+      MediaService.chunks = [];
+      MediaService.mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm;codecs=vp9'
+      });
+
+      MediaService.mediaRecorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data.size > 0) {
+          MediaService.chunks.push(event.data);
+        }
+      };
+
+      MediaService.mediaRecorder.onstop = () => {
+        MediaService.lastBlob = new Blob(MediaService.chunks, { type: 'video/webm' });
+        console.log('🎥 Blob criado:', MediaService.lastBlob.size, 'bytes');
+      };
+
+      MediaService.mediaRecorder.start(1000); // Capturar dados a cada 1s
+      console.log('🎥 Gravação iniciada');
+    } catch (error) {
+      console.error('❌ Erro ao iniciar gravação:', error);
+    }
+  }
+
+  // Obter último blob gravado
+  static async getLastRecordedBlob(): Promise<Blob | null> {
+    return MediaService.lastBlob;
   }
 }
 
