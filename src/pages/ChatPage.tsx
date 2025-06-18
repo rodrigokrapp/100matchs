@@ -31,6 +31,7 @@ const ChatPage: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState<Map<string, boolean>>(new Map());
   const [mediaPermissions, setMediaPermissions] = useState({camera: false, microphone: false});
   const [showMediaOptions, setShowMediaOptions] = useState(false);
+  const [viewedMessages, setViewedMessages] = useState<Map<string, number>>(new Map()); // messageId -> timestamp quando foi visualizado
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
@@ -487,6 +488,14 @@ const ChatPage: React.FC = () => {
 
   const handleViewTemporaryMessage = async (messageId: string) => {
     if (usuario?.nome) {
+      // Marcar que este usuário específico visualizou a mensagem
+      const currentTime = Date.now();
+      setViewedMessages(prev => {
+        const newMap = new Map(prev);
+        newMap.set(messageId, currentTime);
+        return newMap;
+      });
+      
       await chatService.markTemporaryMessageViewed(messageId, usuario.nome);
     }
   };
@@ -501,7 +510,19 @@ const ChatPage: React.FC = () => {
 
   const isMessageExpired = (msg: ChatMessage): boolean => {
     if (!msg.is_temporary || !msg.expires_at) return false;
-    return new Date() > new Date(msg.expires_at);
+    
+    // Verificar se este usuário específico já visualizou a mensagem
+    const viewedTime = viewedMessages.get(msg.id);
+    
+    if (viewedTime) {
+      // Se o usuário já visualizou, verificar se passaram 10 segundos desde a visualização
+      const currentTime = Date.now();
+      const elapsedSeconds = (currentTime - viewedTime) / 1000;
+      return elapsedSeconds > 10; // Expira após 10 segundos da visualização individual
+    }
+    
+    // Se o usuário ainda não visualizou, a mensagem está disponível
+    return false;
   };
 
   const formatRecordingTime = (seconds: number): string => {
