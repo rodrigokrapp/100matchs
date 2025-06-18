@@ -7,7 +7,7 @@ import './SalasPage.css';
 interface Sala {
   id: string;
   nome: string;
-  tipo: 'capital' | 'personalizada' | 'premium' | 'chat';
+  tipo: 'capital' | 'personalizada' | 'premium' | 'chat' | 'visitante';
   usuarios: number;
   criada_em?: string;
 }
@@ -57,8 +57,16 @@ const SalasPage: React.FC = () => {
     } else if (visitante) {
       setUsuario(JSON.parse(visitante));
     } else {
-      navigate('/inicio');
-      return;
+      // Se veio da página início sem login, criar usuário visitante temporário
+      const usuarioVisitante = {
+        nome: 'Visitante',
+        premium: false,
+        tipo: 'visitante',
+        limiteTempo: 5 * 60 * 1000, // 5 minutos
+        inicioSessao: new Date().getTime()
+      };
+      localStorage.setItem('visitante', JSON.stringify(usuarioVisitante));
+      setUsuario(usuarioVisitante);
     }
 
     // Inicializar salas das capitais
