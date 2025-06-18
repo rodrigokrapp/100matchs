@@ -1,29 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiHeart, FiStar } from 'react-icons/fi';
 import Header from '../components/Header';
 import './InicioPage.css';
 
 const InicioPage: React.FC = () => {
   const navigate = useNavigate();
   const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [showLoginPremium, setShowLoginPremium] = useState(false);
-  const [loginData, setLoginData] = useState({
-    nome: '',
-    email: '',
-    senha: ''
-  });
 
-  const handleEntrarComoVisitante = () => {
-    if (!nome.trim() || !email.trim()) {
-      alert('Por favor, preencha seu nome e email para continuar!');
+  const handleEntrar = () => {
+    if (!nome.trim()) {
+      alert('Por favor, digite seu nome');
       return;
     }
 
+    // Salvar como visitante
     const visitante = {
       nome: nome.trim(),
-      email: email.trim(),
+      premium: false,
       tipo: 'visitante'
     };
 
@@ -31,193 +24,100 @@ const InicioPage: React.FC = () => {
     navigate('/salas');
   };
 
-  const handleLoginPremium = () => {
-    if (!loginData.nome.trim() || !loginData.email.trim() || !loginData.senha.trim()) {
-      alert('Por favor, preencha todos os campos para fazer login premium!');
-      return;
-    }
-
-    // Simular validação de usuário premium
-    const usuarioPremium = {
-      nome: loginData.nome.trim(),
-      email: loginData.email.trim(),
-      tipo: 'premium'
-    };
-
-    localStorage.setItem('usuario', JSON.stringify(usuarioPremium));
-    alert('🎉 Login Premium realizado com sucesso! Bem-vindo(a)!');
-    navigate('/salas');
+  const handleSejaPremium = () => {
+    window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank');
   };
 
-  const handleSerPremium = () => {
-    window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank');
+  const handleSupporte = () => {
+    navigate('/suporte6828');
+  };
+
+  const handleEntrarPremium = () => {
+    navigate('/loginpremium');
   };
 
   return (
     <div className="inicio-page">
       <Header />
       
-      <div className="hero-banner-section">
-        <div className="hero-banner-container">
-          <img 
-            src="https://media.discordapp.net/attachments/1215003629906395176/1324102542928863244/image.png"
-            alt="100 MATCHS - Pessoas conversando" 
-            className="hero-banner-image"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover'
-            }}
-          />
-        </div>
-      </div>
-      
       <div className="inicio-container">
         <div className="hero-section">
-          <div className="hero-content">
-            <div className="hero-icon">
-              <div className="hero-image">
-                <div className="image-overlay">
-                  <div className="overlay-text">
-                    <h3>DESLIZA, DESLIZA E NADA!</h3>
-                    <h2>CONVERSE FREE</h2>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <h1 className="hero-title">Resenha Sem Match</h1>
+          <p className="hero-subtitle">
+            Conecte-se com pessoas reais em salas de chat das principais capitais do Brasil. 
+            Converse por vídeo, áudio, imagens e muito mais!
+          </p>
+        </div>
 
-            <div className="hero-text">
-              <div className="features-grid">
-                <div className="feature">
-                  <span className="feature-icon">💝</span>
-                  <span>Matches Instantâneos</span>
-                </div>
-                <div className="feature">
-                  <span className="feature-icon">🎯</span>
-                  <span>100% Grátis</span>
-                </div>
-                <div className="feature">
-                  <span className="feature-icon">🔥</span>
-                  <span>Chat em Tempo Real</span>
-                </div>
-                <div className="feature">
-                  <span className="feature-icon">🌟</span>
-                  <span>Perfis Verificados</span>
-                </div>
-              </div>
-
-              <div className="action-buttons">
-                <button 
-                  className="btn-suporte"
-                  onClick={() => {
-                    console.log('🛠️ Botão Suporte clicado');
-                    navigate('/suporte6828');
-                  }}
-                >
-                  🛠️ Suporte
-                </button>
-                <button 
-                  className="btn-seja-premium"
-                  onClick={() => {
-                    console.log('👑 Botão Seja Premium clicado');
-                    console.log('🔗 Abrindo link:', 'https://pay.kiwify.com.br/E2Y9N6m');
-                    window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank');
-                  }}
-                >
-                  👑 Seja Premium
-                </button>
-              </div>
+        <div className="main-content">
+          <div className="entrada-card card">
+            <h2>Entrar no Chat</h2>
+            <p>Digite seu nome e comece a conversar agora mesmo</p>
+            
+            <div className="input-group">
+              <input
+                type="text"
+                placeholder="Digite seu nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                className="input"
+                onKeyPress={(e) => e.key === 'Enter' && handleEntrar()}
+              />
+              <button onClick={handleEntrar} className="btn btn-primary">
+                Entrar
+              </button>
             </div>
+          </div>
+
+          <div className="actions-grid">
+            <button onClick={handleSejaPremium} className="btn btn-premium premium-card">
+              <div className="premium-icon">⭐</div>
+              <div>
+                <h3>SEJA PREMIUM</h3>
+                <p>Acesso completo a todas as funcionalidades</p>
+              </div>
+            </button>
+
+            <button onClick={handleEntrarPremium} className="btn btn-secondary">
+              <div className="login-icon">🔑</div>
+              <div>
+                <h3>Entrar Premium</h3>
+                <p>Já tem conta premium? Faça login</p>
+              </div>
+            </button>
+
+            <button onClick={handleSupporte} className="btn btn-secondary">
+              <div className="support-icon">💬</div>
+              <div>
+                <h3>Suporte</h3>
+                <p>Precisa de ajuda? Clique aqui</p>
+              </div>
+            </button>
           </div>
         </div>
 
-        <div className="forms-section">
-          <div className="form-container visitante-form">
-            <h3>Entrar como Visitante</h3>
-            <div className="input-group">
-              <FiUser className="input-icon" />
-              <input
-                type="text"
-                placeholder="Seu nome"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                className="form-input"
-              />
+        <div className="features-section">
+          <h2>Funcionalidades do Chat</h2>
+          <div className="features-grid grid grid-4">
+            <div className="feature-card card">
+              <div className="feature-icon">🎥</div>
+              <h3>Vídeo</h3>
+              <p>Grave vídeos de até 10 segundos</p>
             </div>
-            <div className="input-group">
-              <FiMail className="input-icon" />
-              <input
-                type="email"
-                placeholder="Seu email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="form-input"
-              />
+            <div className="feature-card card">
+              <div className="feature-icon">🎤</div>
+              <h3>Áudio</h3>
+              <p>Envie mensagens de voz</p>
             </div>
-            <button onClick={handleEntrarComoVisitante} className="btn-primary">
-              ENTRAR COMO VISITANTE
-            </button>
-          </div>
-
-          <div className="form-container premium-form">
-            <button 
-              onClick={() => setShowLoginPremium(!showLoginPremium)}
-              className="btn-login-premium"
-            >
-              <FiStar /> LOGIN PREMIUM
-            </button>
-
-            {showLoginPremium && (
-              <div className="login-premium-form">
-                <h3>Login Premium</h3>
-                <div className="input-group">
-                  <FiUser className="input-icon" />
-                  <input
-                    type="text"
-                    placeholder="Nome completo"
-                    value={loginData.nome}
-                    onChange={(e) => setLoginData({...loginData, nome: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="input-group">
-                  <FiMail className="input-icon" />
-                  <input
-                    type="email"
-                    placeholder="Email premium"
-                    value={loginData.email}
-                    onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="input-group">
-                  <span className="input-icon">🔐</span>
-                  <input
-                    type="password"
-                    placeholder="Senha premium"
-                    value={loginData.senha}
-                    onChange={(e) => setLoginData({...loginData, senha: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <button onClick={handleLoginPremium} className="btn-primary premium">
-                  FAZER LOGIN PREMIUM
-                </button>
-              </div>
-            )}
-
-            <div className="premium-benefits">
-              <h4>Benefícios Premium:</h4>
-              <ul>
-                <li>📸 Envio de fotos e vídeos</li>
-                <li>🎤 Mensagens de áudio</li>
-                <li>⏰ Mensagens temporárias</li>
-                <li>🎯 Filtros avançados</li>
-                <li>⭐ Badge exclusivo</li>
-              </ul>
-              <button onClick={handleSerPremium} className="btn-upgrade">
-                SER PREMIUM AGORA
-              </button>
+            <div className="feature-card card">
+              <div className="feature-icon">📷</div>
+              <h3>Fotos</h3>
+              <p>Compartilhe imagens da galeria</p>
+            </div>
+            <div className="feature-card card">
+              <div className="feature-icon">😀</div>
+              <h3>Emoticons</h3>
+              <p>Expresse-se com emojis</p>
             </div>
           </div>
         </div>

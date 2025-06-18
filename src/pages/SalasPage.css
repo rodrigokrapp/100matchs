@@ -1,0 +1,168 @@
+.salas-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fce7f3, #f9a8d4);
+}
+
+.salas-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.salas-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.salas-header h1 {
+  font-size: 3rem;
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.salas-header p {
+  font-size: 1.2rem;
+  color: #1e3a8a;
+  margin-bottom: 2rem;
+}
+
+.search-section {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+}
+
+.criar-sala-btn {
+  white-space: nowrap;
+}
+
+.salas-section {
+  margin-bottom: 3rem;
+}
+
+.salas-section h2 {
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+}
+
+.section-subtitle {
+  color: #1e3a8a;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.salas-grid {
+  gap: 1.5rem;
+}
+
+.sala-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem;
+  min-height: 150px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sala-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.sala-info h3 {
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.sala-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.usuarios-online {
+  color: #059669;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.sala-tempo {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.sala-card .btn {
+  margin-top: auto;
+  width: 100%;
+}
+
+.no-results {
+  text-align: center;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  backdrop-filter: blur(15px);
+}
+
+.no-results h3 {
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+}
+
+.no-results p {
+  color: #1e3a8a;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .salas-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .search-container {
+    flex-direction: column;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+  
+  .criar-sala-btn {
+    width: 100%;
+  }
+  
+  .salas-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .salas-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .salas-header h1 {
+    font-size: 2rem;
+  }
+  
+  .sala-card {
+    padding: 1rem;
+  }
+} 

@@ -2,33 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiMapPin, FiUsers, FiLogOut, FiStar } from 'react-icons/fi';
 import Header from '../components/Header';
+import './SalasPage.css';
 
 interface Sala {
   id: string;
   nome: string;
-  estado: string;
+  tipo: 'capital' | 'personalizada';
   usuarios: number;
-  ultimaMensagem: string;
+  criada_em?: string;
 }
 
+const CAPITAIS_BRASILEIRAS = [
+  'Rio Branco - AC', 'Maceió - AL', 'Macapá - AP', 'Manaus - AM',
+  'Salvador - BA', 'Fortaleza - CE', 'Brasília - DF', 'Vitória - ES',
+  'Goiânia - GO', 'São Luís - MA', 'Cuiabá - MT', 'Campo Grande - MS',
+  'Belo Horizonte - MG', 'Belém - PA', 'João Pessoa - PB', 'Curitiba - PR',
+  'Recife - PE', 'Teresina - PI', 'Rio de Janeiro - RJ', 'Natal - RN',
+  'Porto Alegre - RS', 'Porto Velho - RO', 'Boa Vista - RR', 'Florianópolis - SC',
+  'São Paulo - SP', 'Aracaju - SE', 'Palmas - TO'
+];
+
 const SalasPage: React.FC = () => {
-  const [usuario, setUsuario] = useState<any>(null);
-  const [salas] = useState<Sala[]>([
-    { id: 'sp', nome: 'São Paulo', estado: 'SP', usuarios: 1247, ultimaMensagem: 'Alguém aí da zona sul?' },
-    { id: 'rj', nome: 'Rio de Janeiro', estado: 'RJ', usuarios: 892, ultimaMensagem: 'Praia hoje?' },
-    { id: 'bh', nome: 'Belo Horizonte', estado: 'MG', usuarios: 634, ultimaMensagem: 'Pão de açúcar ou brigadeiro?' },
-    { id: 'salvador', nome: 'Salvador', estado: 'BA', usuarios: 567, ultimaMensagem: 'Axé! 🎉' },
-    { id: 'fortaleza', nome: 'Fortaleza', estado: 'CE', usuarios: 445, ultimaMensagem: 'Sol o ano todo ☀️' },
-    { id: 'brasilia', nome: 'Brasília', estado: 'DF', usuarios: 423, ultimaMensagem: 'Política deixa pra lá hehe' },
-    { id: 'curitiba', nome: 'Curitiba', estado: 'PR', usuarios: 398, ultimaMensagem: 'Frio mas o coração é quente' },
-    { id: 'recife', nome: 'Recife', estado: 'PE', usuarios: 376, ultimaMensagem: 'Frevo no sangue! 💃' },
-    { id: 'manaus', nome: 'Manaus', estado: 'AM', usuarios: 289, ultimaMensagem: 'Floresta urbana 🌳' },
-    { id: 'goiania', nome: 'Goiânia', estado: 'GO', usuarios: 267, ultimaMensagem: 'Sertanejo universitário?' },
-    { id: 'porto-alegre', nome: 'Porto Alegre', estado: 'RS', usuarios: 243, ultimaMensagem: 'Chimarrão online? ☕' },
-    { id: 'belem', nome: 'Belém', estado: 'PA', usuarios: 198, ultimaMensagem: 'Açaí é vida!' },
-  ]);
-  
   const navigate = useNavigate();
+  const [busca, setBusca] = useState('');
+  const [salasCapitais, setSalasCapitais] = useState<Sala[]>([]);
+  const [salasPersonalizadas, setSalasPersonalizadas] = useState<Sala[]>([]);
+  const [usuario, setUsuario] = useState<any>(null);
 
   useEffect(() => {
     // Verificar se usuário está logado
@@ -41,6 +40,32 @@ const SalasPage: React.FC = () => {
       setUsuario(JSON.parse(usuarioPremium));
     } else {
       navigate('/inicio');
+      return;
+    }
+
+    // Inicializar salas das capitais
+    const capitais = CAPITAIS_BRASILEIRAS.map((capital, index) => ({
+      id: capital.toLowerCase().replace(/\s/g, '-').replace(/[^a-z0-9-]/g, ''),
+      nome: capital,
+      tipo: 'capital' as const,
+      usuarios: Math.floor(Math.random() * 500) + 50 // Simular usuários online
+    }));
+
+    setSalasCapitais(capitais);
+
+    // Carregar salas personalizadas do localStorage
+    const salasPersonalizadasSalvas = localStorage.getItem('salas-personalizadas');
+    if (salasPersonalizadasSalvas) {
+      const salas = JSON.parse(salasPersonalizadasSalvas);
+      // Filtrar salas que não expiraram (24 horas)
+      const salasValidas = salas.filter((sala: any) => {
+        const agora = new Date().getTime();
+        const criacao = new Date(sala.criada_em).getTime();
+        const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
+        return diferencaHoras < 24;
+      });
+      setSalasPersonalizadas(salasValidas);
+      localStorage.setItem('salas-personalizadas', JSON.stringify(salasValidas));
     }
   }, [navigate]);
 
@@ -48,15 +73,17 @@ const SalasPage: React.FC = () => {
     navigate(`/chat/${salaId}`, { state: { nomeSala } });
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('visitante');
-    localStorage.removeItem('usuario');
-    navigate('/inicio');
+  const handleCriarSala = () => {
+    navigate('/criarsala');
   };
 
-  const handleUpgradePremium = () => {
-    window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank');
-  };
+  const salasFiltradas = salasCapitais.filter(sala => 
+    sala.nome.toLowerCase().includes(busca.toLowerCase())
+  );
+
+  const salasPersonalizadasFiltradas = salasPersonalizadas.filter(sala =>
+    sala.nome.toLowerCase().includes(busca.toLowerCase())
+  );
 
   if (!usuario) {
     return (
@@ -68,97 +95,97 @@ const SalasPage: React.FC = () => {
   }
 
   return (
-    <div style={styles.salasPage}>
+    <div className="salas-page">
       <Header />
       
-      {/* User Info Header */}
-      <header style={styles.userHeader}>
-        <div style={styles.userHeaderContent}>
-          <div style={styles.userInfo}>
-            <div style={styles.avatar}>
-              {usuario.tipo === 'premium' ? <FiStar /> : '👤'}
-            </div>
-            <div>
-              <h3 style={styles.userName}>{usuario.nome}</h3>
-              <span style={styles.userType}>
-                {usuario.tipo === 'premium' ? '⭐ Premium' : '🆓 Gratuito'}
-              </span>
-            </div>
-          </div>
-
-          <div style={styles.headerActions}>
-            {usuario.tipo !== 'premium' && (
-              <button onClick={handleUpgradePremium} style={styles.btnUpgrade}>
-                <FiStar /> Seja Premium
+      <div className="salas-container">
+        <div className="salas-header">
+          <h1>Salas de Chat</h1>
+          <p>Escolha uma sala e comece a conversar!</p>
+          
+          <div className="search-section">
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="Buscar salas..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                className="input search-input"
+              />
+              <button onClick={handleCriarSala} className="btn btn-primary criar-sala-btn">
+                Criar Sala
               </button>
-            )}
-            <button onClick={handleLogout} style={styles.btnLogout}>
-              <FiLogOut /> Sair
-            </button>
+            </div>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main style={styles.main}>
-        <div style={styles.container}>
-          <div style={styles.welcomeSection}>
-            <h1 style={styles.title}>Salas de Chat por Cidade</h1>
-            <p style={styles.subtitle}>
-              Escolha sua cidade e comece a conversar com pessoas da sua região!
-            </p>
-            </div>
-
-          {/* Grid de Salas */}
-          <div style={styles.salasGrid}>
-            {salas.map((sala) => (
-                    <div
-                      key={sala.id}
-                style={styles.salaCard}
-                onClick={() => handleEntrarSala(sala.id, sala.nome)}
-              >
-                <div style={styles.salaHeader}>
-                  <div style={styles.salaIcon}>
-                    <FiMapPin />
-                  </div>
-                  <div style={styles.salaInfo}>
-                    <h3 style={styles.salaNome}>{sala.nome}</h3>
-                    <span style={styles.salaEstado}>{sala.estado}</span>
-                  </div>
-                  <div style={styles.salaUsuarios}>
-                    <FiUsers />
-                    <span>{sala.usuarios}</span>
+        {/* Salas das Capitais */}
+        <div className="salas-section">
+          <h2>🏛️ Capitais Brasileiras</h2>
+          <div className="salas-grid grid grid-3">
+            {salasFiltradas.map((sala) => (
+              <div key={sala.id} className="sala-card card">
+                <div className="sala-info">
+                  <h3>{sala.nome}</h3>
+                  <div className="sala-stats">
+                    <span className="usuarios-online">
+                      👥 {sala.usuarios} online
+                    </span>
                   </div>
                 </div>
-                
-                <div style={styles.ultimaMensagem}>
-                  <p>💬 {sala.ultimaMensagem}</p>
-                </div>
-                
-                <div style={styles.salaFooter}>
-                  <span style={styles.statusOnline}>🟢 Online agora</span>
-                      </div>
-                    </div>
-                  ))}
-          </div>
-
-          {/* Informações para usuários gratuitos */}
-          {usuario.tipo !== 'premium' && (
-            <div style={styles.premiumBanner}>
-              <div style={styles.bannerContent}>
-                <FiStar size={40} />
-                <div>
-                  <h3>Quer mais recursos?</h3>
-                  <p>Com o Premium você pode enviar fotos, vídeos, áudios e muito mais!</p>
-                </div>
-                <button onClick={handleUpgradePremium} style={styles.btnBanner}>
-                  Upgrade agora
+                <button 
+                  onClick={() => handleEntrarSala(sala.id, sala.nome)}
+                  className="btn btn-primary"
+                >
+                  Entrar
                 </button>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
-      </main>
+
+        {/* Salas Personalizadas */}
+        {salasPersonalizadas.length > 0 && (
+          <div className="salas-section">
+            <h2>🏠 Salas Personalizadas</h2>
+            <p className="section-subtitle">Salas criadas pelos usuários (válidas por 24h)</p>
+            <div className="salas-grid grid grid-3">
+              {salasPersonalizadasFiltradas.map((sala) => (
+                <div key={sala.id} className="sala-card card">
+                  <div className="sala-info">
+                    <h3>{sala.nome}</h3>
+                    <div className="sala-stats">
+                      <span className="usuarios-online">
+                        👥 {sala.usuarios} online
+                      </span>
+                      <span className="sala-tempo">
+                        ⏰ Criada há {Math.floor((new Date().getTime() - new Date(sala.criada_em!).getTime()) / (1000 * 60 * 60))}h
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => handleEntrarSala(sala.id, sala.nome)}
+                    className="btn btn-primary"
+                  >
+                    Entrar
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Mensagem quando não há resultados */}
+        {salasFiltradas.length === 0 && salasPersonalizadasFiltradas.length === 0 && busca && (
+          <div className="no-results">
+            <h3>Nenhuma sala encontrada</h3>
+            <p>Tente buscar por outro termo ou crie uma nova sala</p>
+            <button onClick={handleCriarSala} className="btn btn-primary">
+              Criar Nova Sala
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,176 +1,152 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import Header from '../components/Header';
+import './LoginPremiumPage.css';
 
 const LoginPremiumPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [mensagemErro, setMensagemErro] = useState('');
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    senha: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email.trim() || !senha.trim()) {
-      setMensagemErro('Preencha email e senha!');
-      return;
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email é obrigatório';
     }
 
+    if (!formData.senha) {
+      newErrors.senha = 'Senha é obrigatória';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const handleLogin = async () => {
+    if (!validateForm()) return;
+
     setLoading(true);
-    setMensagemErro('');
 
     try {
-      // Verificar se é usuário premium no Supabase
-      const { data, error } = await supabase
-        .from('usuarios_premium')
-        .select('*')
-        .eq('email', email.trim())
-        .eq('senha', senha.trim())
-        .single();
+      // Buscar usuários premium
+      const usuariosPremium = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
+      const usuario = usuariosPremium.find((user: any) => 
+        user.email === formData.email && user.senha === formData.senha
+      );
 
-      if (error || !data) {
-        setMensagemErro('Você não é premium! Entre abaixo como visitante.');
-        return;
+      if (usuario) {
+        // Fazer login
+        localStorage.setItem('usuario', JSON.stringify(usuario));
+        alert('Login realizado com sucesso!');
+        navigate('/salas');
+      } else {
+        alert('Email ou senha incorretos!');
       }
-
-      // Login bem-sucedido
-      const userData = {
-        ...data,
-        tipo: 'premium',
-        dataLogin: new Date().toISOString()
-      };
-
-      localStorage.setItem('usuario', JSON.stringify(userData));
-      navigate('/salas');
-
     } catch (error) {
-      console.error('Erro no login premium:', error);
-      setMensagemErro('Erro no sistema. Tente novamente.');
+      console.error('Erro ao fazer login:', error);
+      alert('Erro ao fazer login. Tente novamente.');
     } finally {
       setLoading(false);
     }
   };
 
-  const styles = {
-    container: {
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #ff69b4 0%, #1e3a8a 100%)',
-      fontFamily: 'Inter, sans-serif',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-    },
-    card: {
-      background: 'rgba(255, 255, 255, 0.95)',
-      borderRadius: '20px',
-      padding: '40px',
-      maxWidth: '400px',
-      width: '100%',
-      boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-      textAlign: 'center' as const,
-    },
-    title: {
-      fontSize: '32px',
-      fontWeight: 'bold',
-      marginBottom: '20px',
-      background: 'linear-gradient(135deg, #ff69b4, #1e3a8a)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text',
-    },
-    subtitle: {
-      fontSize: '16px',
-      color: '#666',
-      marginBottom: '30px',
-    },
-    input: {
-      width: '100%',
-      padding: '15px',
-      border: '2px solid #ddd',
-      borderRadius: '12px',
-      fontSize: '16px',
-      marginBottom: '20px',
-      boxSizing: 'border-box' as const,
-    },
-    button: {
-      width: '100%',
-      padding: '15px',
-      background: 'linear-gradient(135deg, #1e3a8a, #3b82f6)',
-      color: 'white',
-      border: 'none',
-      borderRadius: '12px',
-      fontSize: '18px',
-      fontWeight: 'bold',
-      cursor: 'pointer',
-      marginBottom: '15px',
-      opacity: loading ? 0.7 : 1,
-    },
-    backButton: {
-      width: '100%',
-      padding: '15px',
-      background: '#666',
-      color: 'white',
-      border: 'none',
-      borderRadius: '12px',
-      fontSize: '16px',
-      cursor: 'pointer',
-    },
-    errorMessage: {
-      background: '#fee2e2',
-      color: '#dc2626',
-      padding: '10px',
-      borderRadius: '8px',
-      marginBottom: '15px',
-      fontSize: '14px',
-    }
+  const handleVoltar = () => {
+    navigate('/inicio');
+  };
+
+  const handleCadastrar = () => {
+    navigate('/suporte6828');
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>⭐ Login Premium</h1>
-        <p style={styles.subtitle}>
-          Acesse sua conta premium
-        </p>
-
-        {mensagemErro && (
-          <div style={styles.errorMessage}>
-            {mensagemErro}
+    <div className="login-premium-page">
+      <Header />
+      
+      <div className="login-container">
+        <div className="login-card card">
+          <div className="login-header">
+            <div className="premium-badge">⭐ PREMIUM</div>
+            <h1>Login Premium</h1>
+            <p>Acesse sua conta premium</p>
           </div>
-        )}
 
-        <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="Email Premium"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={styles.input}
-            required
-          />
+          <div className="form-section">
+            <div className="input-group">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className={`input ${errors.email ? 'input-error' : ''}`}
+                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+              />
+              {errors.email && <span className="error-message">{errors.email}</span>}
+            </div>
 
-          <input
-            type="password"
-            placeholder="Senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            style={styles.input}
-            required
-          />
+            <div className="input-group">
+              <label htmlFor="senha">Senha</label>
+              <input
+                id="senha"
+                type="password"
+                placeholder="Digite sua senha"
+                value={formData.senha}
+                onChange={(e) => handleInputChange('senha', e.target.value)}
+                className={`input ${errors.senha ? 'input-error' : ''}`}
+                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+              />
+              {errors.senha && <span className="error-message">{errors.senha}</span>}
+            </div>
+          </div>
 
-          <button type="submit" style={styles.button} disabled={loading}>
-            {loading ? '⏳ Entrando...' : '🔑 Entrar Premium'}
-          </button>
-        </form>
+          <div className="actions">
+            <button onClick={handleVoltar} className="btn btn-secondary">
+              Voltar
+            </button>
+            <button 
+              onClick={handleLogin}
+              className="btn btn-premium"
+              disabled={loading}
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
+          </div>
 
-        <button 
-          style={styles.backButton}
-          onClick={() => navigate('/inicio')}
-        >
-          ← Voltar ao Início
-        </button>
+          <div className="cadastro-link">
+            <p>Não tem conta Premium? <button onClick={handleCadastrar} className="link-button">Cadastre-se</button></p>
+          </div>
+
+          <div className="benefits-reminder">
+            <h3>🎯 Lembre-se dos benefícios Premium</h3>
+            <div className="benefits-list">
+              <div className="benefit-item">
+                <span className="benefit-icon">🚀</span>
+                <span>Chat ilimitado sem restrições</span>
+              </div>
+              <div className="benefit-item">
+                <span className="benefit-icon">🏠</span>
+                <span>Criar salas personalizadas</span>
+              </div>
+              <div className="benefit-item">
+                <span className="benefit-icon">⚡</span>
+                <span>Acesso prioritário a recursos</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

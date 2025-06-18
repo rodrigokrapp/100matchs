@@ -2,9 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Header.css';
 
-interface HeaderProps {}
-
-const Header: React.FC<HeaderProps> = () => {
+const Header: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
@@ -12,44 +10,14 @@ const Header: React.FC<HeaderProps> = () => {
   };
 
   return (
-    <header className="app-header">
-      <div className="header-content">
-        <div className="logo-section" onClick={handleLogoClick}>
-          <div className="logo-icon">
-            <svg
-              width="50"
-              height="50"
-              viewBox="0 0 100 100"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* Balão de conversa rosa */}
-              <path
-                d="M20 20C20 15 25 10 30 10H70C75 10 80 15 80 20V50C80 55 75 60 70 60H35L25 80L30 60H30C25 60 20 55 20 50V20Z"
-                fill="#E91E63"
-                stroke="#E91E63"
-                strokeWidth="2"
-              />
-              
-              {/* Coração principal dentro do balão */}
-              <path
-                d="M45 25C42 22 37 22 35 25C33 22 28 22 25 25C23 27 23 32 25 34L35 44L45 34C47 32 47 27 45 25Z"
-                fill="white"
-              />
-              
-              {/* Contorno interno do balão para dar profundidade */}
-              <circle
-                cx="50"
-                cy="35"
-                r="25"
-                fill="none"
-                stroke="rgba(255,255,255,0.3)"
-                strokeWidth="1"
-              />
-            </svg>
-          </div>
-          <h1 className="logo-text">100 MATCHS</h1>
-        </div>
+    <header className="header">
+      <div className="logo-container" onClick={handleLogoClick}>
+        <img 
+          src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQ1IiBzdHJva2U9IiNlOTFlNjMiIHN0cm9rZS13aWR0aD0iMTAiIGZpbGw9Im5vbmUiLz4KPHA+CjxwYXRoIGQ9Ik0zNSAzNUM0MCAzMCA0NSAzMCA1MCAzNUM1NSAzMCA2MCAzMCA2NSAzNSIgc3Ryb2tlPSIjZTkxZTYzIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz4KPHA+CjxwYXRoIGQ9Ik0zNSA2NVM0MCA3MCA0NSA3MCA1MCA2NVM1NSA3MCA2MCA3MCA2NSA2NSIgc3Ryb2tlPSIjZTkxZTYzIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz4KPHA+CjxjaXJjbGUgY3g9IjQwIiBjeT0iNDUiIHI9IjMiIGZpbGw9IiNlOTFlNjMiLz4KPHA+CjxjaXJjbGUgY3g9IjYwIiBjeT0iNDUiIHI9IjMiIGZpbGw9IiNlOTFlNjMiLz4KPC9zdmc+" 
+          alt="100 Matchs Logo" 
+          className="logo" 
+        />
+        <h1 className="site-title">100 Matchs</h1>
       </div>
     </header>
   );

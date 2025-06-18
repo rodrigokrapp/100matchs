@@ -1,59 +1,51 @@
 /* Header.css */
-.app-header {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(15px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+.header {
+  display: flex;
+  align-items: center;
   padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(30, 58, 138, 0.1);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
 }
 
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.logo-section {
+.logo-container {
   display: flex;
   align-items: center;
-  gap: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0.5rem;
-  border-radius: 15px;
+  transition: transform 0.2s ease;
 }
 
-.logo-section:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
+.logo-container:hover {
+  transform: scale(1.05);
 }
 
-.logo-icon {
+.logo {
   width: 50px;
   height: 50px;
-  position: relative;
+  margin-right: 1rem;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
-.logo-svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 4px 8px rgba(236, 72, 153, 0.3));
+.logo:hover {
+  transform: rotate(10deg);
 }
 
-.logo-text {
-  font-size: 2rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, #EC4899, #F97316);
+.site-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #1e3a8a;
+  text-decoration: none;
+  margin: 0;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  margin: 0;
-  letter-spacing: 2px;
 }
 
 .btn-suporte {
@@ -79,16 +71,15 @@
 
 /* Responsivo */
 @media (max-width: 768px) {
-  .app-header {
+  .header {
     padding: 1rem;
   }
   
-  .logo-text {
-    font-size: 1.5rem;
-    letter-spacing: 1px;
+  .site-title {
+    font-size: 1.4rem;
   }
   
-  .logo-icon {
+  .logo {
     width: 40px;
     height: 40px;
   }

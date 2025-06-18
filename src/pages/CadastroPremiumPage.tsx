@@ -1,228 +1,216 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
 import './CadastroPremiumPage.css';
 
-export const CadastroPremiumPage: React.FC = () => {
+const CadastroPremiumPage: React.FC = () => {
   const navigate = useNavigate();
-  
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
     senha: '',
     confirmarSenha: ''
   });
-  
-  const [erro, setErro] = useState('');
-  const [sucesso, setSucesso] = useState(false);
-  const [carregando, setCarregando] = useState(false);
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setErro('');
-  };
-  
-  const validarFormulario = () => {
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+
+    // Validar nome
     if (!formData.nome.trim()) {
-      setErro('Nome é obrigatório');
-      return false;
+      newErrors.nome = 'Nome é obrigatório';
+    } else if (formData.nome.trim().length < 2) {
+      newErrors.nome = 'Nome deve ter pelo menos 2 caracteres';
     }
-    
+
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
-      setErro('Email é obrigatório');
-      return false;
+      newErrors.email = 'Email é obrigatório';
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'Email inválido';
     }
-    
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setErro('Email inválido');
-      return false;
+
+    // Validar senha
+    if (!formData.senha) {
+      newErrors.senha = 'Senha é obrigatória';
+    } else if (formData.senha.length < 6) {
+      newErrors.senha = 'Senha deve ter pelo menos 6 caracteres';
     }
-    
-    if (formData.senha.length < 6) {
-      setErro('Senha deve ter pelo menos 6 caracteres');
-      return false;
-    }
-    
+
+    // Confirmar senha
     if (formData.senha !== formData.confirmarSenha) {
-      setErro('Senhas não conferem');
-      return false;
+      newErrors.confirmarSenha = 'Senhas não coincidem';
     }
-    
-    return true;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
-  
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
   const handleCadastrar = async () => {
-    if (!validarFormulario()) return;
-    
-    setCarregando(true);
-    
+    if (!validateForm()) return;
+
+    setLoading(true);
+
     try {
-      // Simular processo de cadastro
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Salvar dados do usuário premium no localStorage
-      const usuarioPremium = {
-        nome: formData.nome,
-        email: formData.email,
+      // Verificar se email já existe
+      const usuariosExistentes = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
+      const emailExiste = usuariosExistentes.find((user: any) => user.email === formData.email);
+
+      if (emailExiste) {
+        alert('Este email já está cadastrado!');
+        setLoading(false);
+        return;
+      }
+
+      // Criar usuário premium
+      const novoUsuario = {
+        id: Date.now().toString(),
+        nome: formData.nome.trim(),
+        email: formData.email.trim(),
+        senha: formData.senha, // Em produção, usar hash
+        premium: true,
         tipo: 'premium',
-        isPremium: true,
-        dataAtivacao: new Date().toISOString(),
-        id: Date.now().toString()
+        criado_em: new Date().toISOString()
       };
-      
-      // Salvar nas chaves corretas que o sistema usa
-      localStorage.setItem('usuario', JSON.stringify(usuarioPremium));
-      localStorage.setItem('usuarioPremium', JSON.stringify(usuarioPremium));
-      localStorage.setItem('isPremium', 'true');
-      
-      console.log('✅ Usuário Premium ativado:', usuarioPremium);
-      
-      setSucesso(true);
-      
-      // Redirecionar para salas após 3 segundos
-      setTimeout(() => {
-        navigate('/salas');
-      }, 3000);
-      
+
+      // Salvar no localStorage
+      usuariosExistentes.push(novoUsuario);
+      localStorage.setItem('usuarios-premium', JSON.stringify(usuariosExistentes));
+
+      // Fazer login automático
+      localStorage.setItem('usuario', JSON.stringify(novoUsuario));
+
+      alert('Cadastro realizado com sucesso! Bem-vindo ao Premium!');
+      navigate('/salas');
     } catch (error) {
-      setErro('Erro ao processar cadastro. Tente novamente.');
+      console.error('Erro ao cadastrar:', error);
+      alert('Erro ao realizar cadastro. Tente novamente.');
     } finally {
-      setCarregando(false);
+      setLoading(false);
     }
   };
-  
-  if (sucesso) {
-    return (
-      <div className="cadastro-premium-page">
-        <div className="sucesso-container">
-          <div className="sucesso-icon">🎉</div>
-          <h1>Cadastro Premium Realizado!</h1>
-          <p>Parabéns! Sua conta premium foi ativada com sucesso.</p>
-          <div className="redirect-info">
-            <span>Redirecionando para as salas...</span>
-            <div className="loading-bar"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
+
+  const handleVoltar = () => {
+    navigate('/suporte6828');
+  };
+
   return (
     <div className="cadastro-premium-page">
+      <Header />
+      
       <div className="cadastro-container">
-        <div className="cadastro-header">
-          <button className="btn-voltar" onClick={() => navigate('/suporte6828')}>
-            ← Voltar
-          </button>
-          <h1>👑 Cadastro Premium</h1>
-        </div>
-        
-        <div className="cadastro-content">
-          <div className="premium-features">
-            <h3>🚀 Recursos Premium Inclusos</h3>
-            <div className="features-list">
-              <div className="feature-item">
-                <span className="feature-icon">✨</span>
-                <span>Perfil destacado nos resultados</span>
+        <div className="cadastro-card card">
+          <div className="cadastro-header">
+            <div className="premium-badge">⭐ PREMIUM</div>
+            <h1>Cadastro Premium</h1>
+            <p>Acesse todas as funcionalidades exclusivas</p>
+          </div>
+
+          <div className="benefits-section">
+            <h3>🎯 Benefícios Premium</h3>
+            <div className="benefits-grid">
+              <div className="benefit-item">
+                <span className="benefit-icon">🚀</span>
+                <span>Chat ilimitado</span>
               </div>
-              <div className="feature-item">
-                <span className="feature-icon">💬</span>
-                <span>Chat ilimitado e prioritário</span>
+              <div className="benefit-item">
+                <span className="benefit-icon">🏠</span>
+                <span>Criar salas personalizadas</span>
               </div>
-              <div className="feature-item">
-                <span className="feature-icon">🎯</span>
-                <span>Super likes e boosts diários</span>
+              <div className="benefit-item">
+                <span className="benefit-icon">📱</span>
+                <span>Sem limitações de uso</span>
               </div>
-              <div className="feature-item">
-                <span className="feature-icon">👻</span>
-                <span>Modo invisível disponível</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">🔥</span>
-                <span>Boost de visibilidade automático</span>
+              <div className="benefit-item">
+                <span className="benefit-icon">⚡</span>
+                <span>Acesso prioritário</span>
               </div>
             </div>
           </div>
-          
+
           <div className="form-section">
-            <h2>Dados para Ativação</h2>
-            <p>Preencha seus dados para ativar sua conta premium:</p>
-            
-            <div className="form-group">
-              <label>Nome Completo</label>
+            <div className="input-group">
+              <label htmlFor="nome">Nome Completo</label>
               <input
+                id="nome"
                 type="text"
-                name="nome"
-                value={formData.nome}
-                onChange={handleInputChange}
                 placeholder="Digite seu nome completo"
-                className="form-input"
+                value={formData.nome}
+                onChange={(e) => handleInputChange('nome', e.target.value)}
+                className={`input ${errors.nome ? 'input-error' : ''}`}
               />
+              {errors.nome && <span className="error-message">{errors.nome}</span>}
             </div>
-            
-            <div className="form-group">
-              <label>Email</label>
+
+            <div className="input-group">
+              <label htmlFor="email">Email</label>
               <input
+                id="email"
                 type="email"
-                name="email"
+                placeholder="seu@email.com"
                 value={formData.email}
-                onChange={handleInputChange}
-                placeholder="Digite seu email"
-                className="form-input"
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className={`input ${errors.email ? 'input-error' : ''}`}
               />
+              {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
-            
-            <div className="form-group">
-              <label>Senha</label>
+
+            <div className="input-group">
+              <label htmlFor="senha">Senha</label>
               <input
+                id="senha"
                 type="password"
-                name="senha"
+                placeholder="Mínimo 6 caracteres"
                 value={formData.senha}
-                onChange={handleInputChange}
-                placeholder="Digite sua senha (mín. 6 caracteres)"
-                className="form-input"
+                onChange={(e) => handleInputChange('senha', e.target.value)}
+                className={`input ${errors.senha ? 'input-error' : ''}`}
               />
+              {errors.senha && <span className="error-message">{errors.senha}</span>}
             </div>
-            
-            <div className="form-group">
-              <label>Confirmar Senha</label>
+
+            <div className="input-group">
+              <label htmlFor="confirmarSenha">Confirmar Senha</label>
               <input
+                id="confirmarSenha"
                 type="password"
-                name="confirmarSenha"
+                placeholder="Digite a senha novamente"
                 value={formData.confirmarSenha}
-                onChange={handleInputChange}
-                placeholder="Confirme sua senha"
-                className="form-input"
+                onChange={(e) => handleInputChange('confirmarSenha', e.target.value)}
+                className={`input ${errors.confirmarSenha ? 'input-error' : ''}`}
               />
+              {errors.confirmarSenha && <span className="error-message">{errors.confirmarSenha}</span>}
             </div>
-            
-            {erro && <div className="erro-message">{erro}</div>}
-            
-            <button 
-              className="btn-cadastrar"
-              onClick={handleCadastrar}
-              disabled={carregando}
-            >
-              {carregando ? (
-                <>
-                  <div className="spinner"></div>
-                  Processando...
-                </>
-              ) : (
-                '🚀 Cadastrar Premium'
-              )}
+          </div>
+
+          <div className="actions">
+            <button onClick={handleVoltar} className="btn btn-secondary">
+              Voltar
             </button>
-            
-            <div className="garantia-info">
-              <p>✅ Ativação imediata após cadastro</p>
-              <p>🔒 Seus dados estão seguros conosco</p>
-            </div>
+            <button 
+              onClick={handleCadastrar}
+              className="btn btn-premium"
+              disabled={loading}
+            >
+              {loading ? 'Cadastrando...' : 'Cadastrar Premium'}
+            </button>
+          </div>
+
+          <div className="login-link">
+            <p>Já tem conta Premium? <button onClick={() => navigate('/loginpremium')} className="link-button">Fazer login</button></p>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+export default CadastroPremiumPage;

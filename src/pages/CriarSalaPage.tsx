@@ -1,264 +1,159 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaMapMarkerAlt, FaHome, FaCity } from 'react-icons/fa';
-
-interface User {
-  id: string;
-  email: string;
-  nome: string;
-  isPremium: boolean;
-  loginTime: number;
-}
+import Header from '../components/Header';
+import './CriarSalaPage.css';
 
 const CriarSalaPage: React.FC = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState({
-    nome: '',
-    cidade: '',
-    bairro: ''
-  });
+  const [nome, setNome] = useState('');
+  const [bairro, setBairro] = useState('');
+  const [cidade, setCidade] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Cidades brasileiras populares
-  const cidadesPopulares = [
-    'São Paulo', 'Rio de Janeiro', 'Brasília', 'Salvador', 'Fortaleza',
-    'Belo Horizonte', 'Manaus', 'Curitiba', 'Recife', 'Porto Alegre',
-    'Belém', 'Goiânia', 'Guarulhos', 'Campinas', 'São Luís',
-    'São Gonçalo', 'Maceió', 'Duque de Caxias', 'Natal', 'Teresina'
-  ];
-
-  useEffect(() => {
-    // Verificar usuário logado
-    const savedUser = localStorage.getItem('currentUser');
-    if (!savedUser) {
-      navigate('/inicio');
+  const handleCriarSala = () => {
+    if (!nome.trim() || !bairro.trim() || !cidade.trim()) {
+      alert('Por favor, preencha todos os campos');
       return;
     }
-    
-    const userData = JSON.parse(savedUser);
-    setUser(userData);
-
-    // Verificar se visitante gratuito ainda tem tempo
-    if (!userData.isPremium) {
-      const timeElapsed = Date.now() - userData.loginTime;
-      const thirtyMinutes = 30 * 60 * 1000;
-      if (timeElapsed >= thirtyMinutes) {
-        localStorage.setItem(`blocked_${userData.email}`, Date.now().toString());
-        localStorage.removeItem('currentUser');
-        alert('Seu tempo expirou! Você foi bloqueado por 24 horas.');
-        navigate('/inicio');
-        return;
-      }
-    }
-  }, [navigate]);
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.nome.trim()) {
-      newErrors.nome = 'Nome da sala é obrigatório';
-    } else if (formData.nome.length < 3) {
-      newErrors.nome = 'Nome deve ter pelo menos 3 caracteres';
-    } else if (formData.nome.length > 50) {
-      newErrors.nome = 'Nome deve ter no máximo 50 caracteres';
-    }
-
-    if (!formData.cidade.trim()) {
-      newErrors.cidade = 'Cidade é obrigatória';
-    } else if (formData.cidade.length < 2) {
-      newErrors.cidade = 'Cidade deve ter pelo menos 2 caracteres';
-    }
-
-    if (!formData.bairro.trim()) {
-      newErrors.bairro = 'Bairro é obrigatório';
-    } else if (formData.bairro.length < 2) {
-      newErrors.bairro = 'Bairro deve ter pelo menos 2 caracteres';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
 
     setLoading(true);
 
     try {
-      // Simular criação da sala (depois conectar com backend)
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
+      // Criar ID único para a sala
+      const salaId = `${nome.toLowerCase().replace(/\s/g, '-')}-${bairro.toLowerCase().replace(/\s/g, '-')}-${cidade.toLowerCase().replace(/\s/g, '-')}-${Date.now()}`;
+      
+      // Criar objeto da sala
       const novaSala = {
-        id: `sala_${Date.now()}`,
-        nome: formData.nome.trim(),
-        cidade: formData.cidade.trim(),
-        bairro: formData.bairro.trim(),
-        criadorId: user?.id,
-        usuariosOnline: 1,
-        criadaEm: Date.now()
+        id: salaId,
+        nome: `${nome} - ${bairro}, ${cidade}`,
+        tipo: 'personalizada',
+        usuarios: Math.floor(Math.random() * 20) + 1,
+        criada_em: new Date().toISOString(),
+        criador: JSON.parse(localStorage.getItem('visitante') || localStorage.getItem('usuario') || '{}').nome
       };
 
-      // Salvar sala localmente (depois enviar para backend)
-      const salasExistentes = JSON.parse(localStorage.getItem('salas') || '[]');
+      // Salvar no localStorage
+      const salasExistentes = JSON.parse(localStorage.getItem('salas-personalizadas') || '[]');
       salasExistentes.push(novaSala);
-      localStorage.setItem('salas', JSON.stringify(salasExistentes));
+      localStorage.setItem('salas-personalizadas', JSON.stringify(salasExistentes));
 
-      // Redirecionar para a sala criada
-      navigate(`/chat/${novaSala.id}`, { state: { sala: novaSala } });
+      alert('Sala criada com sucesso!');
+      navigate('/salas');
     } catch (error) {
+      console.error('Erro ao criar sala:', error);
       alert('Erro ao criar sala. Tente novamente.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
+  const handleVoltar = () => {
+    navigate('/salas');
   };
 
-  if (!user) return <div>Carregando...</div>;
-
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="card mb-6">
-          <div className="flex items-center gap-4 mb-4">
-            <button
-              onClick={() => navigate('/salas')}
-              className="text-gray-500 hover:text-pink-500 transition-colors"
-            >
-              <FaArrowLeft size={20} />
-            </button>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">
-                ➕ Criar Nova Sala
-              </h1>
-              <p className="text-gray-600">Crie um espaço para conversar com pessoas da sua região</p>
+    <div className="criar-sala-page">
+      <Header />
+      
+      <div className="criar-sala-container">
+        <div className="criar-sala-card card">
+          <div className="card-header">
+            <h1>Criar Nova Sala</h1>
+            <p>Crie sua própria sala de chat personalizada</p>
+          </div>
+
+          <div className="form-section">
+            <div className="input-group">
+              <label htmlFor="nome">Nome da Sala</label>
+              <input
+                id="nome"
+                type="text"
+                placeholder="Ex: Galera do Futebol"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                className="input"
+                maxLength={50}
+              />
             </div>
+
+            <div className="input-group">
+              <label htmlFor="bairro">Bairro</label>
+              <input
+                id="bairro"
+                type="text"
+                placeholder="Ex: Copacabana"
+                value={bairro}
+                onChange={(e) => setBairro(e.target.value)}
+                className="input"
+                maxLength={50}
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="cidade">Cidade</label>
+              <input
+                id="cidade"
+                type="text"
+                placeholder="Ex: Rio de Janeiro"
+                value={cidade}
+                onChange={(e) => setCidade(e.target.value)}
+                className="input"
+                maxLength={50}
+              />
+            </div>
+          </div>
+
+          <div className="info-section">
+            <div className="info-card">
+              <h3>ℹ️ Informações Importantes</h3>
+              <ul>
+                <li>Sua sala ficará disponível por <strong>24 horas</strong></li>
+                <li>Outros usuários poderão encontrar e entrar na sua sala</li>
+                <li>Você será identificado como criador da sala</li>
+                <li>A sala será removida automaticamente após 24h</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="actions">
+            <button 
+              onClick={handleVoltar}
+              className="btn btn-secondary"
+            >
+              Voltar
+            </button>
+            <button 
+              onClick={handleCriarSala}
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? 'Criando...' : 'Criar Sala'}
+            </button>
           </div>
         </div>
 
-        {/* Formulário */}
-        <div className="card">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Nome da Sala */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <FaHome className="inline mr-2" />
-                Nome da Sala *
-              </label>
-              <input
-                type="text"
-                value={formData.nome}
-                onChange={(e) => handleInputChange('nome', e.target.value)}
-                placeholder="Ex: Galera de Copacabana, Pessoal da Vila Madalena..."
-                className={`input-field ${errors.nome ? 'border-red-500' : ''}`}
-                maxLength={50}
-              />
-              {errors.nome && (
-                <p className="text-red-500 text-sm mt-1">{errors.nome}</p>
-              )}
-              <p className="text-gray-500 text-xs mt-1">
-                {formData.nome.length}/50 caracteres
-              </p>
-            </div>
-
-            {/* Cidade */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <FaCity className="inline mr-2" />
-                Cidade *
-              </label>
-              <input
-                type="text"
-                value={formData.cidade}
-                onChange={(e) => handleInputChange('cidade', e.target.value)}
-                placeholder="Digite sua cidade..."
-                className={`input-field ${errors.cidade ? 'border-red-500' : ''}`}
-                list="cidades-populares"
-              />
-              <datalist id="cidades-populares">
-                {cidadesPopulares.map(cidade => (
-                  <option key={cidade} value={cidade} />
-                ))}
-              </datalist>
-              {errors.cidade && (
-                <p className="text-red-500 text-sm mt-1">{errors.cidade}</p>
-              )}
-            </div>
-
-            {/* Bairro */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <FaMapMarkerAlt className="inline mr-2" />
-                Bairro *
-              </label>
-              <input
-                type="text"
-                value={formData.bairro}
-                onChange={(e) => handleInputChange('bairro', e.target.value)}
-                placeholder="Digite seu bairro..."
-                className={`input-field ${errors.bairro ? 'border-red-500' : ''}`}
-              />
-              {errors.bairro && (
-                <p className="text-red-500 text-sm mt-1">{errors.bairro}</p>
-              )}
-            </div>
-
-            {/* Preview da Sala */}
-            {formData.nome && formData.cidade && formData.bairro && (
-              <div className="bg-gradient-to-r from-pink-50 to-blue-50 p-4 rounded-xl border border-pink-200">
-                <h3 className="font-semibold text-gray-800 mb-2">📋 Preview da Sala:</h3>
-                <div className="bg-white p-3 rounded-lg border">
-                  <h4 className="font-semibold text-lg">{formData.nome}</h4>
-                  <p className="text-gray-600 text-sm">
-                    📍 {formData.bairro}, {formData.cidade}
-                  </p>
-                  <p className="text-green-600 text-sm mt-1">
-                    👤 1 online (você)
-                  </p>
+        <div className="preview-section">
+          {nome && bairro && cidade && (
+            <div className="preview-card card">
+              <h3>👀 Prévia da Sala</h3>
+              <div className="sala-preview">
+                <div className="sala-info">
+                  <h4>{nome} - {bairro}, {cidade}</h4>
+                  <div className="sala-stats">
+                    <span className="usuarios-online">
+                      👥 1 online
+                    </span>
+                    <span className="sala-tempo">
+                      ⏰ Criada agora
+                    </span>
+                  </div>
                 </div>
+                <button className="btn btn-primary btn-small" disabled>
+                  Entrar
+                </button>
               </div>
-            )}
-
-            {/* Botões */}
-            <div className="flex flex-col md:flex-row gap-4">
-              <button
-                type="button"
-                onClick={() => navigate('/salas')}
-                className="btn-secondary flex-1"
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="btn-premium flex-1"
-                disabled={loading || !formData.nome || !formData.cidade || !formData.bairro}
-              >
-                {loading ? '⏳ Criando...' : '🚀 Criar Sala'}
-              </button>
             </div>
-          </form>
-        </div>
-
-        {/* Dicas */}
-        <div className="card mt-6 bg-gradient-to-r from-blue-50 to-pink-50">
-          <h3 className="font-semibold text-gray-800 mb-3">💡 Dicas para uma boa sala:</h3>
-          <ul className="text-sm text-gray-600 space-y-2">
-            <li>• Use um nome atrativo e que represente sua região</li>
-            <li>• Seja específico com o bairro para encontrar pessoas próximas</li>
-            <li>• Mantenha um ambiente respeitoso e amigável</li>
-            <li>• {user.isPremium ? 'Como Premium, você pode enviar fotos e vídeos!' : 'Upgrade para Premium para enviar fotos e vídeos!'}</li>
-          </ul>
+          )}
         </div>
       </div>
     </div>
