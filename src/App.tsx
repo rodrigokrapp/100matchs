@@ -7,8 +7,8 @@ import InicioPage from './pages/InicioPage';
 import SalasPage from './pages/SalasPage';
 import ChatPage from './pages/ChatPage';
 import MeuPerfilPage from './pages/MeuPerfilPage';
-import { SuportePage } from './pages/SuportePage';
-import { CadastroPremiumPage } from './pages/CadastroPremiumPage';
+import SuportePage from './pages/SuportePage';
+import CadastroPremiumPage from './pages/CadastroPremiumPage';
 import CriarSalaPage from './pages/CriarSalaPage';
 import LoginPremiumPage from './pages/LoginPremiumPage';
 
