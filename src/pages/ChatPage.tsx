@@ -726,7 +726,9 @@ const ChatPage: React.FC = () => {
                             <div className="video-container">
                               <video 
                                 controls 
-                                preload="metadata"
+                                preload="auto"
+                                playsInline
+                                muted={false}
                                 onClick={() => {
                                   handleViewTemporaryMessage(msg.id);
                                   const video = document.querySelector(`video[data-msg-id="${msg.id}"]`) as HTMLVideoElement;
@@ -740,6 +742,10 @@ const ChatPage: React.FC = () => {
                                 }}
                                 onPlay={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
                                 onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
+                                onLoadedData={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  video.playbackRate = 1.0;
+                                }}
                                 data-msg-id={msg.id}
                               >
                                 <source src={msg.content} type="video/webm" />
@@ -830,7 +836,7 @@ const ChatPage: React.FC = () => {
                 )}
                 
                 {previewMedia.type === 'video' && (
-                  <video ref={videoPreviewRef} controls autoPlay muted>
+                  <video ref={videoPreviewRef} controls autoPlay muted playsInline preload="auto">
                     <source src={previewMedia.url} type="video/webm" />
                   </video>
                 )}
@@ -862,7 +868,7 @@ const ChatPage: React.FC = () => {
         {isRecording && recordingType === 'video' && (
           <div className="video-recording-preview">
             <div className="recording-preview-container">
-              <video ref={videoPreviewRef} autoPlay muted className="camera-preview" />
+              <video ref={videoPreviewRef} autoPlay muted playsInline className="camera-preview" />
               <div className="recording-overlay">
                 <div className="recording-info">
                   <div className="recording-dot"></div>

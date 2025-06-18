@@ -1,0 +1,13 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Balão de chat principal -->
+  <circle cx="60" cy="50" r="40" fill="#E91E63"/>
+  
+  <!-- Pontinha do balão de chat -->
+  <path d="M35 80C35 80 25 70 30 65C35 60 45 65 50 70C55 75 60 80 60 85C55 80 50 75 45 70C40 65 35 70 35 80Z" fill="#E91E63"/>
+  
+  <!-- Coração interno -->
+  <path d="M60 70C60 70 40 55 40 40C40 30 50 25 60 30C70 25 80 30 80 40C80 55 60 70 60 70Z" fill="white"/>
+  
+  <!-- Sombra suave -->
+  <circle cx="60" cy="50" r="40" fill="none" stroke="rgba(233, 30, 99, 0.3)" stroke-width="2"/>
+</svg> 
