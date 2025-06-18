@@ -43,11 +43,7 @@ const InicioPage: React.FC = () => {
       <div className="inicio-container">
         <div className="hero-section">
           <div className="hero-image">
-            <img src="/hero-banner.jpg" alt="Hero Banner" className="banner-image" />
-          </div>
-          <div className="hero-text">
-            <h2>DESLIZA DESLIZA E NADA!</h2>
-            <h3>CONVERSE FREE</h3>
+            <img src="/nova-capa.jpg" alt="Capa do Site" className="banner-image" />
           </div>
         </div>
 
