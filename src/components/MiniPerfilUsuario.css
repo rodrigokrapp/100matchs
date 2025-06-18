@@ -1,0 +1,261 @@
+.mini-perfil-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.mini-foto {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid #f59e0b;
+  transition: all 0.2s ease;
+}
+
+.mini-foto:hover {
+  transform: scale(1.1);
+  border-color: #d97706;
+}
+
+.mini-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.premium-badge-mini {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #f59e0b;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: white;
+}
+
+.mini-foto-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+}
+
+.nome-usuario {
+  font-weight: 600;
+  color: #1e40af;
+  font-size: 0.9rem;
+}
+
+.nome-usuario.premium {
+  color: #d97706;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.star-icon {
+  color: #f59e0b;
+  font-size: 0.8rem;
+}
+
+/* Mini Janela de Perfil */
+.mini-janela-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+}
+
+.mini-janela-perfil {
+  background: white;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mini-janela-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.mini-janela-header h3 {
+  color: #d97706;
+  margin: 0;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-fechar {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.btn-fechar:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.mini-janela-content {
+  padding: 1.5rem;
+}
+
+.fotos-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.foto-mini {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  transition: transform 0.2s ease;
+}
+
+.foto-mini:hover {
+  transform: scale(1.05);
+}
+
+.foto-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.descricao-mini {
+  margin-bottom: 1rem;
+}
+
+.descricao-mini h4 {
+  color: #374151;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.descricao-mini p {
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0 0 0.5rem 0;
+}
+
+.premium-notice {
+  color: #d97706;
+  font-style: italic;
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.limite-chat-notice {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.limite-chat-notice p {
+  color: #92400e;
+  font-weight: 600;
+  margin: 0 0 0.3rem 0;
+}
+
+.limite-chat-notice small {
+  color: #b45309;
+  font-size: 0.8rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .mini-janela-perfil {
+    margin: 0.5rem;
+    max-height: 90vh;
+  }
+  
+  .mini-janela-header {
+    padding: 1rem;
+  }
+  
+  .mini-janela-content {
+    padding: 1rem;
+  }
+  
+  .fotos-mini-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mini-foto {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .premium-badge-mini {
+    width: 10px;
+    height: 10px;
+    font-size: 7px;
+  }
+  
+  .nome-usuario {
+    font-size: 0.8rem;
+  }
+  
+  .mini-janela-overlay {
+    padding: 0.5rem;
+  }
+  
+  .fotos-mini-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+} 

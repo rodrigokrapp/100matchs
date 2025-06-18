@@ -9,6 +9,7 @@ import { chatService, ChatMessage } from '../lib/chatService';
 import MediaService, { EMOJI_CATEGORIES } from '../lib/mediaService';
 import { testChatConnection } from '../lib/supabase';
 import Header from '../components/Header';
+import MiniPerfilUsuario from '../components/MiniPerfilUsuario';
 import './ChatPage.css';
 
 const ChatPage: React.FC = () => {
@@ -672,8 +673,11 @@ const ChatPage: React.FC = () => {
                     className={`message ${isOwn ? 'own-message' : 'other-message'} ${msg.is_temporary ? 'temporary-message' : ''}`}
                   >
                     <div className="message-header">
-                      <span className="sender">{msg.user_name}</span>
-                      {msg.is_premium && <FiStar className="premium-icon" />}
+                      <MiniPerfilUsuario 
+                        nomeUsuario={msg.user_name}
+                        emailUsuario={msg.user_email}
+                        isPremium={msg.is_premium || false}
+                      />
                       <span className="time">{formatTime(msg.created_at)}</span>
                       {msg.is_temporary && (
                         <div className="temporary-indicator">

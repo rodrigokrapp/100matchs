@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import MenuHamburguer from './MenuHamburguer';
+import ContagemRegressiva from './ContagemRegressiva';
 import './Header.css';
 
 const Header: React.FC = () => {
@@ -11,17 +12,20 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="header">
-      <div className="logo-container" onClick={handleLogoClick}>
-        <img 
-          src="/logo-coracao-rosa-nova.png" 
-          alt="100 Matchs Logo" 
-          className="logo" 
-        />
-        <h1 className="site-title">100 Matchs</h1>
-      </div>
-      <MenuHamburguer />
-    </header>
+    <>
+      <header className="header">
+        <div className="logo-container" onClick={handleLogoClick}>
+          <img 
+            src="/logo-coracao-rosa-nova.png" 
+            alt="100 Matchs Logo" 
+            className="logo" 
+          />
+          <h1 className="site-title">100 Matchs</h1>
+        </div>
+        <MenuHamburguer />
+      </header>
+      <ContagemRegressiva />
+    </>
   );
 };
 

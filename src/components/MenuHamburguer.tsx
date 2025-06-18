@@ -27,10 +27,11 @@ const MenuHamburguer: React.FC = () => {
   const handleMeuPerfil = () => {
     if (usuario?.tipo === 'premium') {
       navigate('/meuperfil');
+      setIsOpen(false);
     } else {
-      alert('Apenas usuários premium têm acesso ao perfil. Seja premium!');
+      // Para usuários de chat gratuito, não fazer nada
+      return;
     }
-    setIsOpen(false);
   };
 
   const handleSair = () => {
