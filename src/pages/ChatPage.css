@@ -504,6 +504,83 @@
   transform: translateY(-2px);
 }
 
+/* Video Recording Preview */
+.video-recording-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.recording-preview-container {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.camera-preview {
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: cover;
+  border-radius: 20px 20px 0 0;
+}
+
+.recording-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recording-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-weight: 600;
+}
+
+.recording-info .recording-dot {
+  width: 12px;
+  height: 12px;
+  background: #dc2626;
+  border-radius: 50%;
+  animation: recordingBlink 1s infinite;
+}
+
+.stop-recording-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.stop-recording-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-2px);
+}
+
 /* Recording Indicator */
 .recording-indicator {
   position: fixed;
@@ -938,5 +1015,27 @@
   .back-button {
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
+  }
+
+  .recording-preview-container {
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+
+  .camera-preview {
+    max-height: 60vh;
+  }
+
+  .recording-overlay {
+    padding: 15px;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .stop-recording-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1rem;
   }
 } 

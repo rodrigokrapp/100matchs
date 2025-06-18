@@ -302,6 +302,22 @@ const ChatPage: React.FC = () => {
       setRecordingTime(0);
       setShowMediaOptions(false);
 
+      // Primeiro, obter o stream da câmera para mostrar preview
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { 
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: 'user'
+        },
+        audio: true
+      });
+
+      // Mostrar preview da câmera durante gravação
+      if (videoPreviewRef.current) {
+        videoPreviewRef.current.srcObject = stream;
+        videoPreviewRef.current.play();
+      }
+
       // Iniciar contador de tempo
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => {
@@ -318,6 +334,9 @@ const ChatPage: React.FC = () => {
       const videoBlob = await MediaService.captureVideo(10);
       
       if (videoBlob) {
+        // Parar o stream da câmera
+        stream.getTracks().forEach(track => track.stop());
+        
         const url = MediaService.createTempUrl(videoBlob);
         setPreviewMedia({type: 'video', url, blob: videoBlob});
         setIsPreviewMode(true);
@@ -683,15 +702,36 @@ const ChatPage: React.FC = () => {
                             <div className="video-container">
                               <video 
                                 controls 
-                                onClick={() => handleViewTemporaryMessage(msg.id)}
+                                preload="metadata"
+                                onClick={() => {
+                                  handleViewTemporaryMessage(msg.id);
+                                  const video = document.querySelector(`video[data-msg-id="${msg.id}"]`) as HTMLVideoElement;
+                                  if (video) {
+                                    if (video.paused) {
+                                      video.play();
+                                    } else {
+                                      video.pause();
+                                    }
+                                  }
+                                }}
                                 onPlay={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
                                 onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
+                                data-msg-id={msg.id}
                               >
                                 <source src={msg.content} type="video/webm" />
                                 <source src={msg.content} type="video/mp4" />
                                 Seu navegador não suporta vídeo.
                               </video>
-                              <div className="video-overlay">
+                              <div className="video-overlay" onClick={() => {
+                                const video = document.querySelector(`video[data-msg-id="${msg.id}"]`) as HTMLVideoElement;
+                                if (video) {
+                                  if (video.paused) {
+                                    video.play();
+                                  } else {
+                                    video.pause();
+                                  }
+                                }
+                              }}>
                                 <button className="play-button">
                                   {isPlaying.get(msg.id) ? <FiPause /> : <FiPlay />}
                                 </button>
@@ -788,6 +828,24 @@ const ChatPage: React.FC = () => {
                 <button onClick={handleSendMedia} className="send-button">
                   <FiSend />
                   Enviar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Preview da câmera durante gravação */}
+        {isRecording && recordingType === 'video' && (
+          <div className="video-recording-preview">
+            <div className="recording-preview-container">
+              <video ref={videoPreviewRef} autoPlay muted className="camera-preview" />
+              <div className="recording-overlay">
+                <div className="recording-info">
+                  <div className="recording-dot"></div>
+                  <span>Gravando: {formatRecordingTime(recordingTime)}</span>
+                </div>
+                <button onClick={handleStopRecording} className="stop-recording-btn">
+                  Parar Gravação
                 </button>
               </div>
             </div>
