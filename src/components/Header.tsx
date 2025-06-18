@@ -10,6 +10,10 @@ const Header: React.FC = () => {
     navigate('/inicio');
   };
 
+  const handleSalasClick = () => {
+    navigate('/salas');
+  };
+
   return (
     <header className="header">
       <div className="logo-container" onClick={handleLogoClick}>
@@ -19,6 +23,9 @@ const Header: React.FC = () => {
           className="logo" 
         />
         <h1 className="site-title">100 Matchs</h1>
+      </div>
+      <div className="salas-link" onClick={handleSalasClick}>
+        salas
       </div>
       <MenuHamburguer />
     </header>

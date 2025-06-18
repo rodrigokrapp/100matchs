@@ -2,6 +2,7 @@
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 1rem 2rem;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(15px);
@@ -48,6 +49,25 @@
   background-clip: text;
 }
 
+.salas-link {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: rgba(59, 130, 246, 0.1);
+  border: 2px solid transparent;
+}
+
+.salas-link:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
 .btn-suporte {
   background: linear-gradient(135deg, #EC4899, #F97316);
   color: white;
@@ -82,6 +102,11 @@
   .logo {
     width: 40px;
     height: 40px;
+  }
+  
+  .salas-link {
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
   }
   
   .btn-suporte {
