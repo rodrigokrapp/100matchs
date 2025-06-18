@@ -444,7 +444,7 @@ const ChatPage: React.FC = () => {
         previewMedia.type === 'image' ? 'imagem' : previewMedia.type,
         usuario.premium || false,
         true, // Mensagem temporária
-        10 // 10 segundos para todas as mídias
+        previewMedia.type === 'video' || previewMedia.type === 'audio' ? 30 : 10 // 30 segundos para vídeo/áudio, 10 para imagem
       );
 
       if (sucesso) {
@@ -501,6 +501,18 @@ const ChatPage: React.FC = () => {
 
   const isMessageExpired = (msg: ChatMessage): boolean => {
     if (!msg.is_temporary || !msg.expires_at) return false;
+    
+    // Para vídeos e áudios, permitir que rodem por mais tempo
+    if (msg.message_type === 'video' || msg.message_type === 'audio') {
+      const createdTime = new Date(msg.created_at).getTime();
+      const currentTime = new Date().getTime();
+      const elapsedSeconds = (currentTime - createdTime) / 1000;
+      
+      // Dar 30 segundos para vídeos/áudios rodarem completamente
+      return elapsedSeconds > 30;
+    }
+    
+    // Para imagens, usar o tempo de expiração normal
     return new Date() > new Date(msg.expires_at);
   };
 
