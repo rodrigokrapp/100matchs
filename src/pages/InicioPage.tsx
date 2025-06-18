@@ -12,37 +12,19 @@ const InicioPage: React.FC = () => {
   const [senhaPremium, setSenhaPremium] = useState('');
 
   const handleEntrarChat = () => {
-    if (!nome.trim() || !email.trim()) {
-      alert('Por favor, digite seu nome e email');
+    if (!nome.trim()) {
+      alert('Por favor, digite seu nome');
       return;
     }
 
-    // Verificar se já usou este email nas últimas 24 horas
-    const ultimoAcesso = localStorage.getItem(`acesso_${email}`);
-    if (ultimoAcesso) {
-      const agora = new Date().getTime();
-      const ultimoAcessoTime = parseInt(ultimoAcesso);
-      const diferencaHoras = (agora - ultimoAcessoTime) / (1000 * 60 * 60);
-      
-      if (diferencaHoras < 24) {
-        const horasRestantes = Math.ceil(24 - diferencaHoras);
-        alert(`Você já usou este email hoje. Tente novamente em ${horasRestantes} horas.`);
-        return;
-      }
-    }
-
-    // Salvar usuário de chat gratuito com limite de 15 minutos
+    // Salvar usuário de chat gratuito simples
     const usuarioChat = {
       nome: nome.trim(),
-      email: email.trim(),
       premium: false,
-      tipo: 'chat',
-      inicioSessao: new Date().getTime(),
-      limiteTempo: 15 * 60 * 1000 // 15 minutos em ms
+      tipo: 'chat'
     };
 
     localStorage.setItem('usuarioChat', JSON.stringify(usuarioChat));
-    localStorage.setItem(`acesso_${email}`, new Date().getTime().toString());
     navigate('/salas');
   };
 
@@ -97,7 +79,7 @@ const InicioPage: React.FC = () => {
           {/* Formulário Entrar Chat */}
           <div className="entrada-card card">
             <h2>Entrar no Chat</h2>
-            <p>Acesso gratuito por 15 minutos (apenas texto e emoticons)</p>
+            <p>Acesso gratuito (apenas texto e emoticons)</p>
             
             <div className="input-group">
               <input
@@ -105,13 +87,6 @@ const InicioPage: React.FC = () => {
                 placeholder="Digite seu nome"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                className="input"
-              />
-              <input
-                type="email"
-                placeholder="Digite seu email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className="input"
               />
               <button onClick={handleEntrarChat} className="btn btn-primary">

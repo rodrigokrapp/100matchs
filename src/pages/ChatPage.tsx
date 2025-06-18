@@ -1012,22 +1012,33 @@ const ChatPage: React.FC = () => {
           }}>
             <div className="media-buttons">
               <button 
-                className={`media-toggle ${showMediaOptions ? 'active' : ''}`}
+                className={`media-toggle ${showMediaOptions ? 'active' : ''} ${usuario?.tipo === 'chat' ? 'disabled-for-chat' : ''}`}
                 onClick={() => {
+                  if (usuario?.tipo === 'chat') {
+                    alert('🔒 Recurso disponível apenas para usuários Premium!\nSeja Premium para enviar fotos, vídeos e áudios.');
+                    return;
+                  }
                   console.log('📷 Clicou no botão de mídia');
                   setShowMediaOptions(!showMediaOptions);
                   setShowEmojis(false);
                 }}
-                title="Enviar mídia"
+                title={usuario?.tipo === 'chat' ? 'Apenas Premium' : 'Enviar mídia'}
                 style={{
-                  background: showMediaOptions 
-                    ? 'linear-gradient(135deg, #1e40af, #3b82f6)' 
-                    : 'rgba(30, 64, 175, 0.1)',
+                  background: usuario?.tipo === 'chat' 
+                    ? '#9ca3af' 
+                    : showMediaOptions 
+                      ? 'linear-gradient(135deg, #1e40af, #3b82f6)' 
+                      : 'rgba(30, 64, 175, 0.1)',
                   border: '1px solid rgba(30, 64, 175, 0.3)',
-                  color: showMediaOptions ? 'white' : '#1e40af'
+                  color: usuario?.tipo === 'chat' 
+                    ? '#6b7280' 
+                    : showMediaOptions ? 'white' : '#1e40af',
+                  cursor: usuario?.tipo === 'chat' ? 'not-allowed' : 'pointer'
                 }}
+                disabled={usuario?.tipo === 'chat'}
               >
                 <FiImage />
+                {usuario?.tipo === 'chat' && <span className="lock-icon">🔒</span>}
               </button>
               
               <button 
