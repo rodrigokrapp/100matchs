@@ -324,25 +324,33 @@ const ChatPage: React.FC = () => {
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => {
           const newTime = prev + 1;
-          // Parar automaticamente aos 10 segundos
-          if (newTime >= 10) {
-            handleStopRecording();
-          }
           return newTime;
         });
       }, 1000);
 
-      // Capturar vídeo
+      // Capturar vídeo - aguardar a gravação completa
       const videoBlob = await MediaService.captureVideo(10);
       
+      // Parar o stream da câmera após a gravação
+      stream.getTracks().forEach(track => track.stop());
+      
+      // Parar o contador
+      setIsRecording(false);
+      setRecordingType(null);
+      setRecordingTime(0);
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+      
       if (videoBlob) {
-        // Parar o stream da câmera
-        stream.getTracks().forEach(track => track.stop());
-        
         const url = MediaService.createTempUrl(videoBlob);
         setPreviewMedia({type: 'video', url, blob: videoBlob});
         setIsPreviewMode(true);
-        console.log('✅ Vídeo capturado com sucesso');
+        console.log('✅ Vídeo capturado com sucesso:', videoBlob);
+      } else {
+        console.error('❌ Falha ao gerar blob do vídeo');
+        alert('Erro ao processar vídeo. Tente novamente.');
       }
       
     } catch (error) {
@@ -350,8 +358,10 @@ const ChatPage: React.FC = () => {
       alert('Erro ao acessar câmera. Verifique as permissões do navegador.');
       setIsRecording(false);
       setRecordingType(null);
+      setRecordingTime(0);
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
       }
     }
   };
@@ -433,11 +443,20 @@ const ChatPage: React.FC = () => {
 
   // NOVA FUNCIONALIDADE: Enviar mídia após preview
   const handleSendMedia = async () => {
-    if (!previewMedia || !usuario || !salaId) return;
+    if (!previewMedia || !usuario || !salaId) {
+      console.error('❌ Dados faltando para envio:', { previewMedia, usuario, salaId });
+      return;
+    }
+
+    if (!previewMedia.blob) {
+      console.error('❌ Blob da mídia não encontrado');
+      alert('Erro: mídia corrompida. Grave novamente.');
+      return;
+    }
 
     try {
-      console.log('📤 Enviando mídia:', previewMedia.type);
-      const base64 = await MediaService.blobToBase64(previewMedia.blob!);
+      console.log('📤 Enviando mídia:', previewMedia.type, 'Tamanho:', previewMedia.blob.size);
+      const base64 = await MediaService.blobToBase64(previewMedia.blob);
       
       const sucesso = await chatService.sendMessage(
         salaId,
@@ -451,15 +470,17 @@ const ChatPage: React.FC = () => {
 
       if (sucesso) {
         console.log('✅ Mídia enviada com sucesso!');
+        // Limpar preview apenas se enviado com sucesso
+        setIsPreviewMode(false);
+        setPreviewMedia(null);
+        setShowMediaOptions(false);
+      } else {
+        console.error('❌ Falha no envio da mídia');
+        alert('Erro ao enviar mídia. Tente novamente.');
       }
-
-      // Limpar preview
-      setIsPreviewMode(false);
-      setPreviewMedia(null);
-      setShowMediaOptions(false);
     } catch (error) {
       console.error('❌ Erro ao enviar mídia:', error);
-      alert('Erro ao enviar mídia.');
+      alert(`Erro ao enviar mídia: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   };
 
