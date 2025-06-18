@@ -103,11 +103,11 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     // Verificar se usuário está logado
-    const visitante = localStorage.getItem('visitante');
-    const usuarioPremium = localStorage.getItem('usuario');
+    const usuarioChat = localStorage.getItem('usuarioChat');
+    const usuarioPremium = localStorage.getItem('usuarioPremium');
     
-    if (visitante) {
-      setUsuario(JSON.parse(visitante));
+    if (usuarioChat) {
+      setUsuario(JSON.parse(usuarioChat));
     } else if (usuarioPremium) {
       setUsuario(JSON.parse(usuarioPremium));
     } else {
