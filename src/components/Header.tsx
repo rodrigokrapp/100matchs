@@ -14,7 +14,7 @@ const Header: React.FC = () => {
     <header className="header">
       <div className="logo-container" onClick={handleLogoClick}>
         <img 
-          src="/logo-coracao-rosa.png" 
+          src="/logo-coracao-rosa-nova.png" 
           alt="100 Matchs Logo" 
           className="logo" 
         />
