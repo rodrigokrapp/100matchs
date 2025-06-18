@@ -781,10 +781,9 @@ const ChatPage: React.FC = () => {
                             <div className="video-container">
                               <video 
                                 controls 
-                                preload="auto"
+                                preload="metadata"
                                 playsInline
                                 muted={false}
-                                poster=""
                                 onClick={() => {
                                   handleViewTemporaryMessage(msg.id);
                                   const video = document.querySelector(`video[data-msg-id="${msg.id}"]`) as HTMLVideoElement;
@@ -798,14 +797,16 @@ const ChatPage: React.FC = () => {
                                 }}
                                 onPlay={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
                                 onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
-                                onLoadedData={(e) => {
+                                onLoadedMetadata={(e) => {
                                   const video = e.target as HTMLVideoElement;
                                   video.playbackRate = 1.0;
                                   video.defaultPlaybackRate = 1.0;
                                 }}
-                                onCanPlay={(e) => {
+                                onTimeUpdate={(e) => {
                                   const video = e.target as HTMLVideoElement;
-                                  video.playbackRate = 1.0;
+                                  if (video.playbackRate !== 1.0) {
+                                    video.playbackRate = 1.0;
+                                  }
                                 }}
                                 onEnded={(e) => {
                                   // Quando o vídeo termina, marca como visualizado e some
