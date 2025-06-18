@@ -42,8 +42,18 @@ const MiniPerfilUsuario: React.FC<MiniPerfilProps> = ({
       if (perfilSalvo) {
         setPerfil(JSON.parse(perfilSalvo));
       }
+    } else if (isPremium) {
+      // Se for premium mas não tem email, tentar buscar por nome
+      const usuariosPremium = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
+      const usuarioEncontrado = usuariosPremium.find((u: any) => u.nome === nomeUsuario);
+      if (usuarioEncontrado) {
+        const perfilSalvo = localStorage.getItem(`perfil_${usuarioEncontrado.email}`);
+        if (perfilSalvo) {
+          setPerfil(JSON.parse(perfilSalvo));
+        }
+      }
     }
-  }, [isPremium, emailUsuario]);
+  }, [isPremium, emailUsuario, nomeUsuario]);
 
   const handleClickFoto = () => {
     if (perfil && (perfil.fotos[perfil.fotoPrincipal] || perfil.descricao)) {

@@ -675,7 +675,6 @@ const ChatPage: React.FC = () => {
                     <div className="message-header">
                       <MiniPerfilUsuario 
                         nomeUsuario={msg.user_name}
-                        emailUsuario={msg.user_email}
                         isPremium={msg.is_premium || false}
                       />
                       <span className="time">{formatTime(msg.created_at)}</span>
