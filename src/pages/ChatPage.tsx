@@ -240,12 +240,12 @@ const ChatPage: React.FC = () => {
       return;
     }
 
+    // Limpar mensagem imediatamente para melhor UX
+    const mensagemParaEnviar = mensagem.trim();
+    setMensagem('');
+
     try {
-      console.log('📤 Enviando mensagem:', mensagem);
-      
-      // Limpar mensagem imediatamente para melhor UX
-      const mensagemParaEnviar = mensagem.trim();
-      setMensagem('');
+      console.log('📤 Enviando mensagem:', mensagemParaEnviar);
       
       const sucesso = await chatService.sendMessage(
         salaId,
