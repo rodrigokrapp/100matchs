@@ -103,11 +103,11 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     // Verificar se usuário está logado
-    const visitante = localStorage.getItem('visitante');
-    const usuarioPremium = localStorage.getItem('usuario');
+    const usuarioChat = localStorage.getItem('usuarioChat');
+    const usuarioPremium = localStorage.getItem('usuarioPremium');
     
-    if (visitante) {
-      setUsuario(JSON.parse(visitante));
+    if (usuarioChat) {
+      setUsuario(JSON.parse(usuarioChat));
     } else if (usuarioPremium) {
       setUsuario(JSON.parse(usuarioPremium));
     } else {
@@ -952,48 +952,70 @@ const ChatPage: React.FC = () => {
                 <button 
                   className="media-option image-option"
                   onClick={() => {
+                    if (usuario?.tipo === 'chat') {
+                      alert('🔒 Recurso disponível apenas para usuários Premium!\nSeja Premium para enviar fotos, vídeos e áudios.');
+                      return;
+                    }
                     console.log('🖼️ Clicou na opção Galeria');
                     handleSelectImage();
                   }}
+                  disabled={usuario?.tipo === 'chat'}
                   style={{
-                    background: 'rgba(30, 64, 175, 0.1)',
-                    border: '1px solid rgba(30, 64, 175, 0.3)'
+                    background: usuario?.tipo === 'chat' ? '#9ca3af' : 'rgba(30, 64, 175, 0.1)',
+                    border: '1px solid rgba(30, 64, 175, 0.3)',
+                    cursor: usuario?.tipo === 'chat' ? 'not-allowed' : 'pointer',
+                    opacity: usuario?.tipo === 'chat' ? 0.5 : 1
                   }}
                 >
                   <FiImage />
                   <span>Galeria</span>
+                  {usuario?.tipo === 'chat' && <span className="lock-icon">🔒</span>}
                 </button>
                 
                 <button 
                   className="media-option video-option"
                   onClick={() => {
+                    if (usuario?.tipo === 'chat') {
+                      alert('🔒 Recurso disponível apenas para usuários Premium!\nSeja Premium para enviar fotos, vídeos e áudios.');
+                      return;
+                    }
                     console.log('🎥 Clicou na opção Câmera');
                     handleStartVideoRecording();
                   }}
-                  disabled={!MediaService.isMediaSupported() || isRecording}
+                  disabled={!MediaService.isMediaSupported() || isRecording || usuario?.tipo === 'chat'}
                   style={{
-                    background: 'rgba(190, 24, 93, 0.1)',
-                    border: '1px solid rgba(190, 24, 93, 0.3)'
+                    background: usuario?.tipo === 'chat' ? '#9ca3af' : 'rgba(190, 24, 93, 0.1)',
+                    border: '1px solid rgba(190, 24, 93, 0.3)',
+                    cursor: usuario?.tipo === 'chat' ? 'not-allowed' : 'pointer',
+                    opacity: usuario?.tipo === 'chat' ? 0.5 : 1
                   }}
                 >
                   <FiVideo />
                   <span>Câmera</span>
+                  {usuario?.tipo === 'chat' && <span className="lock-icon">🔒</span>}
                 </button>
                 
                 <button 
                   className="media-option audio-option"
                   onClick={() => {
+                    if (usuario?.tipo === 'chat') {
+                      alert('🔒 Recurso disponível apenas para usuários Premium!\nSeja Premium para enviar fotos, vídeos e áudios.');
+                      return;
+                    }
                     console.log('🎤 Clicou na opção Áudio');
                     handleStartAudioRecording();
                   }}
-                  disabled={!MediaService.isMediaSupported() || isRecording}
+                  disabled={!MediaService.isMediaSupported() || isRecording || usuario?.tipo === 'chat'}
                   style={{
-                    background: 'rgba(131, 24, 67, 0.1)',
-                    border: '1px solid rgba(131, 24, 67, 0.3)'
+                    background: usuario?.tipo === 'chat' ? '#9ca3af' : 'rgba(131, 24, 67, 0.1)',
+                    border: '1px solid rgba(131, 24, 67, 0.3)',
+                    cursor: usuario?.tipo === 'chat' ? 'not-allowed' : 'pointer',
+                    opacity: usuario?.tipo === 'chat' ? 0.5 : 1
                   }}
                 >
                   <FiMic />
                   <span>Áudio</span>
+                  {usuario?.tipo === 'chat' && <span className="lock-icon">🔒</span>}
                 </button>
               </div>
               

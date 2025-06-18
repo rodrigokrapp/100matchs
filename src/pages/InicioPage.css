@@ -742,6 +742,7 @@
   .inicio-page {
     padding: 0;
   }
+<<<<<<< HEAD
 
   .inicio-container {
     padding: 0 10px;
@@ -755,6 +756,15 @@
 
   .banner-image {
     height: 100%;
+=======
+  
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-banner-container {
+    height: 400px;
+>>>>>>> eaed69a4b8e3cac33451c81b251277fb72e9e63a
     border-radius: 0 0 20px 20px;
   }
 
