@@ -786,14 +786,6 @@ const ChatPage: React.FC = () => {
                                 muted={false}
                                 onClick={() => {
                                   handleViewTemporaryMessage(msg.id);
-                                  const video = document.querySelector(`video[data-msg-id="${msg.id}"]`) as HTMLVideoElement;
-                                  if (video) {
-                                    if (video.paused) {
-                                      video.play();
-                                    } else {
-                                      video.pause();
-                                    }
-                                  }
                                 }}
                                 onPlay={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
                                 onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
@@ -826,20 +818,6 @@ const ChatPage: React.FC = () => {
                                 <source src={msg.content} type="video/mp4" />
                                 Seu navegador não suporta vídeo.
                               </video>
-                              <div className="video-overlay" onClick={() => {
-                                const video = document.querySelector(`video[data-msg-id="${msg.id}"]`) as HTMLVideoElement;
-                                if (video) {
-                                  if (video.paused) {
-                                    video.play();
-                                  } else {
-                                    video.pause();
-                                  }
-                                }
-                              }}>
-                                <button className="play-button">
-                                  {isPlaying.get(msg.id) ? <FiPause /> : <FiPlay />}
-                                </button>
-                              </div>
                             </div>
                           )}
                         </div>
