@@ -742,6 +742,10 @@
     padding: 1rem 0.75rem;
   }
   
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  
   .hero-banner-container {
     height: 400px;
     border-radius: 0 0 20px 20px;
