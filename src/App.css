@@ -1,4 +1,4 @@
-/* App.css - Estilos globais com tema rosa moderno */
+/* App.css - Estilos globais com tema roxo moderno */
 * {
   margin: 0;
   padding: 0;
@@ -11,13 +11,13 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #fce7f3, #f9a8d4);
+  background: linear-gradient(135deg, #6B46C1 0%, #8B5CF6 50%, #A855F7 100%);
   min-height: 100vh;
 }
 
 .App {
   min-height: 100vh;
-  background: linear-gradient(135deg, #fce7f3, #f9a8d4);
+  background: linear-gradient(135deg, #6B46C1 0%, #8B5CF6 50%, #A855F7 100%);
 }
 
 /* Header/Logo Component */

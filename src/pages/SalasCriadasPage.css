@@ -1,0 +1,267 @@
+.salas-criadas-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6B46C1 0%, #8B5CF6 50%, #A855F7 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.salas-criadas-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.salas-criadas-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-50%) translateX(-2px);
+}
+
+.header-content h1 {
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-content p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.header-content small {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+}
+
+.no-salas {
+  display: flex;
+  justify-content: center;
+  margin: 3rem 0;
+}
+
+.no-salas-card {
+  text-align: center;
+  padding: 3rem;
+  max-width: 500px;
+}
+
+.no-salas-card h3 {
+  color: #2563eb;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.no-salas-card p {
+  color: #64748b;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.salas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.sala-criada-card {
+  position: relative;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.sala-criada-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.sala-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.sala-header h3 {
+  color: #2563eb;
+  font-size: 1.3rem;
+  margin: 0;
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.btn-excluir {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  transition: all 0.3s ease;
+}
+
+.btn-excluir:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.sala-localizacao {
+  color: #64748b;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.sala-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.stat svg {
+  color: #2563eb;
+}
+
+.sala-criacao {
+  margin-bottom: 1.5rem;
+}
+
+.sala-criacao small {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.btn-entrar {
+  width: 100%;
+  padding: 12px;
+  font-weight: 600;
+  border-radius: 25px;
+}
+
+.info-section {
+  margin-top: 3rem;
+}
+
+.info-card {
+  padding: 2rem;
+}
+
+.info-card h3 {
+  color: #2563eb;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.info-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-card li {
+  color: #64748b;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+  font-size: 1.2rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .salas-criadas-container {
+    padding: 1rem;
+  }
+  
+  .back-button {
+    position: static;
+    transform: none;
+    margin-bottom: 2rem;
+    align-self: flex-start;
+  }
+  
+  .salas-criadas-header {
+    text-align: left;
+  }
+  
+  .header-content h1 {
+    font-size: 2rem;
+  }
+  
+  .salas-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .sala-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .no-salas-card {
+    padding: 2rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content h1 {
+    font-size: 1.8rem;
+  }
+  
+  .header-content p {
+    font-size: 1rem;
+  }
+  
+  .sala-criada-card {
+    padding: 1rem;
+  }
+  
+  .sala-header h3 {
+    font-size: 1.1rem;
+  }
+} 

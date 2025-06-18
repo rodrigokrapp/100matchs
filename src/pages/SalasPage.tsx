@@ -115,6 +115,9 @@ const SalasPage: React.FC = () => {
               <button onClick={handleCriarSala} className="btn btn-primary criar-sala-btn">
                 Criar Sala
               </button>
+              <button onClick={() => navigate('/salascriadas')} className="btn btn-secondary criar-sala-btn">
+                Salas Criadas
+              </button>
             </div>
           </div>
         </div>

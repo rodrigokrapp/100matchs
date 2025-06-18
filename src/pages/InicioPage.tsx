@@ -42,11 +42,13 @@ const InicioPage: React.FC = () => {
       
       <div className="inicio-container">
         <div className="hero-section">
-          <h1 className="hero-title">Resenha Sem Match</h1>
-          <p className="hero-subtitle">
-            Conecte-se com pessoas reais em salas de chat das principais capitais do Brasil. 
-            Converse por vídeo, áudio, imagens e muito mais!
-          </p>
+          <div className="hero-image">
+            <img src="/hero-banner.jpg" alt="Hero Banner" className="banner-image" />
+          </div>
+          <div className="hero-text">
+            <h2>DESLIZA DESLIZA E NADA!</h2>
+            <h3>CONVERSE FREE</h3>
+          </div>
         </div>
 
         <div className="main-content">

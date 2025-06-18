@@ -5,6 +5,7 @@ import { testSupabaseConnection } from './lib/supabase';
 // Páginas
 import InicioPage from './pages/InicioPage';
 import SalasPage from './pages/SalasPage';
+import SalasCriadasPage from './pages/SalasCriadasPage';
 import ChatPage from './pages/ChatPage';
 import MeuPerfilPage from './pages/MeuPerfilPage';
 import SuportePage from './pages/SuportePage';
@@ -23,6 +24,7 @@ function App() {
           <Route path="/" element={<InicioPage />} />
           <Route path="/inicio" element={<InicioPage />} />
           <Route path="/salas" element={<SalasPage />} />
+          <Route path="/salascriadas" element={<SalasCriadasPage />} />
           <Route path="/criarsala" element={<CriarSalaPage />} />
           <Route path="/chat/:salaId" element={<ChatPage />} />
           <Route path="/suporte6828" element={<SuportePage />} />
