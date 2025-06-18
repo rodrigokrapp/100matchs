@@ -43,7 +43,7 @@ const InicioPage: React.FC = () => {
       <div className="inicio-container">
         <div className="hero-section">
           <div className="hero-image">
-            <img src="/capa-desliza-nada.jpg" alt="Capa do Site" className="banner-image" />
+            <img src="/banner-converse-sem-match.jpg" alt="Converse Sem Match" className="banner-image" />
           </div>
         </div>
 
