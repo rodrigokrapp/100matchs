@@ -3,8 +3,9 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   FiSend, FiImage, FiVideo, FiMic, FiSmile, FiArrowLeft, 
   FiUsers, FiStar, FiClock, FiCheck, FiEye, FiPlay, FiPause,
-  FiCamera, FiMicOff
+  FiMicOff
 } from 'react-icons/fi';
+import { MdGif } from 'react-icons/md';
 import { chatService, ChatMessage } from '../lib/chatService';
 import MediaService, { EMOJI_CATEGORIES } from '../lib/mediaService';
 import { testChatConnection } from '../lib/supabase';
@@ -298,7 +299,7 @@ const ChatPage: React.FC = () => {
   // NOVA FUNCIONALIDADE: Capturar vídeo com preview
   const handleStartVideoRecording = async () => {
     try {
-      console.log('📹 Iniciando gravação de vídeo...');
+      console.log('🎥 Iniciando gravação de vídeo...');
       setIsRecording(true);
       setRecordingType('video');
       setRecordingTime(0);
@@ -549,6 +550,91 @@ const ChatPage: React.FC = () => {
     navigate('/premium');
   };
 
+  const handleStartGifRecording = async () => {
+    try {
+      setIsRecording(true);
+      setRecordingType('video');
+      setRecordingTime(0);
+      
+      // Obter stream da câmera primeiro
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: true, 
+        audio: false 
+      });
+      
+      if (videoPreviewRef.current) {
+        videoPreviewRef.current.srcObject = stream;
+        videoPreviewRef.current.play();
+      }
+      
+      // Iniciar gravação com o stream
+      MediaService.startVideoRecording(stream);
+      
+      // Timer para 5 segundos
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTime(prev => {
+          if (prev >= 4) { // 5 segundos (0-4)
+            handleStopGifRecording();
+            return 0;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Erro ao iniciar gravação de GIF:', error);
+      alert('Erro ao acessar a câmera. Verifique as permissões.');
+      setIsRecording(false);
+      setRecordingType(null);
+    }
+  };
+
+  const handleStopGifRecording = async () => {
+    try {
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+      
+      // Parar gravação
+      MediaService.stopRecording();
+      
+      // Aguardar um pouco e obter o blob
+      setTimeout(async () => {
+        const videoBlob = await MediaService.getLastRecordedBlob();
+        
+        if (videoBlob && usuario) {
+          // Enviar automaticamente o GIF
+          const videoUrl = URL.createObjectURL(videoBlob);
+          
+          await chatService.sendMessage(
+            salaId || 'default',
+            usuario.nome,
+            videoUrl,
+            'video',
+            true // temporário
+          );
+          
+          // Limpar URL após 30 segundos
+          setTimeout(() => {
+            URL.revokeObjectURL(videoUrl);
+          }, 30000);
+        }
+        
+        setIsRecording(false);
+        setRecordingType(null);
+        setRecordingTime(0);
+        setShowMediaOptions(false);
+      }, 500);
+      
+    } catch (error) {
+      console.error('Erro ao parar gravação de GIF:', error);
+      setIsRecording(false);
+      setRecordingType(null);
+      setRecordingTime(0);
+    }
+  };
+
   if (!usuario) {
     return <div className="loading">Carregando...</div>;
   }
@@ -566,14 +652,14 @@ const ChatPage: React.FC = () => {
             <h2>{nomeSala}</h2>
             <div className="online-users">
               <FiUsers />
-              <span>{usuariosOnline} online</span>
-              {isConnected && <div className="connection-status connected"></div>}
+              <span>{usuariosOnline} pessoas online</span>
+              <div className={`connection-status ${isConnected ? 'connected' : ''}`}></div>
             </div>
           </div>
           {!usuario?.premium && (
             <button className="upgrade-button" onClick={handleUpgradePremium}>
               <FiStar />
-              Premium
+              Seja Premium
             </button>
           )}
         </div>
@@ -581,8 +667,8 @@ const ChatPage: React.FC = () => {
         {/* Hero Banner Section */}
         <div className="hero-banner-section">
           <img 
-            src="/hero-banner.jpg" 
-            alt="Banner 100 Matchs"
+            src="/banner-converse-sem-match.jpg" 
+            alt="Converse Sem Match"
             onError={(e) => {
               // Se a imagem não carregar, mostra um fundo com as cores da foto original
               (e.target as HTMLImageElement).style.display = 'none';
@@ -960,7 +1046,7 @@ const ChatPage: React.FC = () => {
               ))}
             </div>
             <div className="emoji-grid">
-              {EMOJI_CATEGORIES[selectedEmojiCategory as keyof typeof EMOJI_CATEGORIES]?.map((emoji: string, index: number) => (
+              {EMOJI_CATEGORIES[selectedEmojiCategory as keyof typeof EMOJI_CATEGORIES]?.slice(1).map((emoji, index) => (
                 <button
                   key={index}
                   className="emoji-button"
@@ -978,23 +1064,34 @@ const ChatPage: React.FC = () => {
           <div className="media-options-panel">
             <div className="media-options-grid">
               <button 
-                className="media-option" 
+                className="media-option"
                 onClick={handleSelectImage}
                 disabled={!mediaPermissions.camera}
               >
                 <FiImage />
                 <span>Foto</span>
               </button>
+              
               <button 
-                className="media-option" 
+                className="media-option"
                 onClick={handleStartVideoRecording}
                 disabled={!mediaPermissions.camera}
               >
                 <FiVideo />
                 <span>Vídeo</span>
               </button>
+
               <button 
-                className="media-option" 
+                className="media-option"
+                onClick={handleStartGifRecording}
+                disabled={!mediaPermissions.camera}
+              >
+                <MdGif />
+                <span>GIF 5s</span>
+              </button>
+              
+              <button 
+                className="media-option"
                 onClick={handleStartAudioRecording}
                 disabled={!mediaPermissions.microphone}
               >
@@ -1002,10 +1099,11 @@ const ChatPage: React.FC = () => {
                 <span>Áudio</span>
               </button>
             </div>
+            
             {(!mediaPermissions.camera || !mediaPermissions.microphone) && (
               <div className="media-not-supported">
-                <p>Algumas funcionalidades podem não estar disponíveis.</p>
-                <p>Verifique as permissões do navegador.</p>
+                <p>⚠️ Permissões de mídia necessárias</p>
+                <p>Ative câmera e microfone para usar todas as funções</p>
               </div>
             )}
           </div>
@@ -1018,7 +1116,7 @@ const ChatPage: React.FC = () => {
               className={`media-toggle ${showMediaOptions ? 'active' : ''}`}
               onClick={() => setShowMediaOptions(!showMediaOptions)}
             >
-              <FiCamera />
+              <MdGif />
             </button>
             <button 
               className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
