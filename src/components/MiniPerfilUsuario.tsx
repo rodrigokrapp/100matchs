@@ -1,183 +1,243 @@
-import React, { useState, useEffect } from 'react';
-import { FiX, FiStar } from 'react-icons/fi';
+import React, { useState } from 'react';
+import { FiX, FiHeart, FiMapPin, FiUser, FiStar, FiLock } from 'react-icons/fi';
 import './MiniPerfilUsuario.css';
 
-interface MiniPerfilProps {
+interface MiniPerfilUsuarioProps {
   nomeUsuario: string;
-  emailUsuario?: string;
-  isPremium: boolean;
+  isUserPremium: boolean;
+  isViewerPremium: boolean;
 }
 
-interface PerfilData {
-  nome: string;
-  email: string;
-  descricao: string;
-  fotos: string[];
-  fotoPrincipal: number;
-}
+// Dados simulados dos perfis dos usuários
+const perfisDosUsuarios: { [key: string]: any } = {
+  'rodrigo': {
+    nome: 'Rodrigo',
+    idade: 28,
+    localizacao: 'São Paulo, SP',
+    profissao: 'Desenvolvedor',
+    bio: 'Apaixonado por tecnologia e aventuras. Gosto de viajar, conhecer pessoas novas e criar conexões autênticas. Procuro alguém especial para compartilhar momentos únicos.',
+    fotos: [
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face'
+    ],
+    interesses: ['Tecnologia', 'Viagens', 'Música', 'Esportes'],
+    premium: true
+  },
+  'joana': {
+    nome: 'Joana',
+    idade: 25,
+    localizacao: 'Rio de Janeiro, RJ',
+    profissao: 'Designer',
+    bio: 'Criativa e sonhadora, amo arte e design. Sempre em busca de inspiração e novas experiências. Procuro alguém que compartilhe da minha paixão pela vida.',
+    fotos: [
+      'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face'
+    ],
+    interesses: ['Arte', 'Design', 'Fotografia', 'Café'],
+    premium: true
+  },
+  'carlos': {
+    nome: 'Carlos',
+    idade: 30,
+    localizacao: 'Belo Horizonte, MG',
+    profissao: 'Engenheiro',
+    bio: 'Engenheiro apaixonado por inovação e sustentabilidade. Gosto de natureza, trilhas e boa conversa. Busco uma conexão verdadeira.',
+    fotos: [
+      'https://images.unsplash.com/photo-1566492031773-4f4e44671d66?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1558222218-b7b54eede3f3?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1553967570-112d1533f012?w=400&h=400&fit=crop&crop=face'
+    ],
+    interesses: ['Engenharia', 'Natureza', 'Trilhas', 'Tecnologia'],
+    premium: false
+  }
+};
 
-const MiniPerfilUsuario: React.FC<MiniPerfilProps> = ({ 
+const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({ 
   nomeUsuario, 
-  emailUsuario, 
-  isPremium 
+  isUserPremium, 
+  isViewerPremium 
 }) => {
-  const [perfil, setPerfil] = useState<PerfilData | null>(null);
-  const [mostrarJanela, setMostrarJanela] = useState(false);
-  const [usuarioAtual, setUsuarioAtual] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
-  useEffect(() => {
-    // Verificar tipo do usuário atual
-    const usuarioPremium = localStorage.getItem('usuarioPremium');
-    const usuarioChat = localStorage.getItem('usuarioChat');
-    
-    if (usuarioPremium) {
-      setUsuarioAtual({ ...JSON.parse(usuarioPremium), tipo: 'premium' });
-    } else if (usuarioChat) {
-      setUsuarioAtual({ ...JSON.parse(usuarioChat), tipo: 'chat' });
-    }
-
-    // Carregar perfil do usuário se for premium e tiver email
-    if (isPremium && emailUsuario) {
-      const perfilSalvo = localStorage.getItem(`perfil_${emailUsuario}`);
-      if (perfilSalvo) {
-        setPerfil(JSON.parse(perfilSalvo));
-      }
-    } else if (isPremium) {
-      // Se for premium mas não tem email, tentar buscar por nome
-      const usuariosPremium = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
-      const usuarioEncontrado = usuariosPremium.find((u: any) => u.nome === nomeUsuario);
-      if (usuarioEncontrado) {
-        const perfilSalvo = localStorage.getItem(`perfil_${usuarioEncontrado.email}`);
-        if (perfilSalvo) {
-          setPerfil(JSON.parse(perfilSalvo));
-        }
-      }
-    }
-  }, [isPremium, emailUsuario, nomeUsuario]);
-
-  const handleClickFoto = () => {
-    if (perfil && (perfil.fotos[perfil.fotoPrincipal] || perfil.descricao)) {
-      setMostrarJanela(true);
-    }
+  // Buscar dados do usuário (ou usar dados padrão se não encontrar)
+  const dadosUsuario = perfisDosUsuarios[nomeUsuario.toLowerCase()] || {
+    nome: nomeUsuario,
+    idade: 25,
+    localizacao: 'Brasil',
+    profissao: 'Usuário',
+    bio: 'Olá! Sou novo na plataforma e estou conhecendo pessoas interessantes. Gosto de conversar e fazer novas amizades.',
+    fotos: [
+      'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1628157588553-5eeea00af15c?w=400&h=400&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop&crop=face'
+    ],
+    interesses: ['Conversas', 'Amizades', 'Música'],
+    premium: isUserPremium
   };
 
-  const getDescricaoVisivel = () => {
-    if (!perfil?.descricao) return '';
-    
-    // Se usuário atual é chat gratuito, mostrar apenas metade
-    if (usuarioAtual?.tipo === 'chat') {
-      const metade = Math.floor(perfil.descricao.length / 2);
-      return perfil.descricao.substring(0, metade) + '...';
-    }
-    
-    // Se usuário atual é premium, mostrar tudo
-    return perfil.descricao;
+  const handleOpenModal = () => {
+    setShowModal(true);
+    setCurrentPhotoIndex(0);
   };
 
-  const getFotosVisiveis = () => {
-    if (!perfil?.fotos) return [];
-    
-    // Se usuário atual é chat gratuito, mostrar apenas a foto principal
-    if (usuarioAtual?.tipo === 'chat') {
-      return perfil.fotos[perfil.fotoPrincipal] ? [perfil.fotos[perfil.fotoPrincipal]] : [];
-    }
-    
-    // Se usuário atual é premium, mostrar todas as fotos
-    return perfil.fotos.filter(foto => foto !== '');
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
-  // Se não for premium, mostrar apenas o nome
-  if (!isPremium) {
-    return (
-      <div className="mini-perfil-container">
-        <span className="nome-usuario">{nomeUsuario}</span>
-      </div>
-    );
-  }
+  const nextPhoto = () => {
+    const maxPhotos = isViewerPremium ? dadosUsuario.fotos.length : 1;
+    setCurrentPhotoIndex((prev) => (prev + 1) % maxPhotos);
+  };
 
-  // Se for premium mas não tem perfil configurado
-  if (!perfil) {
-    return (
-      <div className="mini-perfil-container">
-        <div className="mini-foto-placeholder">
-          <FiStar />
-        </div>
-        <span className="nome-usuario premium">
-          {nomeUsuario} <FiStar className="star-icon" />
-        </span>
-      </div>
-    );
-  }
+  const prevPhoto = () => {
+    const maxPhotos = isViewerPremium ? dadosUsuario.fotos.length : 1;
+    setCurrentPhotoIndex((prev) => (prev - 1 + maxPhotos) % maxPhotos);
+  };
+
+  // Determinar quantas fotos e quanto da bio mostrar
+  const fotosParaMostrar = isViewerPremium ? dadosUsuario.fotos : [dadosUsuario.fotos[0]];
+  const bioParaMostrar = isViewerPremium 
+    ? dadosUsuario.bio 
+    : dadosUsuario.bio.substring(0, Math.floor(dadosUsuario.bio.length / 2)) + '...';
 
   return (
-    <div className="mini-perfil-container">
-      {perfil.fotos[perfil.fotoPrincipal] && (
-        <div className="mini-foto" onClick={handleClickFoto}>
-          <img 
-            src={perfil.fotos[perfil.fotoPrincipal]} 
-            alt={`Foto de ${nomeUsuario}`}
-          />
-          <div className="premium-badge-mini">
-            <FiStar />
-          </div>
-        </div>
-      )}
-      
-      <span className="nome-usuario premium">
-        {nomeUsuario} <FiStar className="star-icon" />
-      </span>
+    <>
+      {/* Mini foto do perfil */}
+      <div className="mini-perfil-trigger" onClick={handleOpenModal}>
+        <img 
+          src={dadosUsuario.fotos[0]} 
+          alt={`Foto de ${dadosUsuario.nome}`}
+          className="mini-foto-perfil"
+        />
+        {isUserPremium && <FiStar className="mini-premium-icon" />}
+      </div>
 
-      {/* Mini Janela de Perfil */}
-      {mostrarJanela && (
-        <div className="mini-janela-overlay" onClick={() => setMostrarJanela(false)}>
-          <div className="mini-janela-perfil" onClick={(e) => e.stopPropagation()}>
-            <div className="mini-janela-header">
-              <h3>{perfil.nome} <FiStar className="star-icon" /></h3>
-              <button 
-                className="btn-fechar"
-                onClick={() => setMostrarJanela(false)}
-              >
+      {/* Modal do perfil */}
+      {showModal && (
+        <div className="mini-perfil-overlay" onClick={handleCloseModal}>
+          <div className="mini-perfil-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title">
+                <FiUser />
+                <span>Perfil de {dadosUsuario.nome}</span>
+                {isUserPremium && <FiStar className="premium-badge" />}
+              </div>
+              <button className="close-button" onClick={handleCloseModal}>
                 <FiX />
               </button>
             </div>
 
-            <div className="mini-janela-content">
-              {/* Fotos */}
-              {getFotosVisiveis().length > 0 && (
-                <div className="fotos-mini-grid">
-                  {getFotosVisiveis().map((foto, index) => (
-                    <div key={index} className="foto-mini">
-                      <img src={foto} alt={`Foto ${index + 1}`} />
-                    </div>
-                  ))}
+            <div className="modal-content">
+              {/* Seção de fotos */}
+              <div className="photos-section">
+                <div className="photo-container">
+                  <img 
+                    src={fotosParaMostrar[currentPhotoIndex]} 
+                    alt={`Foto ${currentPhotoIndex + 1} de ${dadosUsuario.nome}`}
+                    className="main-photo"
+                  />
+                  
+                  {fotosParaMostrar.length > 1 && (
+                    <>
+                      <button className="photo-nav prev" onClick={prevPhoto}>‹</button>
+                      <button className="photo-nav next" onClick={nextPhoto}>›</button>
+                    </>
+                  )}
+                  
+                  <div className="photo-counter">
+                    {currentPhotoIndex + 1} / {fotosParaMostrar.length}
+                    {!isViewerPremium && (
+                      <span className="limited-access">
+                        <FiLock /> Limitado
+                      </span>
+                    )}
+                  </div>
                 </div>
-              )}
 
-              {/* Descrição */}
-              {getDescricaoVisivel() && (
-                <div className="descricao-mini">
-                  <h4>Sobre</h4>
-                  <p>{getDescricaoVisivel()}</p>
-                  {usuarioAtual?.tipo === 'chat' && perfil.descricao.length > getDescricaoVisivel().length && (
-                    <small className="premium-notice">
-                      💎 Seja Premium para ver a descrição completa
-                    </small>
+                {/* Thumbnails das fotos (só para premium) */}
+                {isViewerPremium && fotosParaMostrar.length > 1 && (
+                  <div className="photo-thumbnails">
+                    {fotosParaMostrar.map((foto, index) => (
+                      <img
+                        key={index}
+                        src={foto}
+                        alt={`Thumbnail ${index + 1}`}
+                        className={`thumbnail ${index === currentPhotoIndex ? 'active' : ''}`}
+                        onClick={() => setCurrentPhotoIndex(index)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Informações do perfil */}
+              <div className="profile-info">
+                <div className="basic-info">
+                  <h3>{dadosUsuario.nome}, {dadosUsuario.idade}</h3>
+                  <div className="location">
+                    <FiMapPin />
+                    <span>{dadosUsuario.localizacao}</span>
+                  </div>
+                  <div className="profession">
+                    <FiUser />
+                    <span>{dadosUsuario.profissao}</span>
+                  </div>
+                </div>
+
+                <div className="bio-section">
+                  <h4>Sobre mim</h4>
+                  <p>{bioParaMostrar}</p>
+                  {!isViewerPremium && (
+                    <div className="premium-upgrade-hint">
+                      <FiLock />
+                      <span>Faça upgrade para ver o perfil completo</span>
+                    </div>
                   )}
                 </div>
-              )}
 
-              {/* Aviso para usuários chat */}
-              {usuarioAtual?.tipo === 'chat' && (
-                <div className="limite-chat-notice">
-                  <p>🔒 Visualização limitada</p>
-                  <small>Usuários Premium veem todas as fotos e descrição completa</small>
-                </div>
-              )}
+                {isViewerPremium && (
+                  <div className="interests-section">
+                    <h4>Interesses</h4>
+                    <div className="interests-tags">
+                      {dadosUsuario.interesses.map((interesse: string, index: number) => (
+                        <span key={index} className="interest-tag">
+                          {interesse}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Ações */}
+              <div className="modal-actions">
+                <button className="action-button like">
+                  <FiHeart />
+                  <span>Curtir</span>
+                </button>
+                {!isViewerPremium && (
+                  <button className="action-button upgrade">
+                    <FiStar />
+                    <span>Upgrade Premium</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

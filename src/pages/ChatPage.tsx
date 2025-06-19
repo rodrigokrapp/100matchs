@@ -899,10 +899,15 @@ const ChatPage: React.FC = () => {
                     className={`message ${isOwn ? 'own-message' : 'other-message'} ${msg.is_temporary ? 'temporary-message' : ''}`}
                   >
                     <div className="message-header">
-                      <MiniPerfilUsuario 
-                        nomeUsuario={msg.user_name}
-                        isPremium={msg.is_premium || false}
-                      />
+                      <span className="sender">
+                        {msg.user_name}
+                        {msg.is_premium && <FiStar className="premium-icon" />}
+                        <MiniPerfilUsuario 
+                          nomeUsuario={msg.user_name}
+                          isUserPremium={msg.is_premium || false}
+                          isViewerPremium={isPremiumUser()}
+                        />
+                      </span>
                       <span className="time">{formatTime(msg.created_at)}</span>
                       {msg.is_temporary && (
                         <div className="temporary-indicator">

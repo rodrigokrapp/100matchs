@@ -258,4 +258,446 @@
   .fotos-mini-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* MiniPerfilUsuario.css */
+
+/* Mini foto do perfil (trigger) */
+.mini-perfil-trigger {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.mini-foto-perfil {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  object-fit: cover;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.mini-foto-perfil:hover {
+  transform: scale(1.1);
+  border-color: #663399;
+  box-shadow: 0 4px 15px rgba(102, 51, 153, 0.4);
+}
+
+.mini-premium-icon {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: linear-gradient(45deg, #ffd700, #ffed4a);
+  color: #663399;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Modal overlay */
+.mini-perfil-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal principal */
+.mini-perfil-modal {
+  background: white;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+  position: relative;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header do modal */
+.modal-header {
+  background: linear-gradient(135deg, #663399, #8b5cf6);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.premium-badge {
+  background: linear-gradient(45deg, #ffd700, #ffed4a);
+  color: #663399;
+  padding: 4px;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Conteúdo do modal */
+.modal-content {
+  padding: 0;
+  max-height: calc(80vh - 80px);
+  overflow-y: auto;
+}
+
+/* Seção de fotos */
+.photos-section {
+  position: relative;
+}
+
+.photo-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+}
+
+.main-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.photo-nav:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.photo-nav.prev {
+  left: 15px;
+}
+
+.photo-nav.next {
+  right: 15px;
+}
+
+.photo-counter {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.limited-access {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #ff6b6b;
+  font-size: 12px;
+}
+
+/* Thumbnails */
+.photo-thumbnails {
+  display: flex;
+  gap: 8px;
+  padding: 15px;
+  background: #f8f9fa;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.photo-thumbnails::-webkit-scrollbar {
+  height: 4px;
+}
+
+.photo-thumbnails::-webkit-scrollbar-thumb {
+  background: #663399;
+  border-radius: 2px;
+}
+
+.thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.thumbnail:hover {
+  transform: scale(1.1);
+  border-color: #663399;
+}
+
+.thumbnail.active {
+  border-color: #663399;
+  box-shadow: 0 4px 15px rgba(102, 51, 153, 0.3);
+}
+
+/* Informações do perfil */
+.profile-info {
+  padding: 20px;
+}
+
+.basic-info h3 {
+  color: #333;
+  margin: 0 0 15px 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.location,
+.profession {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.location svg,
+.profession svg {
+  color: #663399;
+}
+
+/* Bio section */
+.bio-section {
+  margin-top: 20px;
+}
+
+.bio-section h4 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.bio-section p {
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.premium-upgrade-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 8px;
+  color: #ff6b6b;
+  font-size: 14px;
+}
+
+/* Interesses */
+.interests-section {
+  margin-top: 20px;
+}
+
+.interests-section h4 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.interests-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.interest-tag {
+  background: linear-gradient(135deg, #663399, #8b5cf6);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Ações do modal */
+.modal-actions {
+  padding: 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 15px;
+}
+
+.action-button {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.action-button.like {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+}
+
+.action-button.like:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+}
+
+.action-button.upgrade {
+  background: linear-gradient(135deg, #ffd700, #ffed4a);
+  color: #663399;
+}
+
+.action-button.upgrade:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .mini-perfil-modal {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .modal-header {
+    padding: 15px;
+  }
+  
+  .modal-title {
+    font-size: 16px;
+  }
+  
+  .photo-container {
+    height: 250px;
+  }
+  
+  .profile-info {
+    padding: 15px;
+  }
+  
+  .basic-info h3 {
+    font-size: 20px;
+  }
+  
+  .modal-actions {
+    padding: 15px;
+    flex-direction: column;
+  }
+  
+  .photo-thumbnails {
+    padding: 10px;
+  }
+  
+  .thumbnail {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mini-foto-perfil {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .mini-premium-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 8px;
+  }
+  
+  .photo-container {
+    height: 200px;
+  }
+  
+  .photo-nav {
+    width: 35px;
+    height: 35px;
+    font-size: 18px;
+  }
 } 
