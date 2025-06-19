@@ -32,6 +32,7 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
   const [userBio, setUserBio] = useState<string>("Usuário da plataforma 100matchs.");
   const [mainPhotoIndex, setMainPhotoIndex] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -57,17 +58,37 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
       
       // Buscar perfil de outros usuários no Supabase
       try {
-        const { data, error } = await supabase
+        console.log('🔍 Buscando perfil no Supabase para usuário:', nomeUsuario);
+        
+        // Primeiro tenta busca exata pelo nome
+        let { data, error } = await supabase
           .from('perfis')
-          .select('fotos, descricao, foto_principal')
-          .ilike('nome', nomeUsuario.toLowerCase())
+          .select('fotos, descricao, foto_principal, nome, email')
+          .eq('nome', nomeUsuario)
           .single();
         
-        if (data) {
+        // Se não encontrou, tenta busca case-insensitive
+        if (!data || error) {
+          console.log('🔍 Tentando busca case-insensitive...');
+          const result = await supabase
+            .from('perfis')
+            .select('fotos, descricao, foto_principal, nome, email')
+            .ilike('nome', `%${nomeUsuario}%`);
+          
+          if (result.data && result.data.length > 0) {
+            data = result.data[0];
+            error = null;
+          }
+        }
+        
+        if (data && !error) {
+          console.log('✅ Perfil encontrado no Supabase:', data);
           setUserPhotos(data.fotos ? data.fotos.filter((foto: string) => foto !== '') : []);
           setUserBio(data.descricao || 'Usuário da plataforma 100matchs.');
           setMainPhotoIndex(data.foto_principal || 0);
         } else {
+          console.log('❌ Perfil não encontrado no Supabase, usando dados demo');
+          console.log('Erro:', error);
           // Dados de demonstração para outros usuários (fallback)
           const userPhotosData: { [key: string]: string[] } = {
             'rodrigo': [
@@ -95,7 +116,46 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
     };
 
     loadUserData();
+  }, [nomeUsuario, refreshTrigger]);
+  
+  // Listener para mudanças no localStorage (atualização em tempo real)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key && e.key.startsWith('perfil_')) {
+        console.log('🔄 Perfil atualizado, recarregando dados...');
+        setRefreshTrigger(prev => prev + 1);
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Também escutar mudanças customizadas (mesmo aba)
+    const handleCustomUpdate = (e: CustomEvent) => {
+      if (e.detail?.userName === nomeUsuario) {
+        console.log('🔄 Atualização personalizada detectada para:', nomeUsuario);
+        setRefreshTrigger(prev => prev + 1);
+      }
+    };
+    
+    window.addEventListener('perfilUpdated' as any, handleCustomUpdate);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('perfilUpdated' as any, handleCustomUpdate);
+    };
   }, [nomeUsuario]);
+  
+  // Sistema de atualização automática a cada 30 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isOwnProfile) { // Só atualiza perfis de outros usuários
+        console.log('🔄 Atualização automática de perfil:', nomeUsuario);
+        setRefreshTrigger(prev => prev + 1);
+      }
+    }, 30000); // 30 segundos
+    
+    return () => clearInterval(interval);
+  }, [nomeUsuario, isOwnProfile]);
 
   if (loading) {
     return (

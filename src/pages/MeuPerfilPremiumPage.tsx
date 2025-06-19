@@ -116,6 +116,18 @@ const MeuPerfilPremiumPage: React.FC = () => {
         console.error('Erro ao salvar perfil no Supabase:', error);
       } else {
         console.log('✅ Perfil salvo no Supabase com sucesso!');
+        
+        // Disparar evento personalizado para atualização em tempo real
+        window.dispatchEvent(new CustomEvent('perfilUpdated', {
+          detail: { 
+            userName: perfilAtualizado.nome,
+            email: perfilAtualizado.email,
+            timestamp: Date.now()
+          }
+        }));
+        
+        // Forçar atualização do localStorage (para disparar storage event em outras abas)
+        localStorage.setItem('lastProfileUpdate', Date.now().toString());
       }
     } catch (error) {
       console.error('Erro ao conectar com Supabase:', error);
