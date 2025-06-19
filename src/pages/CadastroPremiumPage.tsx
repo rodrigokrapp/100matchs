@@ -93,7 +93,7 @@ const CadastroPremiumPage: React.FC = () => {
       localStorage.setItem('usuarios-premium', JSON.stringify(usuariosExistentes));
 
       // Fazer login automático
-      localStorage.setItem('usuario', JSON.stringify(novoUsuario));
+      localStorage.setItem('usuarioPremium', JSON.stringify(novoUsuario));
 
       alert('Cadastro realizado com sucesso! Bem-vindo ao Premium!');
       navigate('/salas');

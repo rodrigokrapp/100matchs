@@ -6,6 +6,7 @@ interface MiniPerfilUsuarioProps {
   nomeUsuario: string;
   isUserPremium: boolean;
   isViewerPremium: boolean;
+  isOwnProfile?: boolean; // Se é o próprio perfil do usuário logado
   userPhotos?: string[]; // Fotos do usuário (opcional)
   userBio?: string; // Bio do usuário (opcional)
   userAge?: number; // Idade (opcional)
@@ -19,6 +20,7 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
   nomeUsuario, 
   isUserPremium, 
   isViewerPremium,
+  isOwnProfile = false,
   userPhotos = [],
   userBio = "Usuário da plataforma 100matchs.",
   userAge = 25,
@@ -30,62 +32,156 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
   const [showModal, setShowModal] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
-  // Se o usuário não é premium, mostrar apenas ícone
-  if (!isUserPremium) {
-    return (
-      <div className="user-icon-only">
-        <FiUser className="default-user-icon" />
-      </div>
-    );
-  }
-
-  // Se não tem fotos, mostrar ícone mesmo sendo premium
-  if (userPhotos.length === 0) {
-    return (
-      <div className="user-icon-only">
-        <FiUser className="default-user-icon" />
-      </div>
-    );
-  }
-
   const handleOpenModal = () => {
-    // Permitir abrir modal se:
-    // 1. Visualizador é premium (vê tudo)
-    // 2. OU se o usuário do perfil é premium (gratuito pode ver limitado)
-    if (isViewerPremium || isUserPremium) {
-      setShowModal(true);
-      setCurrentPhotoIndex(0);
-    }
+    setShowModal(true);
+    setCurrentPhotoIndex(0);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
   };
 
+  // Determinar quantas fotos e quanto da bio mostrar
+  // Próprio usuário premium ou viewer premium podem ver tudo
+  // Usuário gratuito vendo premium pode ver limitado
+  const canViewFull = isViewerPremium || isOwnProfile;
+  const fotosParaMostrar = canViewFull ? userPhotos : [userPhotos[0]];
+  const bioParaMostrar = canViewFull 
+    ? userBio 
+    : userBio.substring(0, Math.floor(userBio.length / 2)) + '...';
+
   const nextPhoto = () => {
-    // Se visualizador não é premium, só pode ver 1 foto
-    const maxPhotos = isViewerPremium ? userPhotos.length : 1;
+    // Se pode ver tudo (próprio perfil ou viewer premium), pode navegar por todas as fotos
+    const maxPhotos = canViewFull ? userPhotos.length : 1;
     setCurrentPhotoIndex((prev) => (prev + 1) % maxPhotos);
   };
 
   const prevPhoto = () => {
-    // Se visualizador não é premium, só pode ver 1 foto
-    const maxPhotos = isViewerPremium ? userPhotos.length : 1;
+    // Se pode ver tudo (próprio perfil ou viewer premium), pode navegar por todas as fotos
+    const maxPhotos = canViewFull ? userPhotos.length : 1;
     setCurrentPhotoIndex((prev) => (prev - 1 + maxPhotos) % maxPhotos);
   };
-
-  // Determinar quantas fotos e quanto da bio mostrar
-  const fotosParaMostrar = isViewerPremium ? userPhotos : [userPhotos[0]];
-  const bioParaMostrar = isViewerPremium 
-    ? userBio 
-    : userBio.substring(0, Math.floor(userBio.length / 2)) + '...';
 
   // Foto principal para mostrar na mini foto
   const fotoPrincipal = userPhotos[mainPhotoIndex] || userPhotos[0];
 
+  // Se não tem foto, mostrar ícone padrão
+  if (userPhotos.length === 0) {
+    return (
+      <div className="user-icon-only" onClick={handleOpenModal}>
+        <FiUser className="default-user-icon" />
+        {isUserPremium && <FiStar className="mini-premium-icon-no-photo" />}
+        
+        {/* Modal para usuários sem foto */}
+        {showModal && (
+          <div className="mini-perfil-overlay" onClick={handleCloseModal}>
+            <div className="mini-perfil-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <div className="modal-title">
+                  <FiUser />
+                  <span>Perfil de {nomeUsuario}</span>
+                  {isUserPremium && <FiStar className="premium-badge" />}
+                </div>
+                <button className="close-button" onClick={handleCloseModal}>
+                  <FiX />
+                </button>
+              </div>
+
+              <div className="modal-content">
+                <div className="no-photo-section">
+                  {isOwnProfile ? (
+                    <div className="upload-photo-hint">
+                      <FiUser size={60} />
+                      <p>Adicione fotos ao seu perfil para aparecer aqui!</p>
+                    </div>
+                  ) : (
+                    <div className="blocked-photo-section">
+                      <FiLock size={60} />
+                      <p>🔒 Fotos bloqueadas</p>
+                      <p>Faça upgrade para Premium para ver fotos</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="profile-info">
+                  <div className="basic-info">
+                    <h3>{nomeUsuario}, {userAge}</h3>
+                    <div className="location">
+                      <FiMapPin />
+                      <span>{userLocation}</span>
+                    </div>
+                    <div className="profession">
+                      <FiUser />
+                      <span>{userProfession}</span>
+                    </div>
+                  </div>
+
+                  <div className="bio-section">
+                    <h4>Sobre mim</h4>
+                    {canViewFull ? (
+                      <p>{userBio}</p>
+                    ) : (
+                      <>
+                        <div className="blocked-bio">
+                          <FiLock />
+                          <p>🔒 Descrição bloqueada</p>
+                          <p>Faça upgrade para Premium para ver descrição completa</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {canViewFull && (
+                    <div className="interests-section">
+                      <h4>Interesses</h4>
+                      <div className="interests-tags">
+                        {userInterests.map((interesse: string, index: number) => (
+                          <span key={index} className="interest-tag">
+                            {interesse}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="modal-actions">
+                  {!isOwnProfile && (
+                    <button className="action-button like">
+                      <FiHeart />
+                      <span>Curtir</span>
+                    </button>
+                  )}
+                  {!canViewFull && (
+                    <button className="action-button upgrade">
+                      <FiStar />
+                      <span>Upgrade Premium</span>
+                    </button>
+                  )}
+                  {canViewFull && !isOwnProfile && (
+                    <button className="action-button chat">
+                      <FiUser />
+                      <span>Conversar</span>
+                    </button>
+                  )}
+                  {isOwnProfile && (
+                    <button className="action-button edit">
+                      <FiUser />
+                      <span>Editar Perfil</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* Mini foto do perfil - só para usuários premium com fotos */}
+      {/* Mini foto do perfil - para todos que têm foto */}
       <div 
         className="mini-perfil-trigger"
         onClick={handleOpenModal}
@@ -96,18 +192,18 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
           alt={`Foto de ${nomeUsuario}`}
           className="mini-foto-perfil"
         />
-        <FiStar className="mini-premium-icon" />
+        {isUserPremium && <FiStar className="mini-premium-icon" />}
       </div>
 
-      {/* Modal do perfil - abre para qualquer um se o usuário for premium */}
-      {showModal && (isViewerPremium || isUserPremium) && (
+      {/* Modal do perfil */}
+      {showModal && (
         <div className="mini-perfil-overlay" onClick={handleCloseModal}>
           <div className="mini-perfil-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div className="modal-title">
                 <FiUser />
-                <span>Perfil de {nomeUsuario}</span>
-                <FiStar className="premium-badge" />
+                <span>{isOwnProfile ? 'Meu Perfil' : `Perfil de ${nomeUsuario}`}</span>
+                {isUserPremium && <FiStar className="premium-badge" />}
               </div>
               <button className="close-button" onClick={handleCloseModal}>
                 <FiX />
@@ -138,7 +234,7 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
                         ⭐ Principal
                       </span>
                     )}
-                    {!isViewerPremium && (
+                    {!canViewFull && (
                       <span className="limited-access">
                         <FiLock /> Limitado
                       </span>
@@ -146,8 +242,8 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
                   </div>
                 </div>
 
-                {/* Thumbnails das fotos - só para viewers premium */}
-                {isViewerPremium && fotosParaMostrar.length > 1 && (
+                {/* Thumbnails das fotos - só para quem pode ver tudo */}
+                {canViewFull && fotosParaMostrar.length > 1 && (
                   <div className="photo-thumbnails">
                     {fotosParaMostrar.map((foto: string, index: number) => (
                       <img
@@ -179,7 +275,7 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
                 <div className="bio-section">
                   <h4>Sobre mim</h4>
                   <p>{bioParaMostrar}</p>
-                  {!isViewerPremium && (
+                  {!canViewFull && (
                     <div className="premium-upgrade-hint">
                       <FiLock />
                       <span>Faça upgrade para ver o perfil completo</span>
@@ -187,7 +283,7 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
                   )}
                 </div>
 
-                {isViewerPremium && (
+                {canViewFull && (
                   <div className="interests-section">
                     <h4>Interesses</h4>
                     <div className="interests-tags">
@@ -203,20 +299,28 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
 
               {/* Ações */}
               <div className="modal-actions">
-                <button className="action-button like">
-                  <FiHeart />
-                  <span>Curtir</span>
-                </button>
-                {!isViewerPremium && (
+                {!isOwnProfile && (
+                  <button className="action-button like">
+                    <FiHeart />
+                    <span>Curtir</span>
+                  </button>
+                )}
+                {!canViewFull && (
                   <button className="action-button upgrade">
                     <FiStar />
                     <span>Upgrade Premium</span>
                   </button>
                 )}
-                {isViewerPremium && (
+                {canViewFull && !isOwnProfile && (
                   <button className="action-button chat">
                     <FiUser />
                     <span>Conversar</span>
+                  </button>
+                )}
+                {isOwnProfile && (
+                  <button className="action-button edit">
+                    <FiUser />
+                    <span>Editar Perfil</span>
                   </button>
                 )}
               </div>

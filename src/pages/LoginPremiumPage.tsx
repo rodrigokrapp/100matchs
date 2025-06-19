@@ -54,7 +54,7 @@ const LoginPremiumPage: React.FC = () => {
 
       if (usuario) {
         // Fazer login
-        localStorage.setItem('usuario', JSON.stringify(usuario));
+        localStorage.setItem('usuarioPremium', JSON.stringify(usuario));
         alert('Login realizado com sucesso!');
         navigate('/salas');
       } else {
