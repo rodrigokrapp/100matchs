@@ -1064,15 +1064,6 @@ const ChatPage: React.FC = () => {
                 <FiImage />
                 <span>Foto</span>
               </button>
-              
-              <button 
-                className="media-option"
-                onClick={handleStartVideoRecording}
-                disabled={!mediaPermissions.camera}
-              >
-                <FiVideo />
-                <span>Vídeo</span>
-              </button>
 
               <button 
                 className="media-option"
@@ -1111,13 +1102,6 @@ const ChatPage: React.FC = () => {
               title="Selecionar foto"
             >
               <FiImage />
-            </button>
-            <button 
-              className="media-toggle"
-              onClick={handleStartVideoRecording}
-              title="Gravar vídeo"
-            >
-              <FiVideo />
             </button>
             <button 
               className="media-toggle"
