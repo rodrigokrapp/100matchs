@@ -206,6 +206,70 @@ class MediaService {
     }
   }
 
+  // Iniciar gravação de áudio (versão otimizada)
+  static async startAudioRecording(): Promise<void> {
+    try {
+      MediaService.stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 44100
+        }
+      });
+
+      MediaService.mediaRecorder = new MediaRecorder(MediaService.stream, {
+        mimeType: 'audio/webm'
+      });
+      MediaService.chunks = [];
+
+      MediaService.mediaRecorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data.size > 0) {
+          MediaService.chunks.push(event.data);
+        }
+      };
+
+      MediaService.mediaRecorder.start();
+    } catch (error) {
+      console.error('Erro ao iniciar gravação de áudio:', error);
+      throw error;
+    }
+  }
+
+  // Parar gravação e obter blob imediatamente
+  static async stopAndGetBlob(): Promise<Blob | null> {
+    return new Promise((resolve, reject) => {
+      if (!MediaService.mediaRecorder) {
+        resolve(null);
+        return;
+      }
+
+      MediaService.mediaRecorder.onstop = () => {
+        try {
+          const blob = new Blob(MediaService.chunks, { 
+            type: MediaService.chunks[0]?.type || 'audio/webm' 
+          });
+          MediaService.lastBlob = blob;
+          MediaService.cleanup();
+          resolve(blob);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      MediaService.mediaRecorder.onerror = (event: Event) => {
+        MediaService.cleanup();
+        reject(event);
+      };
+
+      if (MediaService.mediaRecorder.state === 'recording') {
+        MediaService.mediaRecorder.stop();
+      } else {
+        resolve(MediaService.lastBlob);
+      }
+    });
+  }
+
   // Novo método para iniciar gravação
   static startVideoRecording(stream: MediaStream) {
     try {

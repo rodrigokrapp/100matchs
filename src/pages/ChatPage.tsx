@@ -358,36 +358,40 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  // NOVA FUNCIONALIDADE: Gravar áudio com preview
+  // NOVA FUNCIONALIDADE: Gravar áudio com preview otimizado
   const handleStartAudioRecording = async () => {
     try {
       console.log('🎤 Iniciando gravação de áudio...');
+      
+      // Verificar permissões primeiro
+      if (!mediaPermissions.microphone) {
+        const permission = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (permission) {
+          setMediaPermissions(prev => ({ ...prev, microphone: true }));
+        }
+      }
+
       setIsRecording(true);
       setRecordingType('audio');
       setRecordingTime(0);
       setShowMediaOptions(false);
+      setShowEmojis(false);
 
-      // Iniciar contador de tempo
+      // Iniciar contador de tempo com feedback visual
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => {
           const newTime = prev + 1;
           // Parar automaticamente aos 10 segundos
           if (newTime >= 10) {
             handleStopRecording();
+            return 10;
           }
           return newTime;
         });
       }, 1000);
 
-      // Gravar áudio
-      const audioBlob = await MediaService.recordAudio(10);
-      
-      if (audioBlob) {
-        const url = MediaService.createTempUrl(audioBlob);
-        setPreviewMedia({type: 'audio', url, blob: audioBlob});
-        setIsPreviewMode(true);
-        console.log('✅ Áudio gravado com sucesso');
-      }
+      // Começar gravação imediatamente
+      MediaService.startAudioRecording();
       
     } catch (error) {
       console.error('❌ Erro ao gravar áudio:', error);
@@ -402,31 +406,37 @@ const ChatPage: React.FC = () => {
 
   const handleStopRecording = async () => {
     console.log('⏹️ Parando gravação...');
-    MediaService.stopRecording();
     
     if (recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
       recordingIntervalRef.current = null;
     }
     
-    // Aguardar blob e criar preview
-    setTimeout(async () => {
-      const blob = await MediaService.getLastRecordedBlob();
+    try {
+      // Parar gravação e obter blob imediatamente
+      const blob = await MediaService.stopAndGetBlob();
       
       setIsRecording(false);
+      const currentRecordingType = recordingType;
       setRecordingType(null);
       setRecordingTime(0);
       
       if (blob && blob.size > 0) {
         const url = MediaService.createTempUrl(blob);
-        setPreviewMedia({type: recordingType || 'video', url, blob});
+        setPreviewMedia({type: currentRecordingType || 'audio', url, blob});
         setIsPreviewMode(true);
         console.log('✅ Preview criado:', blob.size, 'bytes');
       } else {
-        console.error('❌ Erro ao obter blob');
-        alert('Erro ao processar mídia. Tente novamente.');
+        console.error('❌ Erro ao obter blob da gravação');
+        alert('Erro ao processar gravação. Tente novamente.');
       }
-    }, 1000);
+    } catch (error) {
+      console.error('❌ Erro ao parar gravação:', error);
+      setIsRecording(false);
+      setRecordingType(null);
+      setRecordingTime(0);
+      alert('Erro ao finalizar gravação. Tente novamente.');
+    }
   };
 
   // NOVA FUNCIONALIDADE: Selecionar imagem com preview
@@ -738,46 +748,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Seção de Botões Grandes de Mídia */}
-        <div className="media-actions-section">
-          <div className="media-actions-grid">
-            <button 
-              className="media-action-large"
-              onClick={handleSelectImage}
-              title="Selecionar foto da galeria"
-            >
-              <FiImage />
-              <span>Galeria</span>
-            </button>
-            
-            <button 
-              className="media-action-large"
-              onClick={handleStartVideoRecording}
-              title="Gravar vídeo"
-            >
-              <FiVideo />
-              <span>Vídeo</span>
-            </button>
-            
-            <button 
-              className="media-action-large"
-              onClick={handleStartAudioRecording}
-              title="Gravar áudio"
-            >
-              <FiMic />
-              <span>Áudio</span>
-            </button>
 
-            <button 
-              className="media-action-large"
-              onClick={() => setShowEmojis(!showEmojis)}
-              title="Emojis"
-            >
-              <FiSmile />
-              <span>Emojis</span>
-            </button>
-          </div>
-        </div>
 
         <div className="messages-container">
           {mensagens.length === 0 ? (
@@ -873,15 +844,16 @@ const ChatPage: React.FC = () => {
                             <div className="audio-container">
                               <audio 
                                 controls 
-                                preload="none"
+                                preload="metadata"
                                 style={{
                                   width: '100%',
-                                  height: '35px'
+                                  height: '40px',
+                                  borderRadius: '8px'
                                 }}
                                 src={msg.content}
                                 onLoadedMetadata={(e) => {
                                   const audio = e.target as HTMLAudioElement;
-                                  audio.volume = 1.0;
+                                  audio.volume = 0.8;
                                   audio.playbackRate = 1.0;
                                 }}
                                 onPlay={(e) => {
@@ -892,8 +864,11 @@ const ChatPage: React.FC = () => {
                                 onPause={(e) => {
                                   handlePlayPause(msg.id, e.target as HTMLAudioElement);
                                 }}
-                                onLoadStart={() => {
-                                  // Carregamento rápido
+                                onCanPlay={() => {
+                                  // Áudio pronto para reprodução
+                                }}
+                                onError={(e) => {
+                                  console.error('Erro ao carregar áudio:', e);
                                 }}
                               >
                                 <source src={msg.content} type="audio/webm" />
@@ -904,7 +879,7 @@ const ChatPage: React.FC = () => {
                               </audio>
                               {msg.is_temporary && (
                                 <div className="audio-temp-indicator">
-                                  <span>🔊 Áudio temporário - Clique para ouvir</span>
+                                  <span>🔊 Áudio temporário (10s)</span>
                                 </div>
                               )}
                             </div>
@@ -947,18 +922,26 @@ const ChatPage: React.FC = () => {
                 )}
                 {previewMedia.type === 'audio' && (
                   <div className="audio-preview">
+                    <div className="audio-preview-info">
+                      <span>🎤 Áudio gravado - {recordingTime}s</span>
+                    </div>
                     <audio 
                       controls 
                       preload="metadata"
+                      autoPlay={false}
                       style={{
                         width: '100%',
-                        height: '40px'
+                        height: '50px',
+                        borderRadius: '8px'
                       }}
                       src={previewMedia.url}
                       onLoadedMetadata={(e) => {
                         const audio = e.target as HTMLAudioElement;
                         audio.playbackRate = 1.0;
-                        audio.volume = 1.0;
+                        audio.volume = 0.8;
+                      }}
+                      onCanPlay={() => {
+                        console.log('Áudio preview pronto');
                       }}
                     />
                   </div>
@@ -1058,55 +1041,7 @@ const ChatPage: React.FC = () => {
           </div>
         )}
 
-        {/* Media Options Panel */}
-        {showMediaOptions && (
-          <div className="media-options-panel">
-            <div className="media-options-grid">
-              <button 
-                className="media-option"
-                onClick={handleSelectImage}
-                disabled={!mediaPermissions.camera}
-              >
-                <FiImage />
-                <span>Foto</span>
-              </button>
 
-              <button 
-                className="media-option"
-                onClick={handleStartVideoRecording}
-                disabled={!mediaPermissions.camera}
-              >
-                <FiVideo />
-                <span>Vídeo</span>
-              </button>
-
-              <button 
-                className="media-option"
-                onClick={handleStartGifRecording}
-                disabled={!mediaPermissions.camera}
-              >
-                <MdGif />
-                <span>GIF 5s</span>
-              </button>
-              
-              <button 
-                className="media-option"
-                onClick={handleStartAudioRecording}
-                disabled={!mediaPermissions.microphone}
-              >
-                <FiMic />
-                <span>Áudio</span>
-              </button>
-            </div>
-            
-            {(!mediaPermissions.camera || !mediaPermissions.microphone) && (
-              <div className="media-not-supported">
-                <p>⚠️ Permissões de mídia necessárias</p>
-                <p>Ative câmera e microfone para usar todas as funções</p>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Input Area */}
         <div className="input-container">
