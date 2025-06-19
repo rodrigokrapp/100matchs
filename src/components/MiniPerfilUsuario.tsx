@@ -60,12 +60,18 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
       try {
         console.log('🔍 Buscando perfil no Supabase para usuário:', nomeUsuario);
         
+        let data = null;
+        let error = null;
+        
         // Primeiro tenta busca exata pelo nome
-        let { data, error } = await supabase
+        const nameResult = await supabase
           .from('perfis')
           .select('fotos, descricao, foto_principal, nome, email')
           .eq('nome', nomeUsuario)
           .single();
+        
+        data = nameResult.data;
+        error = nameResult.error;
         
         // Se não encontrou, tenta busca case-insensitive
         if (!data || error) {
@@ -73,7 +79,8 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
           const result = await supabase
             .from('perfis')
             .select('fotos, descricao, foto_principal, nome, email')
-            .ilike('nome', `%${nomeUsuario}%`);
+            .ilike('nome', `%${nomeUsuario}%`)
+            .limit(1);
           
           if (result.data && result.data.length > 0) {
             data = result.data[0];
@@ -83,29 +90,17 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
         
         if (data && !error) {
           console.log('✅ Perfil encontrado no Supabase:', data);
-          setUserPhotos(data.fotos ? data.fotos.filter((foto: string) => foto !== '') : []);
+          const fotosValidas = data.fotos ? data.fotos.filter((foto: string) => foto !== '') : [];
+          console.log('📸 Fotos encontradas:', fotosValidas.length);
+          setUserPhotos(fotosValidas);
           setUserBio(data.descricao || 'Usuário da plataforma 100matchs.');
           setMainPhotoIndex(data.foto_principal || 0);
         } else {
-          console.log('❌ Perfil não encontrado no Supabase, usando dados demo');
+          console.log('❌ Perfil não encontrado no Supabase');
           console.log('Erro:', error);
-          // Dados de demonstração para outros usuários (fallback)
-          const userPhotosData: { [key: string]: string[] } = {
-            'rodrigo': [
-              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-              'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
-              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
-            ]
-          };
-          
-          const userBiosData: { [key: string]: string } = {
-            'rodrigo': 'Desenvolvedor apaixonado por tecnologia e inovação. Gosto de criar soluções que impactam positivamente a vida das pessoas.',
-            'joana': 'Designer criativa com foco em UX/UI. Amo transformar ideias em experiências digitais incríveis.',
-            'carlos': 'Engenheiro sustentável, amante da natureza e trilhas. Busco equilibrio entre tecnologia e meio ambiente.'
-          };
-          
-          setUserPhotos(userPhotosData[nomeUsuario.toLowerCase()] || []);
-          setUserBio(userBiosData[nomeUsuario.toLowerCase()] || 'Usuário da plataforma 100matchs.');
+          // Sem dados demo - apenas dados vazios se usuário não tem perfil
+          setUserPhotos([]);
+          setUserBio('Usuário da plataforma 100matchs.');
           setMainPhotoIndex(0);
         }
       } catch (error) {
@@ -145,14 +140,14 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
     };
   }, [nomeUsuario]);
   
-  // Sistema de atualização automática a cada 30 segundos
+  // Sistema de atualização automática a cada 5 segundos para garantir tempo real
   useEffect(() => {
     const interval = setInterval(() => {
       if (!isOwnProfile) { // Só atualiza perfis de outros usuários
-        console.log('🔄 Atualização automática de perfil:', nomeUsuario);
+        console.log('🔄 Atualização automática rápida de perfil:', nomeUsuario);
         setRefreshTrigger(prev => prev + 1);
       }
-    }, 30000); // 30 segundos
+    }, 5000); // 5 segundos para atualização mais rápida
     
     return () => clearInterval(interval);
   }, [nomeUsuario, isOwnProfile]);
