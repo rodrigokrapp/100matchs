@@ -85,8 +85,8 @@ const InicioPage: React.FC = () => {
         <div className="capa-site-section">
           <div className="capa-site-container">
             <img 
-              src="/capa-site.jpg" 
-              alt="Capa do Site - 100 Matchs" 
+              src="/capa-converse-sem-match.jpg" 
+              alt="Converse Sem Match - 100 Matchs" 
               className="capa-site-image"
             />
           </div>
