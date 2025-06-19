@@ -781,7 +781,7 @@ const ChatPage: React.FC = () => {
                             <div className="video-container">
                               <video 
                                 controls 
-                                preload="metadata"
+                                preload="auto"
                                 playsInline
                                 muted={false}
                                 onClick={() => {
@@ -793,6 +793,14 @@ const ChatPage: React.FC = () => {
                                   const video = e.target as HTMLVideoElement;
                                   video.playbackRate = 1.0;
                                   video.defaultPlaybackRate = 1.0;
+                                }}
+                                onLoadedData={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  video.playbackRate = 1.0;
+                                }}
+                                onCanPlay={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  video.playbackRate = 1.0;
                                 }}
                                 onTimeUpdate={(e) => {
                                   const video = e.target as HTMLVideoElement;
