@@ -38,15 +38,16 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
     const loadUserData = async () => {
       setLoading(true);
       
-      // Buscar perfil salvo do usuário
+      // Buscar perfil salvo do usuário logado primeiro (mais rápido)
       const usuarioAtual = localStorage.getItem('usuarioPremium');
       if (usuarioAtual) {
         const user = JSON.parse(usuarioAtual);
         if (user.nome.toLowerCase() === nomeUsuario.toLowerCase()) {
-          // É o próprio usuário, buscar perfil salvo
+          // É o próprio usuário, buscar perfil salvo local
           const perfilSalvo = localStorage.getItem(`perfil_${user.email}`);
           if (perfilSalvo) {
             const perfil = JSON.parse(perfilSalvo);
+            console.log('✅ PERFIL PRÓPRIO carregado do localStorage:', perfil);
             setUserPhotos(perfil.fotos.filter((foto: string) => foto !== ''));
             setUserBio(perfil.descricao || 'Usuário da plataforma 100matchs.');
             setMainPhotoIndex(perfil.fotoPrincipal || 0);
@@ -56,55 +57,102 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
         }
       }
       
-      // Buscar perfil de outros usuários no Supabase
+      // Buscar perfil de outros usuários no Supabase com múltiplas estratégias
       try {
-        console.log('🔍 Buscando perfil no Supabase para usuário:', nomeUsuario);
+        console.log('🔍 BUSCA AVANÇADA no Supabase para:', nomeUsuario);
         
-        let data = null;
-        let error = null;
-        
-        // Primeiro tenta busca exata pelo nome
-        const nameResult = await supabase
+        // Estratégia 1: Busca por nome exato
+        console.log('📡 Estratégia 1: Busca exata por nome');
+        let { data: exactData } = await supabase
           .from('perfis')
-          .select('fotos, descricao, foto_principal, nome, email')
+          .select('*')
           .eq('nome', nomeUsuario)
-          .single();
+          .maybeSingle();
         
-        data = nameResult.data;
-        error = nameResult.error;
+        if (exactData) {
+          console.log('✅ ENCONTRADO por nome exato:', exactData);
+          const fotosValidas = exactData.fotos ? exactData.fotos.filter((foto: string) => foto !== '') : [];
+          console.log('📸 Fotos válidas encontradas:', fotosValidas.length, fotosValidas);
+          setUserPhotos(fotosValidas);
+          setUserBio(exactData.descricao || 'Usuário da plataforma 100matchs.');
+          setMainPhotoIndex(exactData.foto_principal || 0);
+          setLoading(false);
+          return;
+        }
         
-        // Se não encontrou, tenta busca case-insensitive
-        if (!data || error) {
-          console.log('🔍 Tentando busca case-insensitive...');
-          const result = await supabase
-            .from('perfis')
-            .select('fotos, descricao, foto_principal, nome, email')
-            .ilike('nome', `%${nomeUsuario}%`)
-            .limit(1);
+        // Estratégia 2: Busca case-insensitive
+        console.log('📡 Estratégia 2: Busca case-insensitive');
+        let { data: likeData } = await supabase
+          .from('perfis')
+          .select('*')
+          .ilike('nome', nomeUsuario);
+        
+        if (likeData && likeData.length > 0) {
+          console.log('✅ ENCONTRADO por busca case-insensitive:', likeData[0]);
+          const perfil = likeData[0];
+          const fotosValidas = perfil.fotos ? perfil.fotos.filter((foto: string) => foto !== '') : [];
+          console.log('📸 Fotos válidas encontradas:', fotosValidas.length, fotosValidas);
+          setUserPhotos(fotosValidas);
+          setUserBio(perfil.descricao || 'Usuário da plataforma 100matchs.');
+          setMainPhotoIndex(perfil.foto_principal || 0);
+          setLoading(false);
+          return;
+        }
+        
+        // Estratégia 3: Busca com wildcard
+        console.log('📡 Estratégia 3: Busca wildcard');
+        let { data: wildcardData } = await supabase
+          .from('perfis')
+          .select('*')
+          .ilike('nome', `%${nomeUsuario}%`);
+        
+        if (wildcardData && wildcardData.length > 0) {
+          console.log('✅ ENCONTRADO por wildcard:', wildcardData[0]);
+          const perfil = wildcardData[0];
+          const fotosValidas = perfil.fotos ? perfil.fotos.filter((foto: string) => foto !== '') : [];
+          console.log('📸 Fotos válidas encontradas:', fotosValidas.length, fotosValidas);
+          setUserPhotos(fotosValidas);
+          setUserBio(perfil.descricao || 'Usuário da plataforma 100matchs.');
+          setMainPhotoIndex(perfil.foto_principal || 0);
+          setLoading(false);
+          return;
+        }
+        
+        // Estratégia 4: Listar todos e procurar manualmente
+        console.log('📡 Estratégia 4: Busca completa na tabela');
+        let { data: allData } = await supabase
+          .from('perfis')
+          .select('*');
+        
+        if (allData && allData.length > 0) {
+          console.log('📊 Total de perfis na base:', allData.length);
+          const encontrado = allData.find(p => 
+            p.nome && p.nome.toLowerCase().includes(nomeUsuario.toLowerCase())
+          );
           
-          if (result.data && result.data.length > 0) {
-            data = result.data[0];
-            error = null;
+          if (encontrado) {
+            console.log('✅ ENCONTRADO por busca manual:', encontrado);
+            const fotosValidas = encontrado.fotos ? encontrado.fotos.filter((foto: string) => foto !== '') : [];
+            console.log('📸 Fotos válidas encontradas:', fotosValidas.length, fotosValidas);
+            setUserPhotos(fotosValidas);
+            setUserBio(encontrado.descricao || 'Usuário da plataforma 100matchs.');
+            setMainPhotoIndex(encontrado.foto_principal || 0);
+            setLoading(false);
+            return;
           }
         }
         
-        if (data && !error) {
-          console.log('✅ Perfil encontrado no Supabase:', data);
-          const fotosValidas = data.fotos ? data.fotos.filter((foto: string) => foto !== '') : [];
-          console.log('📸 Fotos encontradas:', fotosValidas.length);
-          setUserPhotos(fotosValidas);
-          setUserBio(data.descricao || 'Usuário da plataforma 100matchs.');
-          setMainPhotoIndex(data.foto_principal || 0);
-        } else {
-          console.log('❌ Perfil não encontrado no Supabase');
-          console.log('Erro:', error);
-          // Sem dados demo - apenas dados vazios se usuário não tem perfil
-          setUserPhotos([]);
-          setUserBio('Usuário da plataforma 100matchs.');
-          setMainPhotoIndex(0);
-        }
+        // Se chegou aqui, não encontrou nada
+        console.log('❌ PERFIL NÃO ENCONTRADO em nenhuma estratégia para:', nomeUsuario);
+        setUserPhotos([]);
+        setUserBio('Usuário da plataforma 100matchs.');
+        setMainPhotoIndex(0);
+        
       } catch (error) {
-        console.log('Erro ao buscar perfil:', error);
+        console.error('💥 ERRO na busca do Supabase:', error);
+        setUserPhotos([]);
+        setUserBio('Usuário da plataforma 100matchs.');
+        setMainPhotoIndex(0);
       }
       
       setLoading(false);
@@ -155,14 +203,14 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
     };
   }, [nomeUsuario]);
   
-  // Sistema de atualização automática a cada 5 segundos para garantir tempo real
+  // Sistema de atualização automática a cada 2 segundos para garantir tempo real MÁXIMO
   useEffect(() => {
     const interval = setInterval(() => {
       if (!isOwnProfile) { // Só atualiza perfis de outros usuários
-        console.log('🔄 Atualização automática rápida de perfil:', nomeUsuario);
+        console.log('⚡ REFRESH ULTRA RÁPIDO:', nomeUsuario);
         setRefreshTrigger(prev => prev + 1);
       }
-    }, 5000); // 5 segundos para atualização mais rápida
+    }, 2000); // 2 segundos para máxima velocidade
     
     return () => clearInterval(interval);
   }, [nomeUsuario, isOwnProfile]);
@@ -209,11 +257,15 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   const handleOpenModal = () => {
+    console.log('🖱️ CLIQUE NA MINI FOTO detectado para:', nomeUsuario);
+    console.log('📸 Fotos disponíveis:', userPhotos.length);
+    console.log('🔧 Modal será exibido:', true);
     setShowModal(true);
     setCurrentPhotoIndex(0);
   };
 
   const handleCloseModal = () => {
+    console.log('❌ FECHANDO modal para:', nomeUsuario);
     setShowModal(false);
   };
 
