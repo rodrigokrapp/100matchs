@@ -100,75 +100,89 @@ const InicioPage: React.FC = () => {
         </div>
 
         <div className="main-content">
-          {/* Formulário Entrar Chat */}
-          <div className="entrada-card card">
-            <h2>Entrar no Chat</h2>
-            <p>Acesso gratuito (apenas texto e emoticons)</p>
-            
-            <div className="input-group">
-              <input
-                type="text"
-                placeholder="Digite seu nome"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                className="input"
+          {/* Logo da empresa */}
+          <div className="logo-section">
+            <div className="logo-container">
+              <img 
+                src="/logo-nova-coracao-rosa.svg" 
+                alt="Logo 100 Matchs" 
+                className="main-logo"
               />
-              <div className="terms-checkbox">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={aceitarTermos}
-                    onChange={(e) => setAceitarTermos(e.target.checked)}
-                  />
-                  <span>Aceito os termos de políticas e privacidade de imagem, dados básicos e respeito aos usuários do chat</span>
-                </label>
-              </div>
-              <button onClick={handleEntrarChat} className="btn btn-primary">
-                Entrar Chat
-              </button>
             </div>
           </div>
-
-          {/* Formulário Entrar Usuário Premium */}
-          <div className="entrada-card card premium-login-card">
-            <h2>Entrar Usuário Premium</h2>
-            <p>Acesso completo e ilimitado (áudio, imagem, texto e emoticons)</p>
-            
-            <div className="input-group">
-              <input
-                type="text"
-                placeholder="Digite seu nome"
-                value={nomePremium}
-                onChange={(e) => setNomePremium(e.target.value)}
-                className="input"
-              />
-              <input
-                type="email"
-                placeholder="Digite seu email"
-                value={emailPremium}
-                onChange={(e) => setEmailPremium(e.target.value)}
-                className="input"
-              />
-              <input
-                type="password"
-                placeholder="Digite sua senha"
-                value={senhaPremium}
-                onChange={(e) => setSenhaPremium(e.target.value)}
-                className="input"
-              />
-              <div className="terms-checkbox">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={aceitarTermosPremium}
-                    onChange={(e) => setAceitarTermosPremium(e.target.checked)}
-                  />
-                  <span>Aceito os termos de políticas e privacidade de imagem, dados básicos e respeito aos usuários do chat</span>
-                </label>
+          
+          {/* Container dos formulários lado a lado */}
+          <div className="entrada-forms-container">
+            {/* Formulário Entrar Chat */}
+            <div className="entrada-card card">
+              <h2>Entrar no Chat</h2>
+              <p>Acesso gratuito (apenas texto e emoticons)</p>
+              
+              <div className="input-group">
+                <input
+                  type="text"
+                  placeholder="Digite seu nome"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  className="input"
+                />
+                <div className="terms-checkbox">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={aceitarTermos}
+                      onChange={(e) => setAceitarTermos(e.target.checked)}
+                    />
+                    <span>Aceito os termos de políticas e privacidade de imagem, dados básicos e respeito aos usuários do chat</span>
+                  </label>
+                </div>
+                <button onClick={handleEntrarChat} className="btn btn-primary">
+                  Entrar Chat
+                </button>
               </div>
-              <button onClick={handleEntrarPremium} className="btn btn-premium">
-                Entrar Premium
-              </button>
+            </div>
+
+            {/* Formulário Entrar Usuário Premium */}
+            <div className="entrada-card card premium-login-card">
+              <h2>Entrar Usuário Premium</h2>
+              <p>Acesso completo e ilimitado (áudio, imagem, texto e emoticons)</p>
+              
+              <div className="input-group">
+                <input
+                  type="text"
+                  placeholder="Digite seu nome"
+                  value={nomePremium}
+                  onChange={(e) => setNomePremium(e.target.value)}
+                  className="input"
+                />
+                <input
+                  type="email"
+                  placeholder="Digite seu email"
+                  value={emailPremium}
+                  onChange={(e) => setEmailPremium(e.target.value)}
+                  className="input"
+                />
+                <input
+                  type="password"
+                  placeholder="Digite sua senha"
+                  value={senhaPremium}
+                  onChange={(e) => setSenhaPremium(e.target.value)}
+                  className="input"
+                />
+                <div className="terms-checkbox">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={aceitarTermosPremium}
+                      onChange={(e) => setAceitarTermosPremium(e.target.checked)}
+                    />
+                    <span>Aceito os termos de políticas e privacidade de imagem, dados básicos e respeito aos usuários do chat</span>
+                  </label>
+                </div>
+                <button onClick={handleEntrarPremium} className="btn btn-premium">
+                  Entrar Premium
+                </button>
+              </div>
             </div>
           </div>
 

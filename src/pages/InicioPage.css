@@ -237,10 +237,52 @@
 }
 
 .main-content {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
   margin-bottom: 3rem;
+}
+
+/* Seção da logo */
+.logo-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 2rem 0;
+}
+
+.logo-container {
+  text-align: center;
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+.main-logo {
+  width: 120px;
+  height: 120px;
+  filter: drop-shadow(0 8px 16px rgba(102, 51, 153, 0.3));
+  transition: all 0.3s ease;
+}
+
+.main-logo:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 12px 24px rgba(102, 51, 153, 0.5));
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Ajustar formulários para ficarem lado a lado */
+.entrada-forms-container {
+  display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 2rem;
 }
 
 /* Melhorias para Desktop */
@@ -253,6 +295,10 @@
   .main-content {
     gap: 3rem;
     margin-bottom: 4rem;
+  }
+  
+  .entrada-forms-container {
+    gap: 3rem;
   }
   
   .entrada-card {
@@ -900,6 +946,16 @@
   }
 
   .main-content {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .main-logo {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .entrada-forms-container {
     grid-template-columns: 1fr;
     gap: 15px;
   }
@@ -1015,6 +1071,16 @@
   .hero-section {
     height: 180px;
     margin-bottom: 12px;
+  }
+
+  .main-logo {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .entrada-forms-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .entrada-card {
