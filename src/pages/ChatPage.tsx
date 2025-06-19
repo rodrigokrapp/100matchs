@@ -843,12 +843,22 @@ const ChatPage: React.FC = () => {
                                 {isPlaying.get(msg.id) ? <FiPause /> : <FiPlay />}
                               </button>
                               <audio 
+                                preload="metadata"
                                 ref={(el) => {
                                   if (el) {
                                     el.onended = () => {
                                       const newState = new Map(isPlaying);
                                       newState.set(msg.id, false);
                                       setIsPlaying(newState);
+                                    };
+                                    el.onloadedmetadata = () => {
+                                      el.playbackRate = 1.0;
+                                      el.defaultPlaybackRate = 1.0;
+                                    };
+                                    el.ontimeupdate = () => {
+                                      if (el.playbackRate !== 1.0) {
+                                        el.playbackRate = 1.0;
+                                      }
                                     };
                                   }
                                 }}
