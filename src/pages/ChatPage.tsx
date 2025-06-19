@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  FiSend, FiImage, FiVideo, FiMic, FiSmile, FiArrowLeft, 
+  FiSend, FiImage, FiMic, FiSmile, FiArrowLeft, 
   FiUsers, FiStar, FiClock, FiCheck, FiEye, FiPlay, FiPause,
-  FiMicOff
+  FiMicOff, FiCamera
 } from 'react-icons/fi';
 import { MdGif } from 'react-icons/md';
 import { chatService, ChatMessage } from '../lib/chatService';
@@ -34,6 +34,7 @@ const ChatPage: React.FC = () => {
   const [mediaPermissions, setMediaPermissions] = useState({camera: false, microphone: false});
   const [showMediaOptions, setShowMediaOptions] = useState(false);
   const [viewedMessages, setViewedMessages] = useState<Map<string, number>>(new Map()); // messageId -> timestamp quando foi visualizado
+  const [videosVisualizados, setVideosVisualizados] = useState<Set<string>>(new Set()); // IDs dos vídeos já visualizados
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
@@ -798,10 +799,10 @@ const ChatPage: React.FC = () => {
                       
                       {msg.message_type === 'video' && (
                         <div className="media-message video-message">
-                          {isExpired ? (
+                          {isExpired || videosVisualizados.has(msg.id) ? (
                             <div className="expired-media">
                               <FiEye />
-                              <span>Vídeo expirado</span>
+                              <span>{videosVisualizados.has(msg.id) ? 'Vídeo já visualizado' : 'Vídeo expirado'}</span>
                             </div>
                           ) : (
                             <div className="video-container">
@@ -821,6 +822,13 @@ const ChatPage: React.FC = () => {
                                     display: 'block'
                                   }}
                                   src={msg.content}
+                                  onPlay={() => {
+                                    console.log('▶️ Vídeo iniciado:', msg.id);
+                                  }}
+                                  onEnded={() => {
+                                    console.log('✅ Vídeo finalizado, marcando como visualizado:', msg.id);
+                                    setVideosVisualizados(prev => new Set([...prev, msg.id]));
+                                  }}
                                   onLoadedData={() => {
                                     console.log('🎬 Vídeo carregado:', msg.content);
                                   }}
@@ -840,7 +848,7 @@ const ChatPage: React.FC = () => {
                               </div>
                               {msg.is_temporary && (
                                 <div className="video-temp-indicator">
-                                  <span>📹 Vídeo temporário (5min)</span>
+                                  <span>📹 Vídeo temporário (visualização única)</span>
                                 </div>
                               )}
                             </div>
@@ -1085,7 +1093,7 @@ const ChatPage: React.FC = () => {
               onClick={handleStartVideoRecording}
               title="Gravar vídeo"
             >
-              <FiVideo />
+              <FiCamera />
             </button>
             <button 
               className="media-toggle"
