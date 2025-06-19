@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiX, FiHeart, FiMapPin, FiUser, FiStar, FiLock } from 'react-icons/fi';
+import { supabase } from '../lib/supabase';
 import './MiniPerfilUsuario.css';
 
 interface MiniPerfilUsuarioProps {
@@ -15,6 +16,111 @@ interface MiniPerfilUsuarioProps {
   userInterests?: string[]; // Interesses (opcional)
   mainPhotoIndex?: number; // Índice da foto principal (padrão 0)
 }
+
+// Componente wrapper que busca dados do Supabase
+export const MiniPerfilUsuarioWrapper: React.FC<{
+  nomeUsuario: string;
+  isUserPremium: boolean;
+  isViewerPremium: boolean;
+  isOwnProfile?: boolean;
+  userAge?: number;
+  userLocation?: string;
+  userProfession?: string;
+  userInterests?: string[];
+}> = ({ nomeUsuario, isUserPremium, isViewerPremium, isOwnProfile = false, userAge = 25, userLocation = "Brasil", userProfession = "Usuário", userInterests = ["Conversas", "Amizades"] }) => {
+  const [userPhotos, setUserPhotos] = useState<string[]>([]);
+  const [userBio, setUserBio] = useState<string>("Usuário da plataforma 100matchs.");
+  const [mainPhotoIndex, setMainPhotoIndex] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      setLoading(true);
+      
+      // Buscar perfil salvo do usuário
+      const usuarioAtual = localStorage.getItem('usuarioPremium');
+      if (usuarioAtual) {
+        const user = JSON.parse(usuarioAtual);
+        if (user.nome.toLowerCase() === nomeUsuario.toLowerCase()) {
+          // É o próprio usuário, buscar perfil salvo
+          const perfilSalvo = localStorage.getItem(`perfil_${user.email}`);
+          if (perfilSalvo) {
+            const perfil = JSON.parse(perfilSalvo);
+            setUserPhotos(perfil.fotos.filter((foto: string) => foto !== ''));
+            setUserBio(perfil.descricao || 'Usuário da plataforma 100matchs.');
+            setMainPhotoIndex(perfil.fotoPrincipal || 0);
+            setLoading(false);
+            return;
+          }
+        }
+      }
+      
+      // Buscar perfil de outros usuários no Supabase
+      try {
+        const { data, error } = await supabase
+          .from('perfis')
+          .select('fotos, descricao, foto_principal')
+          .ilike('nome', nomeUsuario.toLowerCase())
+          .single();
+        
+        if (data) {
+          setUserPhotos(data.fotos ? data.fotos.filter((foto: string) => foto !== '') : []);
+          setUserBio(data.descricao || 'Usuário da plataforma 100matchs.');
+          setMainPhotoIndex(data.foto_principal || 0);
+        } else {
+          // Dados de demonstração para outros usuários (fallback)
+          const userPhotosData: { [key: string]: string[] } = {
+            'rodrigo': [
+              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+              'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
+              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
+            ]
+          };
+          
+          const userBiosData: { [key: string]: string } = {
+            'rodrigo': 'Desenvolvedor apaixonado por tecnologia e inovação. Gosto de criar soluções que impactam positivamente a vida das pessoas.',
+            'joana': 'Designer criativa com foco em UX/UI. Amo transformar ideias em experiências digitais incríveis.',
+            'carlos': 'Engenheiro sustentável, amante da natureza e trilhas. Busco equilibrio entre tecnologia e meio ambiente.'
+          };
+          
+          setUserPhotos(userPhotosData[nomeUsuario.toLowerCase()] || []);
+          setUserBio(userBiosData[nomeUsuario.toLowerCase()] || 'Usuário da plataforma 100matchs.');
+          setMainPhotoIndex(0);
+        }
+      } catch (error) {
+        console.log('Erro ao buscar perfil:', error);
+      }
+      
+      setLoading(false);
+    };
+
+    loadUserData();
+  }, [nomeUsuario]);
+
+  if (loading) {
+    return (
+      <div className="mini-perfil-loading">
+        <FiUser className="default-user-icon" />
+      </div>
+    );
+  }
+
+  return (
+    <MiniPerfilUsuario
+      nomeUsuario={nomeUsuario}
+      isUserPremium={isUserPremium}
+      isViewerPremium={isViewerPremium}
+      isOwnProfile={isOwnProfile}
+      userPhotos={userPhotos}
+      userBio={userBio}
+      userAge={userAge}
+      userLocation={userLocation}
+      userProfession={userProfession}
+      userInterests={userInterests}
+      mainPhotoIndex={mainPhotoIndex}
+    />
+  );
+};
 
 const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({ 
   nomeUsuario, 
@@ -42,13 +148,15 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
   };
 
   // Determinar quantas fotos e quanto da bio mostrar
-  // Próprio usuário premium ou viewer premium podem ver tudo
-  // Usuário gratuito vendo premium pode ver limitado
+  // Usuários premium podem ver tudo
+  // Usuários gratuitos veem apenas 1 foto e descrição limitada
   const canViewFull = isViewerPremium || isOwnProfile;
-  const fotosParaMostrar = canViewFull ? userPhotos : [userPhotos[0]];
+  const fotosParaMostrar = canViewFull ? userPhotos : userPhotos.slice(0, 1);
   const bioParaMostrar = canViewFull 
     ? userBio 
-    : userBio.substring(0, Math.floor(userBio.length / 2)) + '...';
+    : userBio.length > 50 
+      ? userBio.substring(0, 50) + '... 🔒' 
+      : userBio;
 
   const nextPhoto = () => {
     // Se pode ver tudo (próprio perfil ou viewer premium), pode navegar por todas as fotos

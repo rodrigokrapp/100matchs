@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiCamera, FiEdit3, FiSave, FiStar } from 'react-icons/fi';
 import Header from '../components/Header';
+import { supabase } from '../lib/supabase';
 import './MeuPerfilPremiumPage.css';
 
 interface PerfilPremium {
@@ -94,8 +95,31 @@ const MeuPerfilPremiumPage: React.FC = () => {
     navigate('/salas');
   };
 
-  const salvarPerfil = (perfilAtualizado: PerfilPremium) => {
+  const salvarPerfil = async (perfilAtualizado: PerfilPremium) => {
+    // Salvar no localStorage para uso local
     localStorage.setItem(`perfil_${perfilAtualizado.email}`, JSON.stringify(perfilAtualizado));
+    
+    // Salvar no Supabase para que outros usuários possam ver
+    try {
+      const { error } = await supabase
+        .from('perfis')
+        .upsert([{
+          email: perfilAtualizado.email,
+          nome: perfilAtualizado.nome,
+          descricao: perfilAtualizado.descricao,
+          fotos: perfilAtualizado.fotos,
+          foto_principal: perfilAtualizado.fotoPrincipal,
+          updated_at: new Date().toISOString()
+        }]);
+
+      if (error) {
+        console.error('Erro ao salvar perfil no Supabase:', error);
+      } else {
+        console.log('✅ Perfil salvo no Supabase com sucesso!');
+      }
+    } catch (error) {
+      console.error('Erro ao conectar com Supabase:', error);
+    }
   };
 
   const removerFoto = (index: number) => {

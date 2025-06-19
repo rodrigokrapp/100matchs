@@ -10,7 +10,7 @@ import { chatService, ChatMessage } from '../lib/chatService';
 import MediaService, { EMOJI_CATEGORIES } from '../lib/mediaService';
 import { testChatConnection } from '../lib/supabase';
 import Header from '../components/Header';
-import MiniPerfilUsuario from '../components/MiniPerfilUsuario';
+import { MiniPerfilUsuarioWrapper } from '../components/MiniPerfilUsuario';
 import './ChatPage.css';
 
 const ChatPage: React.FC = () => {
@@ -728,58 +728,7 @@ const ChatPage: React.FC = () => {
     navigate('/premium');
   };
 
-  // Funções para buscar dados dos usuários (simulado - em produção viria do banco)
-  const getUserPhotos = (userName: string): string[] => {
-    // Buscar perfil salvo do usuário
-    const usuarioAtual = localStorage.getItem('usuarioPremium');
-    if (usuarioAtual) {
-      const user = JSON.parse(usuarioAtual);
-      if (user.nome.toLowerCase() === userName.toLowerCase()) {
-        // É o próprio usuário, buscar perfil salvo
-        const perfilSalvo = localStorage.getItem(`perfil_${user.email}`);
-        if (perfilSalvo) {
-          const perfil = JSON.parse(perfilSalvo);
-          return perfil.fotos.filter((foto: string) => foto !== '');
-        }
-      }
-    }
-    
-    // Dados de demonstração para outros usuários
-    const userPhotosData: { [key: string]: string[] } = {
-      'rodrigo': [
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
-      ]
-    };
-    
-    return userPhotosData[userName.toLowerCase()] || [];
-  };
-
-  const getUserBio = (userName: string): string => {
-    // Buscar perfil salvo do usuário
-    const usuarioAtual = localStorage.getItem('usuarioPremium');
-    if (usuarioAtual) {
-      const user = JSON.parse(usuarioAtual);
-      if (user.nome.toLowerCase() === userName.toLowerCase()) {
-        // É o próprio usuário, buscar perfil salvo
-        const perfilSalvo = localStorage.getItem(`perfil_${user.email}`);
-        if (perfilSalvo) {
-          const perfil = JSON.parse(perfilSalvo);
-          return perfil.descricao || 'Usuário da plataforma 100matchs.';
-        }
-      }
-    }
-    
-    const userBiosData: { [key: string]: string } = {
-      'rodrigo': 'Desenvolvedor apaixonado por tecnologia e inovação. Gosto de criar soluções que impactam positivamente a vida das pessoas.',
-      'joana': 'Designer criativa com foco em UX/UI. Amo transformar ideias em experiências digitais incríveis.',
-      'carlos': 'Engenheiro sustentável, amante da natureza e trilhas. Busco equilibrio entre tecnologia e meio ambiente.'
-    };
-    
-    return userBiosData[userName.toLowerCase()] || 'Usuário da plataforma 100matchs.';
-  };
-
+  // Funções auxiliares para dados dos usuários
   const getUserAge = (userName: string): number => {
     const userAgesData: { [key: string]: number } = {
       'rodrigo': 28,
@@ -818,32 +767,6 @@ const ChatPage: React.FC = () => {
     };
     
     return userInterestsData[userName.toLowerCase()] || ['Conversas', 'Amizades'];
-  };
-
-  const getMainPhotoIndex = (userName: string): number => {
-    // Buscar perfil salvo do usuário
-    const usuarioAtual = localStorage.getItem('usuarioPremium');
-    if (usuarioAtual) {
-      const user = JSON.parse(usuarioAtual);
-      if (user.nome.toLowerCase() === userName.toLowerCase()) {
-        // É o próprio usuário, buscar perfil salvo
-        const perfilSalvo = localStorage.getItem(`perfil_${user.email}`);
-        if (perfilSalvo) {
-          const perfil = JSON.parse(perfilSalvo);
-          return perfil.fotoPrincipal || 0;
-        }
-      }
-    }
-    
-    // Em produção, isso viria do perfil do usuário salvo no banco
-    // Por enquanto, simulando que a primeira foto é sempre a principal
-    const mainPhotoIndexData: { [key: string]: number } = {
-      'rodrigo': 0, // Primeira foto é a principal
-      'joana': 0,
-      'carlos': 0
-    };
-    
-    return mainPhotoIndexData[userName.toLowerCase()] || 0;
   };
 
   const handleStartGifRecording = async () => {
@@ -1020,18 +943,15 @@ const ChatPage: React.FC = () => {
                       <span className="sender">
                         {msg.user_name}
                         {msg.is_premium && <FiStar className="premium-icon" />}
-                        <MiniPerfilUsuario 
+                        <MiniPerfilUsuarioWrapper 
                           nomeUsuario={msg.user_name}
                           isUserPremium={msg.is_premium || false}
                           isViewerPremium={isPremiumUser()}
                           isOwnProfile={msg.user_name.toLowerCase() === usuario?.nome?.toLowerCase()}
-                          userPhotos={getUserPhotos(msg.user_name)}
-                          userBio={getUserBio(msg.user_name)}
                           userAge={getUserAge(msg.user_name)}
                           userLocation={getUserLocation(msg.user_name)}
                           userProfession={getUserProfession(msg.user_name)}
                           userInterests={getUserInterests(msg.user_name)}
-                          mainPhotoIndex={getMainPhotoIndex(msg.user_name)}
                         />
                       </span>
                       <span className="time">{formatTime(msg.created_at)}</span>
