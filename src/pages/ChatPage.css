@@ -1138,4 +1138,34 @@
 .lock-icon {
   font-size: 24px;
   color: #fbbf24;
+}
+
+.countdown-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.countdown-number {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #FF1744;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  background: linear-gradient(135deg, #FF1744, #FFEB3B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: countdownPulse 1s ease-in-out infinite;
+}
+
+@keyframes countdownPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.countdown-info span {
+  font-size: 1.2rem;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
 } 

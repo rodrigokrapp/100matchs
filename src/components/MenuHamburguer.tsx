@@ -51,8 +51,7 @@ const MenuHamburguer: React.FC = () => {
 
   return (
     <div className="menu-hamburguer">
-      <button className="menu-toggle" onClick={toggleMenu}>
-        {isOpen ? <FiX /> : <FiMenu />}
+      <button className={`menu-toggle ${isOpen ? 'active' : ''}`} onClick={toggleMenu}>
       </button>
 
       {isOpen && (

@@ -300,12 +300,43 @@ const ChatPage: React.FC = () => {
   const handleStartVideoRecording = async () => {
     try {
       console.log('🎥 Iniciando gravação de vídeo...');
+      
+      // Mostrar contagem regressiva
       setIsRecording(true);
       setRecordingType('video');
-      setRecordingTime(0);
+      setRecordingTime(10); // Começar com 10 segundos para contagem regressiva
       setShowMediaOptions(false);
 
-      // Iniciar contador de tempo
+      // Contagem regressiva de 10 segundos
+      const countdownInterval = setInterval(() => {
+        setRecordingTime(prev => {
+          const newTime = prev - 1;
+          if (newTime <= 0) {
+            clearInterval(countdownInterval);
+            // Após contagem regressiva, iniciar gravação real
+            startActualVideoRecording();
+            return 0;
+          }
+          return newTime;
+        });
+      }, 1000);
+      
+    } catch (error) {
+      console.error('❌ Erro ao iniciar gravação de vídeo:', error);
+      alert('Erro ao acessar câmera. Verifique as permissões do navegador.');
+      setIsRecording(false);
+      setRecordingType(null);
+    }
+  };
+
+  const startActualVideoRecording = async () => {
+    try {
+      console.log('🎥 Iniciando gravação real...');
+      
+      // Resetar contador para gravação de 10 segundos
+      setRecordingTime(0);
+      
+      // Iniciar contador de tempo da gravação
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => {
           const newTime = prev + 1;
@@ -954,16 +985,26 @@ const ChatPage: React.FC = () => {
                 }}
               />
               <div className="recording-overlay">
-                <div className="recording-info">
-                  <div className="recording-dot"></div>
-                  <span>Gravando... {formatRecordingTime(recordingTime)}</span>
-                </div>
+                {recordingTime > 0 && recordingTime <= 10 && !recordingIntervalRef.current ? (
+                  <div className="countdown-info">
+                    <div className="countdown-number">{recordingTime}</div>
+                    <span>Gravação iniciará em...</span>
+                  </div>
+                ) : (
+                  <div className="recording-info">
+                    <div className="recording-dot"></div>
+                    <span>Gravando... {formatRecordingTime(recordingTime)}</span>
+                  </div>
+                )}
                 <button 
                   className="stop-recording-btn"
                   onClick={handleStopRecording}
                 >
                   <FiPause />
-                  Parar ({10 - recordingTime}s)
+                  {recordingTime > 0 && recordingTime <= 10 && !recordingIntervalRef.current ? 
+                    'Cancelar' : 
+                    `Parar (${Math.max(0, 10 - recordingTime)}s)`
+                  }
                 </button>
               </div>
             </div>
