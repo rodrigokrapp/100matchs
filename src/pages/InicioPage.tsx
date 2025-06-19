@@ -192,8 +192,8 @@ const InicioPage: React.FC = () => {
         </div>
 
         <div className="features-section">
-          <h2>Funcionalidades do Chat</h2>
-          <div className="features-grid grid grid-4">
+          <h2>Vantagens Premium</h2>
+          <div className="features-grid grid grid-3">
 
             <div className="feature-card card">
               <div className="feature-icon">🎤</div>
@@ -202,13 +202,33 @@ const InicioPage: React.FC = () => {
             </div>
             <div className="feature-card card">
               <div className="feature-icon">📷</div>
-              <h3>Fotos</h3>
+              <h3>Fotos no Chat</h3>
               <p>Compartilhe imagens (Premium)</p>
             </div>
             <div className="feature-card card">
               <div className="feature-icon">😀</div>
               <h3>Emoticons</h3>
               <p>Expresse-se com emojis (Premium)</p>
+            </div>
+            <div className="feature-card card">
+              <div className="feature-icon">👀</div>
+              <h3>Ver Todas as Fotos</h3>
+              <p>Veja o perfil completo dos outros usuários (Premium)</p>
+            </div>
+            <div className="feature-card card">
+              <div className="feature-icon">📝</div>
+              <h3>Ver Toda Descrição</h3>
+              <p>Leia a descrição completa dos perfis (Premium)</p>
+            </div>
+            <div className="feature-card card">
+              <div className="feature-icon">🖼️</div>
+              <h3>Ter Fotos no Perfil</h3>
+              <p>Adicione suas fotos ao seu perfil (Premium)</p>
+            </div>
+            <div className="feature-card card">
+              <div className="feature-icon">✍️</div>
+              <h3>Ter Descrição</h3>
+              <p>Escreva sua descrição personalizada (Premium)</p>
             </div>
           </div>
         </div>
