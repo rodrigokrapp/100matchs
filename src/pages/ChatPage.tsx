@@ -327,18 +327,11 @@ const ChatPage: React.FC = () => {
       
       // Iniciar contador de tempo da gravação
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingTime(prev => {
-          const newTime = prev + 1;
-          // Parar automaticamente aos 10 segundos
-          if (newTime >= 10) {
-            handleStopRecording();
-          }
-          return newTime;
-        });
+        setRecordingTime(prev => prev + 1);
       }, 1000);
 
       // Gravar vídeo
-      const videoBlob = await MediaService.captureVideo(10);
+      const videoBlob = await MediaService.captureVideo();
       
       if (videoBlob) {
         const url = MediaService.createTempUrl(videoBlob);
@@ -377,17 +370,9 @@ const ChatPage: React.FC = () => {
       setShowMediaOptions(false);
       setShowEmojis(false);
 
-      // Iniciar contador de tempo com feedback visual
+      // Iniciar contador de tempo (sem limitação)
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingTime(prev => {
-          const newTime = prev + 1;
-          // Parar automaticamente aos 10 segundos
-          if (newTime >= 10) {
-            handleStopRecording();
-            return 10;
-          }
-          return newTime;
-        });
+        setRecordingTime(prev => prev + 1);
       }, 1000);
 
       // Começar gravação imediatamente
@@ -484,7 +469,7 @@ const ChatPage: React.FC = () => {
         previewMedia.type === 'image' ? 'imagem' : previewMedia.type,
         usuario.premium || false,
         true, // Mensagem temporária
-        10 // 10 segundos para todas as mídias
+        300 // 5 minutos de visualização temporária
       );
 
       if (sucesso) {
@@ -879,7 +864,7 @@ const ChatPage: React.FC = () => {
                               </audio>
                               {msg.is_temporary && (
                                 <div className="audio-temp-indicator">
-                                  <span>🔊 Áudio temporário (10s)</span>
+                                  <span>�� Áudio temporário (5min)</span>
                                 </div>
                               )}
                             </div>
@@ -990,7 +975,7 @@ const ChatPage: React.FC = () => {
                   onClick={handleStopRecording}
                 >
                   <FiPause />
-                  Parar ({Math.max(0, 10 - recordingTime)}s)
+                  Parar Gravação
                 </button>
               </div>
             </div>
@@ -1007,7 +992,7 @@ const ChatPage: React.FC = () => {
               </span>
               <button className="stop-button" onClick={handleStopRecording}>
                 <FiMicOff />
-                Parar ({10 - recordingTime}s)
+                Parar Gravação
               </button>
             </div>
           </div>

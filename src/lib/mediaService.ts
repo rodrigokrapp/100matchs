@@ -13,8 +13,8 @@ class MediaService {
   private static chunks: Blob[] = [];
   private static lastBlob: Blob | null = null;
 
-  // Capturar vídeo de 0-10 segundos com qualidade melhorada
-  static async captureVideo(duration: number = 10): Promise<Blob | null> {
+  // Capturar vídeo com qualidade melhorada (sem limitação de tempo)
+  static async captureVideo(): Promise<Blob | null> {
     try {
       MediaService.stream = await navigator.mediaDevices.getUserMedia({
         video: { 
@@ -54,13 +54,7 @@ class MediaService {
         };
 
         MediaService.mediaRecorder.start();
-
-        // Parar gravação automaticamente após a duração especificada
-        setTimeout(() => {
-          if (MediaService.mediaRecorder && MediaService.mediaRecorder.state === 'recording') {
-            MediaService.mediaRecorder.stop();
-          }
-        }, duration * 1000);
+        // Gravação sem limitação de tempo - deve ser parada manualmente
       });
     } catch (error) {
       console.error('Erro ao capturar vídeo:', error);
@@ -68,8 +62,8 @@ class MediaService {
     }
   }
 
-  // Gravar áudio de 0-10 segundos
-  static async recordAudio(duration: number = 10): Promise<Blob | null> {
+  // Gravar áudio sem limitação de tempo
+  static async recordAudio(): Promise<Blob | null> {
     try {
       MediaService.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -101,13 +95,7 @@ class MediaService {
         };
 
         MediaService.mediaRecorder.start();
-
-        // Parar gravação automaticamente após a duração especificada
-        setTimeout(() => {
-          if (MediaService.mediaRecorder && MediaService.mediaRecorder.state === 'recording') {
-            MediaService.mediaRecorder.stop();
-          }
-        }, duration * 1000);
+        // Gravação sem limitação de tempo - deve ser parada manualmente
       });
     } catch (error) {
       console.error('Erro ao gravar áudio:', error);
