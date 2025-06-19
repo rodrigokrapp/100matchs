@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   FiSend, FiImage, FiMic, FiSmile, FiArrowLeft, 
   FiUsers, FiStar, FiClock, FiCheck, FiEye, FiPlay, FiPause,
-  FiMicOff, FiCamera
+  FiMicOff
 } from 'react-icons/fi';
 import { MdGif } from 'react-icons/md';
 import { chatService, ChatMessage } from '../lib/chatService';
@@ -1074,13 +1074,7 @@ const ChatPage: React.FC = () => {
             >
               <FiImage />
             </button>
-            <button 
-              className="media-toggle"
-              onClick={handleStartVideoRecording}
-              title="Gravar vídeo"
-            >
-              <FiCamera />
-            </button>
+
             <button 
               className="media-toggle"
               onClick={handleStartAudioRecording}
