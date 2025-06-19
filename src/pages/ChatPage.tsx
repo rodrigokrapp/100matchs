@@ -301,25 +301,14 @@ const ChatPage: React.FC = () => {
     try {
       console.log('🎥 Iniciando gravação de vídeo...');
       
-      // Mostrar contagem regressiva
+      // Iniciar gravação imediatamente sem contagem regressiva
       setIsRecording(true);
       setRecordingType('video');
-      setRecordingTime(10); // Começar com 10 segundos para contagem regressiva
+      setRecordingTime(0);
       setShowMediaOptions(false);
 
-      // Contagem regressiva de 10 segundos
-      const countdownInterval = setInterval(() => {
-        setRecordingTime(prev => {
-          const newTime = prev - 1;
-          if (newTime <= 0) {
-            clearInterval(countdownInterval);
-            // Após contagem regressiva, iniciar gravação real
-            startActualVideoRecording();
-            return 0;
-          }
-          return newTime;
-        });
-      }, 1000);
+      // Iniciar gravação real imediatamente
+      startActualVideoRecording();
       
     } catch (error) {
       console.error('❌ Erro ao iniciar gravação de vídeo:', error);
@@ -827,20 +816,24 @@ const ChatPage: React.FC = () => {
                             <div className="video-container">
                               <video 
                                 controls 
-                                preload="auto"
+                                preload="metadata"
                                 playsInline
                                 muted={false}
                                 style={{
                                   maxWidth: '100%',
                                   height: 'auto',
                                   borderRadius: '10px',
-                                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                  transition: 'all 0.2s ease-out',
                                   cursor: 'pointer',
-                                  filter: 'contrast(1.08) saturate(1.05) brightness(1.02)',
-                                  willChange: 'transform, opacity, filter',
+                                  willChange: 'auto',
                                   backfaceVisibility: 'hidden',
                                   transform: 'translateZ(0)',
-                                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)'
+                                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.15)'
+                                }}
+                                onLoadedMetadata={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  video.playbackRate = 1.0;
+                                  video.volume = 0.8;
                                 }}
                                 onClick={(e) => {
                                   const video = e.target as HTMLVideoElement;
@@ -976,33 +969,16 @@ const ChatPage: React.FC = () => {
                                 controls 
                                 preload="metadata"
                                 style={{
-                                  willChange: 'transform',
-                                  backfaceVisibility: 'hidden'
+                                  width: '100%',
+                                  height: '40px'
                                 }}
                                 onClick={() => handleViewTemporaryMessage(msg.id)}
                                 onLoadedMetadata={(e) => {
                                   const audio = e.target as HTMLAudioElement;
-                                  audio.playbackRate = 1.0;
-                                  audio.defaultPlaybackRate = 1.0;
-                                }}
-                                onLoadedData={(e) => {
-                                  const audio = e.target as HTMLAudioElement;
-                                  audio.playbackRate = 1.0;
-                                }}
-                                onCanPlay={(e) => {
-                                  const audio = e.target as HTMLAudioElement;
-                                  audio.playbackRate = 1.0;
-                                }}
-                                onTimeUpdate={(e) => {
-                                  const audio = e.target as HTMLAudioElement;
-                                  if (audio.playbackRate !== 1.0) {
-                                    audio.playbackRate = 1.0;
-                                  }
+                                  audio.volume = 1.0;
                                 }}
                                 onPlay={(e) => {
-                                  const audio = e.target as HTMLAudioElement;
-                                  audio.playbackRate = 1.0;
-                                  handlePlayPause(msg.id, audio);
+                                  handlePlayPause(msg.id, e.target as HTMLAudioElement);
                                 }}
                                 onPause={(e) => handlePlayPause(msg.id, e.target as HTMLAudioElement)}
                               >
@@ -1053,31 +1029,16 @@ const ChatPage: React.FC = () => {
                   <div className="audio-preview">
                     <audio 
                       controls 
-                      autoPlay 
-                      preload="auto"
+                      preload="metadata"
                       style={{
-                        willChange: 'transform',
-                        backfaceVisibility: 'hidden'
+                        width: '100%',
+                        height: '40px'
                       }}
                       src={previewMedia.url}
                       onLoadedMetadata={(e) => {
                         const audio = e.target as HTMLAudioElement;
                         audio.playbackRate = 1.0;
-                        audio.defaultPlaybackRate = 1.0;
-                      }}
-                      onLoadedData={(e) => {
-                        const audio = e.target as HTMLAudioElement;
-                        audio.playbackRate = 1.0;
-                      }}
-                      onCanPlay={(e) => {
-                        const audio = e.target as HTMLAudioElement;
-                        audio.playbackRate = 1.0;
-                      }}
-                      onTimeUpdate={(e) => {
-                        const audio = e.target as HTMLAudioElement;
-                        if (audio.playbackRate !== 1.0) {
-                          audio.playbackRate = 1.0;
-                        }
+                        audio.volume = 1.0;
                       }}
                     />
                   </div>
@@ -1117,26 +1078,16 @@ const ChatPage: React.FC = () => {
                 }}
               />
               <div className="recording-overlay">
-                {recordingTime > 0 && recordingTime <= 10 && !recordingIntervalRef.current ? (
-                  <div className="countdown-info">
-                    <div className="countdown-number">{recordingTime}</div>
-                    <span>Gravação iniciará em...</span>
-                  </div>
-                ) : (
-                  <div className="recording-info">
-                    <div className="recording-dot"></div>
-                    <span>Gravando... {formatRecordingTime(recordingTime)}</span>
-                  </div>
-                )}
+                <div className="recording-info">
+                  <div className="recording-dot"></div>
+                  <span>Gravando... {formatRecordingTime(recordingTime)}</span>
+                </div>
                 <button 
                   className="stop-recording-btn"
                   onClick={handleStopRecording}
                 >
                   <FiPause />
-                  {recordingTime > 0 && recordingTime <= 10 && !recordingIntervalRef.current ? 
-                    'Cancelar' : 
-                    `Parar (${Math.max(0, 10 - recordingTime)}s)`
-                  }
+                  Parar ({Math.max(0, 10 - recordingTime)}s)
                 </button>
               </div>
             </div>
@@ -1241,9 +1192,9 @@ const ChatPage: React.FC = () => {
         <div className="input-container">
           <div className="media-buttons">
             <button 
-              className={`media-toggle ${showMediaOptions ? 'active' : ''}`}
-              onClick={() => setShowMediaOptions(!showMediaOptions)}
-              title="Opções de mídia"
+              className="media-toggle"
+              onClick={handleSelectImage}
+              title="Selecionar foto"
             >
               <FiImage />
             </button>

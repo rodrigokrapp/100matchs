@@ -874,9 +874,9 @@
 
 .media-toggle,
 .emoji-toggle {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  color: white;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8));
+  border: 2px solid rgba(102, 51, 153, 0.6);
+  color: #663399;
   font-size: 20px;
   padding: 12px;
   border-radius: 50%;
@@ -893,10 +893,11 @@
 
 .media-toggle:hover,
 .emoji-toggle:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.25));
-  border-color: rgba(255, 255, 255, 0.6);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.95));
+  border-color: #663399;
+  color: #663399;
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(102, 51, 153, 0.4);
 }
 
 .media-toggle.active,
