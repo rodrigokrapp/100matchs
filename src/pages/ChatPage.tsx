@@ -1254,8 +1254,12 @@ const ChatPage: React.FC = () => {
             
             <button 
               className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
-              onClick={() => setShowEmojis(!showEmojis)}
-              title="Emojis"
+              onClick={() => {
+                console.log('🔥 Emoji button clicked! Current showEmojis:', showEmojis);
+                setShowEmojis(!showEmojis);
+                console.log('🔥 Setting showEmojis to:', !showEmojis);
+              }}
+              title="Emojis e Figurinhas"
             >
               <FiSmile />
             </button>
