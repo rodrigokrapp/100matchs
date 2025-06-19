@@ -520,17 +520,13 @@ const ChatPage: React.FC = () => {
 
   // NOVA FUNCIONALIDADE: Play/pause para áudio e vídeo
   const handlePlayPause = (messageId: string, element: HTMLVideoElement | HTMLAudioElement) => {
-    const newPlayingState = new Map(isPlaying);
-    
-    if (element.paused) {
-      element.play();
-      newPlayingState.set(messageId, true);
-    } else {
-      element.pause();
-      newPlayingState.set(messageId, false);
-    }
-    
-    setIsPlaying(newPlayingState);
+    // Simplesmente pausa outros elementos para não sobrecarregar
+    const otherMediaElements = document.querySelectorAll('video, audio');
+    otherMediaElements.forEach((el) => {
+      if (el !== element && !el.paused) {
+        el.pause();
+      }
+    });
   };
 
   const handleViewTemporaryMessage = async (messageId: string) => {
@@ -732,28 +728,6 @@ const ChatPage: React.FC = () => {
           )}
         </div>
 
-        {/* Hero Banner Section */}
-        <div className="hero-banner-section">
-          <img 
-            src="/banner-converse-sem-match.jpg" 
-            alt="Converse Sem Match"
-            onError={(e) => {
-              // Se a imagem não carregar, mostra um fundo com as cores da foto original
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
-          <div className="hero-overlay">
-            <div className="hero-content">
-              <h1>
-                CONECTE-SE AGORA!
-              </h1>
-              <p>
-                Converse grátis com pessoas incríveis
-              </p>
-            </div>
-          </div>
-        </div>
-
 
 
         <div className="messages-container">
@@ -831,10 +805,28 @@ const ChatPage: React.FC = () => {
                               <span>Vídeo expirado</span>
                             </div>
                           ) : (
-                            <VideoWithThumbnail
-                              videoUrl={msg.content}
-                              messageId={msg.id}
-                            />
+                            <div className="video-container">
+                              <video 
+                                controls 
+                                preload="metadata"
+                                style={{
+                                  width: '100%',
+                                  maxWidth: '300px',
+                                  borderRadius: '12px',
+                                  backgroundColor: '#000'
+                                }}
+                                src={msg.content}
+                              >
+                                <source src={msg.content} type="video/webm" />
+                                <source src={msg.content} type="video/mp4" />
+                                Seu navegador não suporta vídeo.
+                              </video>
+                              {msg.is_temporary && (
+                                <div className="video-temp-indicator">
+                                  <span>📹 Vídeo temporário (5min)</span>
+                                </div>
+                              )}
+                            </div>
                           )}
                         </div>
                       )}
@@ -857,36 +849,6 @@ const ChatPage: React.FC = () => {
                                   borderRadius: '8px'
                                 }}
                                 src={msg.content}
-                                onLoadedMetadata={(e) => {
-                                  const audio = e.target as HTMLAudioElement;
-                                  audio.volume = 0.7;
-                                  audio.playbackRate = 1.0;
-                                  audio.load(); // Força reload mais leve
-                                }}
-                                onLoadedData={(e) => {
-                                  const audio = e.target as HTMLAudioElement;
-                                  audio.currentTime = 0;
-                                }}
-                                onPlay={(e) => {
-                                  const audio = e.target as HTMLAudioElement;
-                                  audio.playbackRate = 1.0;
-                                  handlePlayPause(msg.id, audio);
-                                }}
-                                onPause={(e) => {
-                                  handlePlayPause(msg.id, e.target as HTMLAudioElement);
-                                }}
-                                onCanPlay={() => {
-                                  console.log('🎵 Áudio carregado e pronto');
-                                }}
-                                onSuspend={() => {
-                                  console.log('⏸️ Download pausado para economizar');
-                                }}
-                                onError={(e) => {
-                                  console.error('Erro ao carregar áudio:', e);
-                                }}
-                                onStalled={(e) => {
-                                  console.log('Rebuffer de áudio...');
-                                }}
                               >
                                 <source src={msg.content} type="audio/webm" />
                                 <source src={msg.content} type="audio/mp4" />
@@ -1060,8 +1022,6 @@ const ChatPage: React.FC = () => {
             </div>
           </div>
         )}
-
-
 
         {/* Input Area */}
         <div className="input-container">
