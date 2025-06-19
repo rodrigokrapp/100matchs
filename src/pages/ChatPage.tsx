@@ -834,32 +834,49 @@ const ChatPage: React.FC = () => {
                                   maxWidth: '100%',
                                   height: 'auto',
                                   borderRadius: '10px',
-                                  transition: 'all 0.3s ease',
+                                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                   cursor: 'pointer',
-                                  filter: 'contrast(1.1) saturate(1.1)',
-                                  willChange: 'transform, opacity'
+                                  filter: 'contrast(1.08) saturate(1.05) brightness(1.02)',
+                                  willChange: 'transform, opacity, filter',
+                                  backfaceVisibility: 'hidden',
+                                  transform: 'translateZ(0)',
+                                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)'
                                 }}
                                 onClick={(e) => {
                                   const video = e.target as HTMLVideoElement;
                                   
-                                  // Melhorar qualidade visual
-                                  video.style.filter = 'contrast(1.05) saturate(1.05) brightness(1.02)';
-                                  video.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
+                                  // Melhorar qualidade visual com animação suave
+                                  video.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                                  video.style.filter = 'contrast(1.1) saturate(1.08) brightness(1.03)';
+                                  video.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.4)';
+                                  video.style.transform = 'scale(1.02) translateZ(0)';
                                   
                                   handleViewTemporaryMessage(msg.id);
                                   
                                   // Se é temporário, iniciar reprodução fluida e exclusão
                                   if (msg.is_temporary) {
-                                    // Reprodução mais fluida
+                                    // Reprodução mais fluida e otimizada
                                     video.playbackRate = 1.0;
                                     video.volume = 0.8;
-                                    video.play();
+                                    video.currentTime = 0; // Começar do início
+                                    
+                                    const playPromise = video.play();
+                                    if (playPromise !== undefined) {
+                                      playPromise.catch(error => {
+                                        console.log('Erro ao reproduzir vídeo:', error);
+                                      });
+                                    }
                                     
                                     // Indicador visual de tempo restante
                                     const container = video.closest('.video-container') as HTMLElement;
                                     if (container) {
+                                      // Remover barra de progresso anterior se existir
+                                      const existingBar = container.querySelector('.countdown-bar');
+                                      if (existingBar) existingBar.remove();
+                                      
                                       // Adicionar barra de progresso
                                       const progressBar = document.createElement('div');
+                                      progressBar.className = 'countdown-bar';
                                       progressBar.style.cssText = `
                                         position: absolute;
                                         bottom: 0;
@@ -870,6 +887,7 @@ const ChatPage: React.FC = () => {
                                         border-radius: 0 0 10px 10px;
                                         transform-origin: left;
                                         animation: countdown 10s linear forwards;
+                                        z-index: 10;
                                       `;
                                       
                                       // Adicionar keyframe para animação
@@ -878,8 +896,8 @@ const ChatPage: React.FC = () => {
                                         style.id = 'countdown-keyframe';
                                         style.textContent = `
                                           @keyframes countdown {
-                                            from { transform: scaleX(1); }
-                                            to { transform: scaleX(0); }
+                                            from { transform: scaleX(1); opacity: 0.9; }
+                                            to { transform: scaleX(0); opacity: 0.5; }
                                           }
                                         `;
                                         document.head.appendChild(style);
@@ -892,14 +910,14 @@ const ChatPage: React.FC = () => {
                                     // Configurar exclusão automática após 10 segundos
                                     setTimeout(() => {
                                       if (container) {
-                                        container.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                                        container.style.transition = 'all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                                         container.style.opacity = '0';
-                                        container.style.transform = 'scale(0.9) translateY(-10px)';
-                                        container.style.filter = 'blur(2px)';
+                                        container.style.transform = 'scale(0.85) translateY(-20px) rotateX(5deg)';
+                                        container.style.filter = 'blur(3px)';
                                         
                                         setTimeout(() => {
                                           container.style.display = 'none';
-                                        }, 800);
+                                        }, 1000);
                                       }
                                     }, 10000); // 10 segundos
                                   }
@@ -1225,12 +1243,28 @@ const ChatPage: React.FC = () => {
             <button 
               className={`media-toggle ${showMediaOptions ? 'active' : ''}`}
               onClick={() => setShowMediaOptions(!showMediaOptions)}
+              title="Opções de mídia"
             >
-              <MdGif />
+              <FiImage />
+            </button>
+            <button 
+              className="media-toggle"
+              onClick={handleStartVideoRecording}
+              title="Gravar vídeo"
+            >
+              <FiVideo />
+            </button>
+            <button 
+              className="media-toggle"
+              onClick={handleStartAudioRecording}
+              title="Gravar áudio"
+            >
+              <FiMic />
             </button>
             <button 
               className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
               onClick={() => setShowEmojis(!showEmojis)}
+              title="Emojis"
             >
               <FiSmile />
             </button>

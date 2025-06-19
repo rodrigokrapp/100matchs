@@ -868,26 +868,44 @@
 
 .media-buttons {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  align-items: center;
 }
 
 .media-toggle,
 .emoji-toggle {
-  background: none;
-  border: none;
-  color: #6b7280;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: white;
   font-size: 20px;
-  padding: 8px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-toggle:hover,
+.emoji-toggle:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.25));
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .media-toggle.active,
 .emoji-toggle.active {
-  background: #be185d;
+  background: linear-gradient(135deg, #ff4081, #f44336);
+  border-color: #ff4081;
   color: white;
-  transform: scale(1.1);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(255, 64, 129, 0.5);
 }
 
 .message-input {
