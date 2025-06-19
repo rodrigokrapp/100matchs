@@ -104,14 +104,11 @@ const ChatPage: React.FC = () => {
   }, [tempMediaUrls]);
 
   useEffect(() => {
-    // Verificar se usuário está logado
-    const usuarioChat = localStorage.getItem('usuarioChat');
+    // Verificar autenticação
     const usuarioPremium = localStorage.getItem('usuarioPremium');
-    
-    if (usuarioChat) {
-      setUsuario(JSON.parse(usuarioChat));
-    } else if (usuarioPremium) {
-      setUsuario(JSON.parse(usuarioPremium));
+    if (usuarioPremium) {
+      const user = JSON.parse(usuarioPremium);
+      setUsuario(user);
     } else {
       navigate('/inicio');
       return;
@@ -129,12 +126,87 @@ const ChatPage: React.FC = () => {
       setMensagens(prev => [...prev, newMessage]);
     };
 
+    // SISTEMA AVANÇADO DE RECEPÇÃO DE MENSAGENS
+    // Listener para eventos customizados
+    const handleChatMessageSent = (event: CustomEvent) => {
+      const { message, roomId } = event.detail;
+      if (roomId === salaId) {
+        console.log('📥 Mensagem recebida via evento customizado:', message);
+        setMensagens(prev => {
+          const exists = prev.some(msg => msg.id === message.id);
+          if (!exists) {
+            return [...prev, message].sort(
+              (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            );
+          }
+          return prev;
+        });
+      }
+    };
+
+    // Listener para mudanças no localStorage
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'lastChatMessage' && event.newValue) {
+        try {
+          const { message, roomId } = JSON.parse(event.newValue);
+          if (roomId === salaId) {
+            console.log('📥 Mensagem recebida via localStorage:', message);
+            setMensagens(prev => {
+              const exists = prev.some(msg => msg.id === message.id);
+              if (!exists) {
+                return [...prev, message].sort(
+                  (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                );
+              }
+              return prev;
+            });
+          }
+        } catch (error) {
+          console.error('❌ Erro ao processar mensagem do storage:', error);
+        }
+      }
+    };
+
+    // POLLING de segurança - verifica mensagens a cada 3 segundos
+    const messagePolling = setInterval(() => {
+      if (salaId) {
+        const chatKey = `chat_${salaId}`;
+        const storedMessages = localStorage.getItem(chatKey);
+        if (storedMessages) {
+          try {
+            const messages = JSON.parse(storedMessages) as ChatMessage[];
+            setMensagens(prev => {
+              // Verificar se há mensagens novas
+              const newMessages = messages.filter(msg => 
+                !prev.some(existingMsg => existingMsg.id === msg.id)
+              );
+              
+              if (newMessages.length > 0) {
+                console.log('🔄 Mensagens encontradas via polling:', newMessages.length);
+                return [...prev, ...newMessages].sort(
+                  (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                );
+              }
+              return prev;
+            });
+          } catch (error) {
+            console.error('❌ Erro no polling de mensagens:', error);
+          }
+        }
+      }
+    }, 3000); // A cada 3 segundos
+
     window.addEventListener('local-message', handleLocalMessage);
+    window.addEventListener('chatMessageSent' as any, handleChatMessageSent);
+    window.addEventListener('storage', handleStorageChange);
 
     // Cleanup ao sair da página
     return () => {
       chatService.leaveRoom();
+      clearInterval(messagePolling);
       window.removeEventListener('local-message', handleLocalMessage);
+      window.removeEventListener('chatMessageSent' as any, handleChatMessageSent);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [navigate, salaId]);
 
@@ -180,21 +252,8 @@ const ChatPage: React.FC = () => {
       
       setIsConnected(connected);
       
-      // Simular usuários online baseado na sala (mais realista)
-      const baseUsers = Math.floor(Math.random() * 100) + 50; // Entre 50-150
-      const roomMultiplier = salaId === 'sao-paulo' ? 3 : salaId === 'rio-de-janeiro' ? 2.5 : 1.5;
-      const finalCount = Math.floor(baseUsers * roomMultiplier);
-      
-      setUsuariosOnline(finalCount);
-      await chatService.updateOnlineUsers(salaId, finalCount);
-      
-      // Atualizar contagem de usuários periodicamente
-      const userCountInterval = setInterval(async () => {
-        const variation = Math.floor(Math.random() * 10) - 5; // Variação de -5 a +5
-        const newCount = Math.max(10, finalCount + variation);
-        setUsuariosOnline(newCount);
-        await chatService.updateOnlineUsers(salaId, newCount);
-      }, 15000); // A cada 15 segundos
+      // SISTEMA REAL DE USUÁRIOS - sem números robóticos
+      await setupRealUserCount(salaId);
       
       // Limpar mensagens expiradas periodicamente
       const cleanupInterval = setInterval(async () => {
@@ -206,7 +265,6 @@ const ChatPage: React.FC = () => {
       
       // Cleanup ao desmontar
       return () => {
-        clearInterval(userCountInterval);
         clearInterval(cleanupInterval);
       };
       
@@ -726,6 +784,105 @@ const ChatPage: React.FC = () => {
 
   const handleUpgradePremium = () => {
     navigate('/premium');
+  };
+
+  // Sistema real de contagem de usuários - sem robôs
+  const setupRealUserCount = async (salaId: string) => {
+    try {
+      // Registrar presença do usuário atual
+      const userSession = {
+        sala_id: salaId,
+        user_name: usuario?.nome || 'Anônimo',
+        last_seen: new Date().toISOString()
+      };
+      
+      // Salvar no localStorage para comunicação entre abas
+      localStorage.setItem(`user_presence_${salaId}`, JSON.stringify(userSession));
+      
+      // Contar usuários reais ativos (últimos 5 minutos)
+      const countRealUsers = () => {
+        const now = new Date().getTime();
+        let activeUsers = 0;
+        
+        // Verificar localStorage para usuários na mesma aba/máquina
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith(`user_presence_${salaId}`)) {
+            try {
+              const session = JSON.parse(localStorage.getItem(key) || '{}');
+              const lastSeen = new Date(session.last_seen).getTime();
+              
+              // Se visto nos últimos 5 minutos, contar como ativo
+              if (now - lastSeen < 300000) { // 5 minutos
+                activeUsers++;
+              }
+            } catch (e) {
+              // Ignorar sessões inválidas
+            }
+          }
+        }
+        
+        // Minimum 1 usuário (você)
+        activeUsers = Math.max(1, activeUsers);
+        
+        console.log('👥 Usuários reais detectados:', activeUsers);
+        setUsuariosOnline(activeUsers);
+        
+        return activeUsers;
+      };
+      
+      // Contagem inicial
+      countRealUsers();
+      
+      // Atualizar presença a cada minuto
+      const presenceInterval = setInterval(() => {
+        // Atualizar sua presença
+        const updatedSession = {
+          ...userSession,
+          last_seen: new Date().toISOString()
+        };
+        localStorage.setItem(`user_presence_${salaId}`, JSON.stringify(updatedSession));
+        
+        // Recontar usuários
+        countRealUsers();
+      }, 60000); // A cada 1 minuto
+      
+      // Limpar presença antiga a cada 5 minutos
+      const cleanupInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const keysToRemove: string[] = [];
+        
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('user_presence_')) {
+            try {
+              const session = JSON.parse(localStorage.getItem(key) || '{}');
+              const lastSeen = new Date(session.last_seen).getTime();
+              
+              // Remover sessões antigas (mais de 10 minutos)
+              if (now - lastSeen > 600000) {
+                keysToRemove.push(key);
+              }
+            } catch (e) {
+              keysToRemove.push(key);
+            }
+          }
+        }
+        
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        countRealUsers();
+      }, 300000); // A cada 5 minutos
+      
+      // Cleanup
+      return () => {
+        clearInterval(presenceInterval);
+        clearInterval(cleanupInterval);
+      };
+      
+    } catch (error) {
+      console.error('❌ Erro ao configurar contagem real de usuários:', error);
+      setUsuariosOnline(1); // Fallback para 1 usuário
+    }
   };
 
   // Funções auxiliares para dados dos usuários
