@@ -80,17 +80,18 @@ const InicioPage: React.FC = () => {
     <div className="inicio-page">
       <Header />
       
-      <div className="inicio-container">
-        {/* Nova seção da foto de capa do site */}
-        <div className="capa-site-section">
-          <div className="capa-site-container">
-            <img 
-              src="/capa-converse-sem-match.jpg" 
-              alt="Converse Sem Match - 100 Matchs" 
-              className="capa-site-image"
-            />
-          </div>
+      {/* Imagem de capa principal no cabeçalho */}
+      <div className="header-capa-section">
+        <div className="header-capa-container">
+          <img 
+            src="/capa-converse-sem-match.jpg" 
+            alt="Converse Sem Match - Desliza é Nada" 
+            className="header-capa-image"
+          />
         </div>
+      </div>
+      
+      <div className="inicio-container">
 
         <div className="hero-section">
           <div className="hero-image">

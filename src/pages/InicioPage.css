@@ -24,27 +24,25 @@
   margin-bottom: 2rem;
 }
 
-/* Nova seção da Capa do Site */
-.capa-site-section {
+/* Imagem de capa principal no cabeçalho */
+.header-capa-section {
   width: 100%;
   position: relative;
-  margin-bottom: 3rem;
-  padding: 0 1rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #663399, #BE185D);
 }
 
-.capa-site-container {
+.header-capa-container {
   position: relative;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
-  height: 400px;
+  height: 300px;
   overflow: hidden;
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-  background: linear-gradient(135deg, rgba(102, 51, 153, 0.1), rgba(190, 24, 93, 0.1));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.capa-site-image {
+.header-capa-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -52,8 +50,8 @@
   transition: transform 0.3s ease;
 }
 
-.capa-site-container:hover .capa-site-image {
-  transform: scale(1.05);
+.header-capa-container:hover .header-capa-image {
+  transform: scale(1.02);
 }
 
 .hero-banner-container {
@@ -808,7 +806,7 @@
     padding: 2rem 1rem;
   }
 
-  .capa-site-container {
+  .header-capa-container {
     height: 300px;
   }
 
@@ -867,7 +865,7 @@
     overflow-x: hidden;
   }
 
-  .capa-site-container {
+  .header-capa-container {
     height: 250px;
     margin-bottom: 2rem;
   }
@@ -1009,7 +1007,7 @@
     padding: 1rem 0.5rem;
   }
 
-  .capa-site-container {
+  .header-capa-container {
     height: 200px;
     border-radius: 15px;
   }
