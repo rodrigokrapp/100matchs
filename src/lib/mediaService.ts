@@ -202,27 +202,24 @@ class MediaService {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          sampleRate: 48000,
+          sampleRate: 44100,
           sampleSize: 16,
           channelCount: 1
         }
       });
 
-      // Verificar formatos suportados e usar o melhor disponível
-      let mimeType = 'audio/webm;codecs=opus';
+      // Usar formato mais compatível e leve
+      let mimeType = 'audio/webm';
       if (!MediaRecorder.isTypeSupported(mimeType)) {
-        mimeType = 'audio/webm';
+        mimeType = 'audio/mp4';
         if (!MediaRecorder.isTypeSupported(mimeType)) {
-          mimeType = 'audio/mp4';
-          if (!MediaRecorder.isTypeSupported(mimeType)) {
-            mimeType = 'audio/wav';
-          }
+          mimeType = 'audio/wav';
         }
       }
 
       MediaService.mediaRecorder = new MediaRecorder(MediaService.stream, {
         mimeType: mimeType,
-        audioBitsPerSecond: 128000
+        audioBitsPerSecond: 64000 // Menor bitrate para melhor performance
       });
       MediaService.chunks = [];
 
@@ -232,8 +229,8 @@ class MediaService {
         }
       };
 
-      MediaService.mediaRecorder.start(250); // Coleta dados a cada 250ms para melhor fluidez
-      console.log('🎤 Gravação iniciada com codec:', mimeType);
+      MediaService.mediaRecorder.start(500); // Coleta dados a cada 500ms
+      console.log('🎤 Gravação iniciada (otimizada):', mimeType);
     } catch (error) {
       console.error('Erro ao iniciar gravação de áudio:', error);
       throw error;
@@ -292,8 +289,16 @@ class MediaService {
     try {
       MediaService.stream = stream;
       MediaService.chunks = [];
+      
+      // Usar codec mais leve e compatível
+      let mimeType = 'video/webm';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'video/mp4';
+      }
+
       MediaService.mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'video/webm;codecs=vp9'
+        mimeType: mimeType,
+        videoBitsPerSecond: 1000000 // 1Mbps para melhor performance
       });
 
       MediaService.mediaRecorder.ondataavailable = (event: BlobEvent) => {
@@ -303,12 +308,12 @@ class MediaService {
       };
 
       MediaService.mediaRecorder.onstop = () => {
-        MediaService.lastBlob = new Blob(MediaService.chunks, { type: 'video/webm' });
-        console.log('🎥 Blob criado:', MediaService.lastBlob.size, 'bytes');
+        MediaService.lastBlob = new Blob(MediaService.chunks, { type: mimeType });
+        console.log('🎥 Vídeo processado:', MediaService.lastBlob.size, 'bytes');
       };
 
       MediaService.mediaRecorder.start(1000); // Capturar dados a cada 1s
-      console.log('🎥 Gravação iniciada');
+      console.log('🎥 Gravação de vídeo iniciada (otimizada)');
     } catch (error) {
       console.error('❌ Erro ao iniciar gravação:', error);
     }

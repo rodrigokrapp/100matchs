@@ -301,44 +301,30 @@ const ChatPage: React.FC = () => {
     try {
       console.log('🎥 Iniciando gravação de vídeo...');
       
-      // Iniciar gravação imediatamente sem contagem regressiva
+      // Verificar permissões primeiro
+      if (!mediaPermissions.camera) {
+        const permission = await navigator.mediaDevices.getUserMedia({ 
+          video: true, 
+          audio: true 
+        });
+        if (permission) {
+          setMediaPermissions(prev => ({ ...prev, camera: true }));
+        }
+      }
+
       setIsRecording(true);
       setRecordingType('video');
       setRecordingTime(0);
       setShowMediaOptions(false);
+      setShowEmojis(false);
 
-      // Iniciar gravação real imediatamente
-      startActualVideoRecording();
-      
-    } catch (error) {
-      console.error('❌ Erro ao iniciar gravação de vídeo:', error);
-      alert('Erro ao acessar câmera. Verifique as permissões do navegador.');
-      setIsRecording(false);
-      setRecordingType(null);
-    }
-  };
-
-  const startActualVideoRecording = async () => {
-    try {
-      console.log('🎥 Iniciando gravação real...');
-      
-      // Resetar contador para gravação de 10 segundos
-      setRecordingTime(0);
-      
-      // Iniciar contador de tempo da gravação
+      // Iniciar contador de tempo (sem limitação)
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
 
-      // Gravar vídeo
-      const videoBlob = await MediaService.captureVideo();
-      
-      if (videoBlob) {
-        const url = MediaService.createTempUrl(videoBlob);
-        setPreviewMedia({type: 'video', url, blob: videoBlob});
-        setIsPreviewMode(true);
-        console.log('✅ Vídeo gravado com sucesso');
-      }
+      // Começar gravação com prévia ao vivo
+      await startActualVideoRecording();
       
     } catch (error) {
       console.error('❌ Erro ao gravar vídeo:', error);
@@ -348,6 +334,41 @@ const ChatPage: React.FC = () => {
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
       }
+    }
+  };
+
+  const startActualVideoRecording = async () => {
+    try {
+      console.log('🎥 Iniciando gravação real com prévia...');
+      
+      // Obter stream da câmera para prévia
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { 
+          width: { ideal: 1280, min: 640 },
+          height: { ideal: 720, min: 480 },
+          facingMode: 'user',
+          frameRate: { ideal: 30, min: 15 }
+        },
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 44100
+        }
+      });
+
+      // Mostrar prévia no elemento de vídeo
+      if (videoPreviewRef.current) {
+        videoPreviewRef.current.srcObject = stream;
+        videoPreviewRef.current.play();
+      }
+
+      // Iniciar gravação
+      MediaService.startVideoRecording(stream);
+      
+    } catch (error) {
+      console.error('❌ Erro ao iniciar gravação:', error);
+      throw error;
     }
   };
 
@@ -829,17 +850,18 @@ const ChatPage: React.FC = () => {
                             <div className="audio-container">
                               <audio 
                                 controls 
-                                preload="auto"
+                                preload="metadata"
                                 style={{
                                   width: '100%',
-                                  height: '45px',
+                                  height: '40px',
                                   borderRadius: '8px'
                                 }}
                                 src={msg.content}
                                 onLoadedMetadata={(e) => {
                                   const audio = e.target as HTMLAudioElement;
-                                  audio.volume = 0.9;
+                                  audio.volume = 0.7;
                                   audio.playbackRate = 1.0;
+                                  audio.load(); // Força reload mais leve
                                 }}
                                 onLoadedData={(e) => {
                                   const audio = e.target as HTMLAudioElement;
@@ -854,29 +876,21 @@ const ChatPage: React.FC = () => {
                                   handlePlayPause(msg.id, e.target as HTMLAudioElement);
                                 }}
                                 onCanPlay={() => {
-                                  // Áudio pronto para reprodução fluida
+                                  console.log('🎵 Áudio carregado e pronto');
                                 }}
-                                onWaiting={() => {
-                                  console.log('Aguardando buffer de áudio...');
-                                }}
-                                onPlaying={() => {
-                                  console.log('Áudio reproduzindo normalmente');
+                                onSuspend={() => {
+                                  console.log('⏸️ Download pausado para economizar');
                                 }}
                                 onError={(e) => {
                                   console.error('Erro ao carregar áudio:', e);
-                                  const audio = e.target as HTMLAudioElement;
-                                  audio.load(); // Tentar recarregar
                                 }}
                                 onStalled={(e) => {
-                                  console.log('Áudio pausado por falta de dados');
-                                  const audio = e.target as HTMLAudioElement;
-                                  audio.load(); // Recarregar se travou
+                                  console.log('Rebuffer de áudio...');
                                 }}
                               >
-                                <source src={msg.content} type="audio/webm;codecs=opus" />
+                                <source src={msg.content} type="audio/webm" />
                                 <source src={msg.content} type="audio/mp4" />
                                 <source src={msg.content} type="audio/wav" />
-                                <source src={msg.content} type="audio/ogg;codecs=vorbis" />
                                 Seu navegador não suporta áudio.
                               </audio>
                               {msg.is_temporary && (
@@ -929,32 +943,25 @@ const ChatPage: React.FC = () => {
                     </div>
                     <audio 
                       controls 
-                      preload="auto"
+                      preload="metadata"
                       autoPlay={false}
                       style={{
                         width: '100%',
-                        height: '50px',
+                        height: '45px',
                         borderRadius: '8px'
                       }}
                       src={previewMedia.url}
                       onLoadedMetadata={(e) => {
                         const audio = e.target as HTMLAudioElement;
                         audio.playbackRate = 1.0;
-                        audio.volume = 0.9;
+                        audio.volume = 0.7;
                         audio.currentTime = 0;
                       }}
                       onCanPlay={() => {
-                        console.log('Áudio preview pronto para reprodução');
+                        console.log('🎵 Preview carregado');
                       }}
                       onError={(e) => {
-                        console.error('Erro no preview de áudio:', e);
-                        const audio = e.target as HTMLAudioElement;
-                        audio.load();
-                      }}
-                      onStalled={(e) => {
-                        console.log('Áudio pausado por falta de dados');
-                        const audio = e.target as HTMLAudioElement;
-                        audio.load();
+                        console.error('Erro no preview:', e);
                       }}
                     />
                   </div>
@@ -1178,34 +1185,27 @@ const VideoWithThumbnail: React.FC<VideoWithThumbnailProps> = ({ videoUrl, messa
         <video
           ref={videoRef}
           controls
-          preload="auto"
+          preload="metadata"
           playsInline
           style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
           src={videoUrl}
-          autoPlay
+          autoPlay={false}
           onLoadedMetadata={(e) => {
             const video = e.target as HTMLVideoElement;
             video.currentTime = 0;
             video.playbackRate = 1.0;
+            video.volume = 0.7;
           }}
           onCanPlay={() => {
-            console.log('Vídeo pronto para reprodução');
+            console.log('🎥 Vídeo carregado');
           }}
-          onWaiting={() => {
-            console.log('Aguardando buffer de vídeo...');
-          }}
-          onStalled={(e) => {
-            console.log('Vídeo pausado por falta de dados');
-            const video = e.target as HTMLVideoElement;
-            video.load();
+          onSuspend={() => {
+            console.log('⏸️ Download de vídeo pausado');
           }}
           onError={(e) => {
             console.error('Erro ao carregar vídeo:', e);
-            const video = e.target as HTMLVideoElement;
-            video.load();
           }}
         >
-          <source src={videoUrl} type="video/webm;codecs=vp9,opus" />
           <source src={videoUrl} type="video/webm" />
           <source src={videoUrl} type="video/mp4" />
           Seu navegador não suporta vídeo.

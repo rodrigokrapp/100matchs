@@ -206,11 +206,16 @@ const HomePage: React.FC = () => {
               src="/banner-converse-sem-match-novo.jpg" 
               alt="Converse sem Match - 100 Matchs" 
               style={styles.heroImage}
+              onError={(e) => {
+                // Fallback para a imagem original se a nova não carregar
+                (e.target as HTMLImageElement).src = "/hero-banner.jpg";
+              }}
             />
             <div style={styles.heroOverlay}>
-              <h1 style={styles.heroTitle}>100 Matchs</h1>
+              <h1 style={styles.heroTitle}>CONVERSE SEM MATCH!</h1>
               <p style={styles.heroSubtitle}>
-                Conecte-se com pessoas reais e tenha conversas autênticas
+                Conecte-se com pessoas próximas sem precisar de match. 
+                Conversas espontâneas, encontros reais e conexões verdadeiras.
               </p>
               <Link to="/salas" style={styles.ctaButton}>
                 🚀 Começar Agora
