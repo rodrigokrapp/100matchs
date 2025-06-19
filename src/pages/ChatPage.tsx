@@ -824,11 +824,21 @@ const ChatPage: React.FC = () => {
                                   borderRadius: '8px'
                                 }}
                                 src={msg.content}
+                                onLoadedMetadata={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  video.volume = 1.0;
+                                  video.playbackRate = 1.0;
+                                }}
                                 onPlay={(e) => {
-                                  handlePlayPause(msg.id, e.target as HTMLVideoElement);
+                                  const video = e.target as HTMLVideoElement;
+                                  video.playbackRate = 1.0;
+                                  handlePlayPause(msg.id, video);
                                 }}
                                 onPause={(e) => {
                                   handlePlayPause(msg.id, e.target as HTMLVideoElement);
+                                }}
+                                onLoadStart={() => {
+                                  // Carregamento rápido
                                 }}
                               >
                                 <source src={msg.content} type="video/webm" />

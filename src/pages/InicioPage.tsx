@@ -81,6 +81,17 @@ const InicioPage: React.FC = () => {
       <Header />
       
       <div className="inicio-container">
+        {/* Nova seção da foto de capa do site */}
+        <div className="capa-site-section">
+          <div className="capa-site-container">
+            <img 
+              src="/capa-site.jpg" 
+              alt="Capa do Site - 100 Matchs" 
+              className="capa-site-image"
+            />
+          </div>
+        </div>
+
         <div className="hero-section">
           <div className="hero-image">
             <img src="/banner-converse-sem-match.jpg" alt="Converse Sem Match" className="banner-image" />
