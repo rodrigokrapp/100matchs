@@ -816,24 +816,26 @@ const ChatPage: React.FC = () => {
                             <div className="video-container">
                               <video 
                                 controls 
-                                preload="metadata"
+                                preload="auto"
                                 playsInline
                                 muted={false}
                                 style={{
                                   maxWidth: '100%',
                                   height: 'auto',
                                   borderRadius: '10px',
-                                  transition: 'all 0.2s ease-out',
                                   cursor: 'pointer',
-                                  willChange: 'auto',
-                                  backfaceVisibility: 'hidden',
-                                  transform: 'translateZ(0)',
-                                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.15)'
+                                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
                                 }}
                                 onLoadedMetadata={(e) => {
                                   const video = e.target as HTMLVideoElement;
                                   video.playbackRate = 1.0;
-                                  video.volume = 0.8;
+                                  video.volume = 0.9;
+                                  console.log('🎥 Vídeo carregado:', video.duration);
+                                }}
+                                onCanPlayThrough={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  console.log('🎥 Vídeo pronto para reprodução');
                                 }}
                                 onClick={(e) => {
                                   const video = e.target as HTMLVideoElement;
@@ -967,26 +969,48 @@ const ChatPage: React.FC = () => {
                             <div className="audio-container">
                               <audio 
                                 controls 
-                                preload="metadata"
+                                preload="auto"
                                 style={{
                                   width: '100%',
-                                  height: '40px'
+                                  height: '50px',
+                                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                  borderRadius: '8px',
+                                  outline: 'none'
                                 }}
+                                src={msg.content}
                                 onClick={() => handleViewTemporaryMessage(msg.id)}
                                 onLoadedMetadata={(e) => {
                                   const audio = e.target as HTMLAudioElement;
                                   audio.volume = 1.0;
+                                  console.log('🔊 Áudio carregado:', audio.duration);
+                                }}
+                                onCanPlayThrough={(e) => {
+                                  const audio = e.target as HTMLAudioElement;
+                                  console.log('🔊 Áudio pronto para reprodução');
                                 }}
                                 onPlay={(e) => {
+                                  console.log('▶️ Reproduzindo áudio');
                                   handlePlayPause(msg.id, e.target as HTMLAudioElement);
                                 }}
-                                onPause={(e) => handlePlayPause(msg.id, e.target as HTMLAudioElement)}
+                                onPause={(e) => {
+                                  console.log('⏸️ Pausando áudio');
+                                  handlePlayPause(msg.id, e.target as HTMLAudioElement);
+                                }}
+                                onError={(e) => {
+                                  console.error('❌ Erro no áudio:', e);
+                                }}
                               >
-                                <source src={msg.content} type="audio/mp4" />
                                 <source src={msg.content} type="audio/webm" />
+                                <source src={msg.content} type="audio/mp4" />
                                 <source src={msg.content} type="audio/wav" />
+                                <source src={msg.content} type="audio/ogg" />
                                 Seu navegador não suporta áudio.
                               </audio>
+                              {msg.is_temporary && (
+                                <div className="audio-temp-indicator">
+                                  <span>🔊 Áudio temporário - Clique para ouvir</span>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>

@@ -68,20 +68,55 @@ const HomePage: React.FC = () => {
       maxWidth: '800px',
       margin: '0 auto'
     },
+    heroBanner: {
+      position: 'relative' as const,
+      width: '100%',
+      height: '400px',
+      overflow: 'hidden',
+      borderRadius: '15px',
+      marginBottom: '40px',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+    },
+    heroImage: {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover' as 'cover',
+      objectPosition: 'center'
+    },
+    heroOverlay: {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column' as const,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      padding: '20px',
+      background: 'linear-gradient(135deg, rgba(102, 51, 153, 0.8), rgba(190, 24, 93, 0.6))',
+      textAlign: 'center' as const
+    },
     heroTitle: {
       fontSize: '48px',
       fontWeight: 700,
       marginBottom: '20px',
-      background: 'linear-gradient(135deg, #ff6b9d, #4facfe)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text'
+      color: 'white',
+      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)',
+      '@media (max-width: 768px)': {
+        fontSize: '36px'
+      }
     },
     heroSubtitle: {
       fontSize: '20px',
-      color: '#666',
-      marginBottom: '40px',
-      lineHeight: 1.6
+      color: 'rgba(255, 255, 255, 0.95)',
+      marginBottom: '30px',
+      lineHeight: 1.6,
+      textShadow: '1px 1px 2px rgba(0, 0, 0, 0.7)',
+      maxWidth: '600px',
+      '@media (max-width: 768px)': {
+        fontSize: '18px'
+      }
     },
     ctaButton: {
       background: 'linear-gradient(135deg, #ff6b9d, #ff8fab)',
@@ -166,13 +201,22 @@ const HomePage: React.FC = () => {
 
       <main>
         <section style={styles.hero}>
-          <h1 style={styles.heroTitle}>Acesso Premium Exclusivo</h1>
-          <p style={styles.heroSubtitle}>
-            Conecte-se com uma comunidade exclusiva e tenha acesso a conteúdos premium únicos
-          </p>
-          <Link to="/salas" style={styles.ctaButton}>
-            🚀 Começar Agora
-          </Link>
+          <div style={styles.heroBanner}>
+            <img 
+              src="/banner-converse-sem-match.jpg" 
+              alt="Converse sem Match - 100 Matchs" 
+              style={styles.heroImage}
+            />
+            <div style={styles.heroOverlay}>
+              <h1 style={styles.heroTitle}>100 Matchs</h1>
+              <p style={styles.heroSubtitle}>
+                Conecte-se com pessoas reais e tenha conversas autênticas
+              </p>
+              <Link to="/salas" style={styles.ctaButton}>
+                🚀 Começar Agora
+              </Link>
+            </div>
+          </div>
         </section>
 
         <section style={styles.features}>
