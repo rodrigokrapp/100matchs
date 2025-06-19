@@ -126,6 +126,22 @@ const MeuPerfilPremiumPage: React.FC = () => {
           }
         }));
         
+        // Broadcast global para todas as abas/componentes
+        localStorage.setItem('forceProfileRefresh', JSON.stringify({
+          userName: perfilAtualizado.nome,
+          timestamp: Date.now()
+        }));
+        
+        // Disparar evento direto para componentes na mesma aba
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('forceRefreshProfile', {
+            detail: { 
+              userName: perfilAtualizado.nome,
+              timestamp: Date.now()
+            }
+          }));
+        }, 100);
+        
         // Forçar atualização do localStorage (para disparar storage event em outras abas)
         localStorage.setItem('lastProfileUpdate', Date.now().toString());
       }

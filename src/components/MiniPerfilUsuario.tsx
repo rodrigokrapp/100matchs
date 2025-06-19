@@ -116,7 +116,13 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
   // Listener para mudanças no localStorage (atualização em tempo real)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key && e.key.startsWith('perfil_')) {
+      if (e.key === 'forceProfileRefresh') {
+        const data = JSON.parse(e.newValue || '{}');
+        if (data.userName === nomeUsuario) {
+          console.log('🚀 FORÇA REFRESH detectada para:', nomeUsuario);
+          setRefreshTrigger(prev => prev + 1);
+        }
+      } else if (e.key && e.key.startsWith('perfil_')) {
         console.log('🔄 Perfil atualizado, recarregando dados...');
         setRefreshTrigger(prev => prev + 1);
       }
@@ -124,7 +130,7 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
     
     window.addEventListener('storage', handleStorageChange);
     
-    // Também escutar mudanças customizadas (mesmo aba)
+    // Escutar eventos customizados
     const handleCustomUpdate = (e: CustomEvent) => {
       if (e.detail?.userName === nomeUsuario) {
         console.log('🔄 Atualização personalizada detectada para:', nomeUsuario);
@@ -132,11 +138,20 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
       }
     };
     
+    const handleForceRefresh = (e: CustomEvent) => {
+      if (e.detail?.userName === nomeUsuario) {
+        console.log('🚀 FORÇA REFRESH DIRETO detectado para:', nomeUsuario);
+        setRefreshTrigger(prev => prev + 1);
+      }
+    };
+    
     window.addEventListener('perfilUpdated' as any, handleCustomUpdate);
+    window.addEventListener('forceRefreshProfile' as any, handleForceRefresh);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('perfilUpdated' as any, handleCustomUpdate);
+      window.removeEventListener('forceRefreshProfile' as any, handleForceRefresh);
     };
   }, [nomeUsuario]);
   
