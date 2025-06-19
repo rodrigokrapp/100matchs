@@ -80,25 +80,7 @@ const InicioPage: React.FC = () => {
     <div className="inicio-page">
       <Header />
       
-      {/* Imagem de capa principal no cabeçalho */}
-      <div className="header-capa-section">
-        <div className="header-capa-container">
-          <img 
-            src="/capa-converse-sem-match.jpg" 
-            alt="Converse Sem Match - Desliza é Nada" 
-            className="header-capa-image"
-          />
-        </div>
-      </div>
-      
       <div className="inicio-container">
-
-        <div className="hero-section">
-          <div className="hero-image">
-            <img src="/banner-converse-sem-match.jpg" alt="Converse Sem Match" className="banner-image" />
-          </div>
-        </div>
-
         <div className="main-content">
           {/* Logo da empresa */}
           <div className="logo-section">
@@ -116,7 +98,7 @@ const InicioPage: React.FC = () => {
             {/* Formulário Entrar Chat */}
             <div className="entrada-card card">
               <h2>Entrar no Chat</h2>
-              <p>Acesso gratuito (apenas texto e emoticons)</p>
+              <p>Acesso gratuito (apenas texto)</p>
               
               <div className="input-group">
                 <input
@@ -222,7 +204,7 @@ const InicioPage: React.FC = () => {
             <div className="feature-card card">
               <div className="feature-icon">😀</div>
               <h3>Emoticons</h3>
-              <p>Expresse-se com emojis (Todos)</p>
+              <p>Expresse-se com emojis (Premium)</p>
             </div>
           </div>
         </div>

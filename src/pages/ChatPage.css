@@ -1601,4 +1601,40 @@
 .media-toggle svg {
   width: 20px;
   height: 20px;
+}
+
+/* Aviso Premium no painel de emojis */
+.premium-warning {
+  padding: 20px;
+  text-align: center;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.premium-warning p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.premium-warning strong {
+  font-size: 16px;
+}
+
+.upgrade-btn {
+  background: #ffdd59;
+  color: #333;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s ease;
+}
+
+.upgrade-btn:hover {
+  background: #ffd700;
+  transform: scale(1.05);
 } 

@@ -455,7 +455,20 @@ const ChatPage: React.FC = () => {
 
   // Verificar se usuário é premium
   const isPremiumUser = () => {
-    return usuario?.premium === true || localStorage.getItem('usuarioPremium') !== null;
+    // Se veio do localStorage 'usuarioPremium', é premium
+    const usuarioPremium = localStorage.getItem('usuarioPremium');
+    if (usuarioPremium) {
+      return true;
+    }
+    
+    // Se veio do localStorage 'usuarioChat' (entrar chat), é gratuito
+    const usuarioChat = localStorage.getItem('usuarioChat');
+    if (usuarioChat) {
+      return false; // Usuários do "Entrar Chat" são SEMPRE gratuitos
+    }
+    
+    // Verificar propriedade premium do objeto usuario
+    return usuario?.premium === true;
   };
 
   // Função para verificar premium e bloquear se necessário
@@ -1170,28 +1183,42 @@ const ChatPage: React.FC = () => {
         {/* Emoji Panel */}
         {showEmojis && (
           <div className="emoji-panel">
-            <div className="emoji-categories">
-              {Object.keys(EMOJI_CATEGORIES).map(category => (
-                <button
-                  key={category}
-                  className={selectedEmojiCategory === category ? 'active' : ''}
-                  onClick={() => setSelectedEmojiCategory(category)}
-                >
-                  {EMOJI_CATEGORIES[category as keyof typeof EMOJI_CATEGORIES][0]}
+            {!isPremiumUser() && (
+              <div className="premium-warning">
+                <p>🔒 <strong>Emojis Premium</strong></p>
+                <p>Faça upgrade para enviar emojis!</p>
+                <button onClick={handleUpgradePremium} className="upgrade-btn">
+                  ⭐ Virar Premium
                 </button>
-              ))}
-            </div>
-            <div className="emoji-grid">
-              {EMOJI_CATEGORIES[selectedEmojiCategory as keyof typeof EMOJI_CATEGORIES]?.slice(1).map((emoji, index) => (
-                <button
-                  key={index}
-                  className="emoji-button"
-                  onClick={() => handleEnviarEmoji(emoji)}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
+              </div>
+            )}
+            
+            {isPremiumUser() && (
+              <>
+                <div className="emoji-categories">
+                  {Object.keys(EMOJI_CATEGORIES).map(category => (
+                    <button
+                      key={category}
+                      className={selectedEmojiCategory === category ? 'active' : ''}
+                      onClick={() => setSelectedEmojiCategory(category)}
+                    >
+                      {EMOJI_CATEGORIES[category as keyof typeof EMOJI_CATEGORIES][0]}
+                    </button>
+                  ))}
+                </div>
+                <div className="emoji-grid">
+                  {EMOJI_CATEGORIES[selectedEmojiCategory as keyof typeof EMOJI_CATEGORIES]?.slice(1).map((emoji, index) => (
+                    <button
+                      key={index}
+                      className="emoji-button"
+                      onClick={() => handleEnviarEmoji(emoji)}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -1226,15 +1253,11 @@ const ChatPage: React.FC = () => {
             </button>
             
             <button 
-              className={`emoji-toggle ${showEmojis ? 'active' : ''} ${!isPremiumUser() ? 'premium-blocked' : ''}`}
-              onClick={() => {
-                if (!checkPremiumAccess('Emoticons e Figurinhas')) return;
-                setShowEmojis(!showEmojis);
-              }}
-              title={isPremiumUser() ? "Emojis" : "🔒 Emojis - Premium"}
+              className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
+              onClick={() => setShowEmojis(!showEmojis)}
+              title="Emojis"
             >
               <FiSmile />
-              {!isPremiumUser() && <span className="premium-lock">🔒</span>}
             </button>
           </div>
           
