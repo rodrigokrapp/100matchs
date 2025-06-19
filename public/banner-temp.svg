@@ -1,0 +1,62 @@
+<svg width="800" height="300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fundo gradiente roxo -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6B46C1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A855F7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fundo -->
+  <rect width="800" height="300" fill="url(#bgGradient)"/>
+  
+  <!-- Texto "desliza e nada" no canto superior esquerdo -->
+  <g transform="translate(50, 50)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#FF6B35" transform="rotate(-10)">desliza</text>
+    <text x="60" y="15" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#FF6B35" transform="rotate(-10)">e nada</text>
+    <circle cx="0" cy="-10" r="12" fill="#FF6B35" opacity="0.8"/>
+    <line x1="-8" y1="-18" x2="8" y2="-2" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Texto principal "CONVERSE SEM MATCH" centralizado -->
+  <text x="400" y="120" font-family="Arial, sans-serif" font-size="36" font-weight="900" fill="#FFE066" text-anchor="middle" stroke="#FF6B9D" stroke-width="1">CONVERSE</text>
+  <text x="400" y="160" font-family="Arial, sans-serif" font-size="36" font-weight="900" fill="#FFE066" text-anchor="middle" stroke="#FF6B9D" stroke-width="1">SEM MATCH</text>
+  
+  <!-- Pessoa 1 - Homem à esquerda -->
+  <g transform="translate(150, 200)">
+    <circle cx="0" cy="0" r="20" fill="#F4A261"/>
+    <path d="M -15,-15 Q 0,-25 15,-15" fill="#8B4513"/>
+    <rect x="-12" y="15" width="24" height="35" rx="5" fill="#2A2A2A"/>
+    <circle cx="-6" cy="-3" r="2" fill="#264653"/>
+    <circle cx="6" cy="-3" r="2" fill="#264653"/>
+    <rect x="20" y="25" width="8" height="12" rx="2" fill="#333"/>
+  </g>
+  
+  <!-- Pessoa 2 - Mulher no centro -->
+  <g transform="translate(400, 205)">
+    <circle cx="0" cy="0" r="20" fill="#F4A261"/>
+    <path d="M -15,-15 Q 0,-30 15,-15" fill="#8B4513"/>
+    <rect x="-12" y="15" width="24" height="35" rx="5" fill="#E76F51"/>
+    <circle cx="-6" cy="-3" r="2" fill="#264653"/>
+    <circle cx="6" cy="-3" r="2" fill="#264653"/>
+    <text x="25" y="-15" font-size="14" fill="#FF6B9D">♥</text>
+    <text x="30" y="-25" font-size="10" fill="#FF6B9D">♥</text>
+  </g>
+  
+  <!-- Pessoa 3 - Homem à direita -->
+  <g transform="translate(650, 200)">
+    <circle cx="0" cy="0" r="20" fill="#F4A261"/>
+    <path d="M -15,-15 Q 0,-25 15,-15" fill="#654321"/>
+    <rect x="-12" y="15" width="24" height="35" rx="5" fill="#4A5568"/>
+    <circle cx="-8" cy="-3" r="6" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="8" cy="-3" r="6" fill="none" stroke="#333" stroke-width="2"/>
+    <rect x="20" y="22" width="10" height="16" rx="2" fill="#333"/>
+  </g>
+  
+  <!-- Ícone de "proibido" -->
+  <g transform="translate(720, 60)">
+    <circle cx="0" cy="0" r="15" fill="#FF6B35" opacity="0.9"/>
+    <line x1="-10" y1="-10" x2="10" y2="10" stroke="white" stroke-width="3"/>
+  </g>
+</svg> 

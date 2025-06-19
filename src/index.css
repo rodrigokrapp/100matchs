@@ -12,7 +12,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background: #E91E63;
+  background: linear-gradient(135deg, #6B46C1 0%, #8B5CF6 50%, #A855F7 100%);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -27,7 +27,7 @@ code {
 }
 
 #root {
-  background: #E91E63;
+  background: linear-gradient(135deg, #6B46C1 0%, #8B5CF6 50%, #A855F7 100%);
   min-height: 100vh;
   width: 100%;
 }
@@ -52,7 +52,7 @@ code {
 
   color-scheme: light;
   color: white;
-  background: #E91E63;
+  background: linear-gradient(135deg, #6B46C1 0%, #8B5CF6 50%, #A855F7 100%);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -179,7 +179,7 @@ button:focus-visible {
   min-height: 100vh;
   color: white;
   font-size: 18px;
-  background: #E91E63;
+  background: linear-gradient(135deg, #6B46C1 0%, #8B5CF6 50%, #A855F7 100%);
 }
 
 /* Responsivo */
