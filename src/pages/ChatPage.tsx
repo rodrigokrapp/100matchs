@@ -104,12 +104,49 @@ const ChatPage: React.FC = () => {
   }, [tempMediaUrls]);
 
   useEffect(() => {
-    // Verificar autenticação
+    // Verificar autenticação - incluir usuários gratuitos e visitantes
     const usuarioPremium = localStorage.getItem('usuarioPremium');
+    const usuarioChat = localStorage.getItem('usuarioChat');
+    const visitante = localStorage.getItem('visitante');
+    
     if (usuarioPremium) {
       const user = JSON.parse(usuarioPremium);
-      setUsuario(user);
+      setUsuario({ ...user, tipo: 'premium' });
+    } else if (usuarioChat) {
+      const userChat = JSON.parse(usuarioChat);
+      
+      // Verificar se o tempo de 15 minutos ainda é válido
+      const agora = new Date().getTime();
+      const tempoDecorrido = agora - userChat.inicioSessao;
+      
+      if (tempoDecorrido > userChat.limiteTempo) {
+        // Tempo expirado, fazer logout automático
+        localStorage.removeItem('usuarioChat');
+        localStorage.removeItem(`acesso_${userChat.email}`);
+        alert('Seu tempo de acesso de 15 minutos expirou. Faça login novamente.');
+        navigate('/inicio');
+        return;
+      }
+      
+      setUsuario({ ...userChat, tipo: 'chat' });
+    } else if (visitante) {
+      const userVisitante = JSON.parse(visitante);
+      
+      // Verificar se o tempo de 5 minutos ainda é válido
+      const agora = new Date().getTime();
+      const tempoDecorrido = agora - userVisitante.inicioSessao;
+      
+      if (tempoDecorrido > userVisitante.limiteTempo) {
+        // Tempo expirado, remover visitante
+        localStorage.removeItem('visitante');
+        alert('Seu tempo de acesso como visitante expirou.');
+        navigate('/inicio');
+        return;
+      }
+      
+      setUsuario({ ...userVisitante, tipo: 'visitante' });
     } else {
+      console.log('❌ Usuário não autenticado, redirecionando para início');
       navigate('/inicio');
       return;
     }

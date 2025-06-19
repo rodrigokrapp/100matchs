@@ -24,14 +24,18 @@ const InicioPage: React.FC = () => {
       return;
     }
 
-    // Salvar usuário de chat gratuito simples
+    // Salvar usuário de chat gratuito com tempo de sessão
     const usuarioChat = {
       nome: nome.trim(),
+      email: email.trim() || `${nome.trim().toLowerCase().replace(/\s+/g, '')}@chat.com`,
       premium: false,
-      tipo: 'chat'
+      tipo: 'chat',
+      limiteTempo: 15 * 60 * 1000, // 15 minutos em milissegundos
+      inicioSessao: new Date().getTime()
     };
 
     localStorage.setItem('usuarioChat', JSON.stringify(usuarioChat));
+    localStorage.setItem(`acesso_${usuarioChat.email}`, 'true');
     navigate('/salas');
   };
 
