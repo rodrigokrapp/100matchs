@@ -807,15 +807,12 @@ const ChatPage: React.FC = () => {
                             <div className="video-container">
                               <div className="simple-media-player">
                                 <video 
-                                  ref={(el) => {
-                                    if (el) {
-                                      el.setAttribute('data-message-id', msg.id);
-                                    }
-                                  }}
+                                  key={msg.id}
                                   preload="metadata"
                                   playsInline
-                                  webkit-playsinline="true"
+                                  muted={false}
                                   controls
+                                  controlsList="nodownload"
                                   style={{
                                     width: '100%',
                                     maxWidth: '300px',
@@ -824,11 +821,21 @@ const ChatPage: React.FC = () => {
                                     display: 'block'
                                   }}
                                   src={msg.content}
-                                  poster="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM2NjMzOTkiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNiZTE4NWQiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0idXJsKCNnKSIvPjxjaXJjbGUgY3g9IjE1MCIgY3k9IjEwMCIgcj0iNDAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC45KSIvPjxwb2x5Z29uIHBvaW50cz0iMTM1LDgwIDE3NSw5OCAxMzUsMTE2IiBmaWxsPSIjYmUxODVkIi8+PC9zdmc+"
+                                  onLoadedData={() => {
+                                    console.log('🎬 Vídeo carregado:', msg.content);
+                                  }}
+                                  onError={(e) => {
+                                    console.error('❌ Erro no vídeo:', e);
+                                  }}
+                                  onCanPlay={() => {
+                                    console.log('✅ Vídeo pronto para reproduzir');
+                                  }}
                                 >
                                   <source src={msg.content} type="video/webm" />
                                   <source src={msg.content} type="video/mp4" />
                                   <source src={msg.content} type="video/mov" />
+                                  <source src={msg.content} type="video/quicktime" />
+                                  Seu navegador não suporta reprodução de vídeo.
                                 </video>
                               </div>
                               {msg.is_temporary && (
@@ -851,7 +858,7 @@ const ChatPage: React.FC = () => {
                           ) : (
                             <div className="audio-container">
                               <div className="simple-media-player">
-                                <audio 
+                              <audio 
                                   ref={(el) => {
                                     if (el) {
                                       el.setAttribute('data-message-id', msg.id);
@@ -859,14 +866,14 @@ const ChatPage: React.FC = () => {
                                   }}
                                   preload="metadata"
                                   style={{ display: 'none' }}
-                                  src={msg.content}
+                                src={msg.content}
                                   controls
-                                >
-                                  <source src={msg.content} type="audio/webm" />
-                                  <source src={msg.content} type="audio/mp4" />
-                                  <source src={msg.content} type="audio/wav" />
-                                  <source src={msg.content} type="audio/ogg" />
-                                </audio>
+                              >
+                                <source src={msg.content} type="audio/webm" />
+                                <source src={msg.content} type="audio/mp4" />
+                                <source src={msg.content} type="audio/wav" />
+                                <source src={msg.content} type="audio/ogg" />
+                              </audio>
                                 <button 
                                   className="big-play-button audio-button"
                                   onClick={() => {

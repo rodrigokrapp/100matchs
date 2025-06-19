@@ -77,12 +77,7 @@ const HomePage: React.FC = () => {
       marginBottom: '40px',
       boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
     },
-    heroImage: {
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover' as 'cover',
-      objectPosition: 'center'
-    },
+
     heroOverlay: {
       position: 'absolute' as const,
       top: 0,
