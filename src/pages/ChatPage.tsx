@@ -278,19 +278,24 @@ const ChatPage: React.FC = () => {
   };
 
   const handleEnviarEmoji = async (emoji: string) => {
-    if (!usuario || !salaId) return;
+    if (!checkPremiumAccess('Emoticons e Figurinhas')) return;
+    
+    if (!salaId || !usuario) return;
 
     try {
-      console.log('😀 Enviando emoji:', emoji);
-      await chatService.sendMessage(
+      console.log('😊 Enviando emoji:', emoji);
+      const sucesso = await chatService.sendMessage(
         salaId,
         usuario.nome,
         emoji,
-        'emoji',
+        'texto',
         usuario.premium || false
       );
-      setShowEmojis(false);
-      console.log('✅ Emoji enviado com sucesso!');
+
+      if (sucesso) {
+        console.log('✅ Emoji enviado!');
+        setShowEmojis(false); // Fechar painel após enviar
+      }
     } catch (error) {
       console.error('❌ Erro ao enviar emoji:', error);
       alert('Erro ao enviar emoji. Tente novamente.');
@@ -377,46 +382,39 @@ const ChatPage: React.FC = () => {
   const handleStartAudioRecording = async () => {
     if (!checkPremiumAccess('Gravação de Áudio')) return;
     
-    if (isRecording) {
-      console.log('⚠️ Já gravando');
-      return;
-    }
-
     try {
       console.log('🎤 Iniciando gravação de áudio...');
+      
+      // Verificar permissões primeiro
+      if (!mediaPermissions.microphone) {
+        const permission = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (permission) {
+          setMediaPermissions(prev => ({ ...prev, microphone: true }));
+        }
+      }
+
       setIsRecording(true);
       setRecordingType('audio');
       setRecordingTime(0);
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
+      setShowMediaOptions(false);
+      setShowEmojis(false);
 
-      // Configurar bitrate mais baixo para melhor performance
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          const audioBlob = new Blob([event.data], { type: 'audio/webm' });
-          const url = MediaService.createTempUrl(audioBlob);
-          console.log('🎵 Áudio gravado, tamanho:', audioBlob.size);
-          setPreviewMedia({type: 'audio', url, blob: audioBlob});
-          setIsPreviewMode(true);
-        }
-      };
-
-      // Começar gravação
-      mediaRecorder.start();
-      
-      // Iniciar timer
+      // Iniciar contador de tempo (sem limitação)
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
 
+      // Começar gravação imediatamente
+      MediaService.startAudioRecording();
+
     } catch (error) {
-      console.error('❌ Erro ao iniciar gravação de áudio:', error);
-      alert('Erro ao acessar microfone. Verifique as permissões.');
+      console.error('❌ Erro ao gravar áudio:', error);
+      alert('Erro ao acessar microfone. Verifique as permissões do navegador.');
       setIsRecording(false);
       setRecordingType(null);
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
     }
   };
 
@@ -479,7 +477,7 @@ const ChatPage: React.FC = () => {
       
       // Tentar usar câmera diretamente
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' }, // Câmera traseira por padrão
+        video: { facingMode: 'user' }, // Câmera frontal (selfie)
         audio: false 
       });
       
@@ -1228,11 +1226,15 @@ const ChatPage: React.FC = () => {
             </button>
             
             <button 
-              className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
-              onClick={() => setShowEmojis(!showEmojis)}
-              title="Emojis"
+              className={`emoji-toggle ${showEmojis ? 'active' : ''} ${!isPremiumUser() ? 'premium-blocked' : ''}`}
+              onClick={() => {
+                if (!checkPremiumAccess('Emoticons e Figurinhas')) return;
+                setShowEmojis(!showEmojis);
+              }}
+              title={isPremiumUser() ? "Emojis" : "🔒 Emojis - Premium"}
             >
               <FiSmile />
+              {!isPremiumUser() && <span className="premium-lock">🔒</span>}
             </button>
           </div>
           
