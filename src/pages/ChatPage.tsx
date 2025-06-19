@@ -841,23 +841,65 @@ const ChatPage: React.FC = () => {
                                 }}
                                 onClick={(e) => {
                                   const video = e.target as HTMLVideoElement;
+                                  
+                                  // Melhorar qualidade visual
+                                  video.style.filter = 'contrast(1.05) saturate(1.05) brightness(1.02)';
+                                  video.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
+                                  
                                   handleViewTemporaryMessage(msg.id);
                                   
-                                  // Se é temporário, iniciar contagem para exclusão
+                                  // Se é temporário, iniciar reprodução fluida e exclusão
                                   if (msg.is_temporary) {
+                                    // Reprodução mais fluida
+                                    video.playbackRate = 1.0;
+                                    video.volume = 0.8;
                                     video.play();
+                                    
+                                    // Indicador visual de tempo restante
+                                    const container = video.closest('.video-container') as HTMLElement;
+                                    if (container) {
+                                      // Adicionar barra de progresso
+                                      const progressBar = document.createElement('div');
+                                      progressBar.style.cssText = `
+                                        position: absolute;
+                                        bottom: 0;
+                                        left: 0;
+                                        height: 4px;
+                                        background: linear-gradient(90deg, #ff4081, #f44336);
+                                        width: 100%;
+                                        border-radius: 0 0 10px 10px;
+                                        transform-origin: left;
+                                        animation: countdown 10s linear forwards;
+                                      `;
+                                      
+                                      // Adicionar keyframe para animação
+                                      if (!document.querySelector('#countdown-keyframe')) {
+                                        const style = document.createElement('style');
+                                        style.id = 'countdown-keyframe';
+                                        style.textContent = `
+                                          @keyframes countdown {
+                                            from { transform: scaleX(1); }
+                                            to { transform: scaleX(0); }
+                                          }
+                                        `;
+                                        document.head.appendChild(style);
+                                      }
+                                      
+                                      container.style.position = 'relative';
+                                      container.appendChild(progressBar);
+                                    }
                                     
                                     // Configurar exclusão automática após 10 segundos
                                     setTimeout(() => {
-                                      const container = video.closest('.video-container') as HTMLElement;
                                       if (container) {
-                                        container.style.transition = 'all 0.5s ease';
+                                        container.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                                         container.style.opacity = '0';
-                                        container.style.transform = 'scale(0.95)';
+                                        container.style.transform = 'scale(0.9) translateY(-10px)';
+                                        container.style.filter = 'blur(2px)';
                                         
                                         setTimeout(() => {
                                           container.style.display = 'none';
-                                        }, 500);
+                                        }, 800);
                                       }
                                     }, 10000); // 10 segundos
                                   }
