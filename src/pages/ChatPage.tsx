@@ -752,25 +752,11 @@ const ChatPage: React.FC = () => {
             
             <button 
               className="media-action-large"
-              onClick={handleStartAudioRecording}
-              title="Gravar áudio"
+              onClick={handleStartVideoRecording}
+              title="Gravar vídeo"
             >
-              <FiMic />
-              <span>Áudio</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Seção de Botões Grandes de Mídia */}
-        <div className="media-actions-section">
-          <div className="media-actions-grid">
-            <button 
-              className="media-action-large"
-              onClick={handleSelectImage}
-              title="Selecionar foto da galeria"
-            >
-              <FiImage />
-              <span>Galeria</span>
+              <FiVideo />
+              <span>Vídeo</span>
             </button>
             
             <button 
@@ -780,6 +766,15 @@ const ChatPage: React.FC = () => {
             >
               <FiMic />
               <span>Áudio</span>
+            </button>
+
+            <button 
+              className="media-action-large"
+              onClick={() => setShowEmojis(!showEmojis)}
+              title="Emojis"
+            >
+              <FiSmile />
+              <span>Emojis</span>
             </button>
           </div>
         </div>
@@ -1078,6 +1073,15 @@ const ChatPage: React.FC = () => {
 
               <button 
                 className="media-option"
+                onClick={handleStartVideoRecording}
+                disabled={!mediaPermissions.camera}
+              >
+                <FiVideo />
+                <span>Vídeo</span>
+              </button>
+
+              <button 
+                className="media-option"
                 onClick={handleStartGifRecording}
                 disabled={!mediaPermissions.camera}
               >
@@ -1113,6 +1117,13 @@ const ChatPage: React.FC = () => {
               title="Selecionar foto"
             >
               <FiImage />
+            </button>
+            <button 
+              className="media-toggle"
+              onClick={handleStartVideoRecording}
+              title="Gravar vídeo"
+            >
+              <FiVideo />
             </button>
             <button 
               className="media-toggle"
