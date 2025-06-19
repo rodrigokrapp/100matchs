@@ -815,41 +815,21 @@ const ChatPage: React.FC = () => {
                                   preload="metadata"
                                   playsInline
                                   webkit-playsinline="true"
+                                  controls
                                   style={{
                                     width: '100%',
                                     maxWidth: '300px',
                                     borderRadius: '12px',
                                     backgroundColor: '#000',
-                                    display: 'none'
+                                    display: 'block'
                                   }}
                                   src={msg.content}
+                                  poster="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM2NjMzOTkiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNiZTE4NWQiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0idXJsKCNnKSIvPjxjaXJjbGUgY3g9IjE1MCIgY3k9IjEwMCIgcj0iNDAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC45KSIvPjxwb2x5Z29uIHBvaW50cz0iMTM1LDgwIDE3NSw5OCAxMzUsMTE2IiBmaWxsPSIjYmUxODVkIi8+PC9zdmc+"
                                 >
                                   <source src={msg.content} type="video/webm" />
                                   <source src={msg.content} type="video/mp4" />
                                   <source src={msg.content} type="video/mov" />
                                 </video>
-                                <div className="video-thumbnail">
-                                  <button 
-                                    className="big-play-button"
-                                    onClick={() => {
-                                      const video = document.querySelector(`video[data-message-id="${msg.id}"]`) as HTMLVideoElement;
-                                      if (video) {
-                                        video.style.display = 'block';
-                                        video.controls = true;
-                                        video.play();
-                                        // Esconder o botão após clicar
-                                        const button = document.querySelector(`button[data-video-id="${msg.id}"]`) as HTMLButtonElement;
-                                        if (button) {
-                                          button.style.display = 'none';
-                                        }
-                                      }
-                                    }}
-                                    data-video-id={msg.id}
-                                  >
-                                    <FiPlay size={40} />
-                                    <span>REPRODUZIR VÍDEO</span>
-                                  </button>
-                                </div>
                               </div>
                               {msg.is_temporary && (
                                 <div className="video-temp-indicator">

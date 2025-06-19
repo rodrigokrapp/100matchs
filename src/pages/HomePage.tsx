@@ -201,16 +201,7 @@ const HomePage: React.FC = () => {
 
       <main>
         <section style={styles.hero}>
-          <div style={styles.heroBanner}>
-                      <img 
-            src="/banner-converse-sem-match-novo.jpg" 
-            alt="Converse sem match"
-            style={styles.heroImage}
-            onError={(e) => {
-              // Fallback para o banner antigo se a nova imagem não carregar
-              (e.target as HTMLImageElement).src = "/banner-converse-sem-match.jpg";
-            }}
-          />
+          <div style={{...styles.heroBanner, background: 'linear-gradient(135deg, #663399 0%, #be185d 100%)'}}>
             <div style={styles.heroOverlay}>
               <h1 style={styles.heroTitle}>CONVERSE SEM MATCH!</h1>
               <p style={styles.heroSubtitle}>
