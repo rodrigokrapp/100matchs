@@ -1,10 +1,10 @@
 <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Balão de chat principal -->
-  <path d="M20 30C20 20.954 27.954 13 37 13H83C92.046 13 100 20.954 100 30V65C100 74.046 92.046 82 83 82H45L20 100V82C20 82 20 30 20 30Z" fill="#E91E63"/>
+  <!-- Círculo de fundo -->
+  <circle cx="60" cy="60" r="55" fill="#E91E63"/>
   
-  <!-- Coração dentro do balão -->
-  <path d="M45 45C45 38 52 32 60 38C68 32 75 38 75 45C75 52 60 65 60 65C60 65 45 52 45 45Z" fill="white"/>
+  <!-- Balão de chat -->
+  <path d="M30 35C30 28.925 34.925 24 41 24H79C85.075 24 90 28.925 90 35V60C90 66.075 85.075 71 79 71H45L30 85V71C30 71 30 35 30 35Z" fill="white"/>
   
-  <!-- Sombra suave -->
-  <ellipse cx="60" cy="110" rx="30" ry="8" fill="rgba(233, 30, 99, 0.2)"/>
+  <!-- Coração dentro -->
+  <path d="M48 47C48 42 53 38 60 43C67 38 72 42 72 47C72 52 60 62 60 62C60 62 48 52 48 47Z" fill="#E91E63"/>
 </svg> 

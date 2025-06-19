@@ -818,121 +818,17 @@ const ChatPage: React.FC = () => {
                                 controls 
                                 preload="none"
                                 playsInline
-                                muted={false}
                                 style={{
                                   maxWidth: '100%',
                                   height: 'auto',
-                                  borderRadius: '10px',
-                                  cursor: 'pointer'
+                                  borderRadius: '8px'
                                 }}
-                                onLoadedMetadata={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  video.volume = 1.0;
-                                }}
-                                onClick={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  
-                                  // Melhorar qualidade visual com animação suave
-                                  video.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-                                  video.style.filter = 'contrast(1.1) saturate(1.08) brightness(1.03)';
-                                  video.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.4)';
-                                  video.style.transform = 'scale(1.02) translateZ(0)';
-                                  
-                                  handleViewTemporaryMessage(msg.id);
-                                  
-                                  // Se é temporário, iniciar reprodução fluida e exclusão
-                                  if (msg.is_temporary) {
-                                    // Reprodução mais fluida e otimizada
-                                    video.playbackRate = 1.0;
-                                    video.volume = 0.8;
-                                    video.currentTime = 0; // Começar do início
-                                    
-                                    const playPromise = video.play();
-                                    if (playPromise !== undefined) {
-                                      playPromise.catch(error => {
-                                        console.log('Erro ao reproduzir vídeo:', error);
-                                      });
-                                    }
-                                    
-                                    // Indicador visual de tempo restante
-                                    const container = video.closest('.video-container') as HTMLElement;
-                                    if (container) {
-                                      // Remover barra de progresso anterior se existir
-                                      const existingBar = container.querySelector('.countdown-bar');
-                                      if (existingBar) existingBar.remove();
-                                      
-                                      // Adicionar barra de progresso
-                                      const progressBar = document.createElement('div');
-                                      progressBar.className = 'countdown-bar';
-                                      progressBar.style.cssText = `
-                                        position: absolute;
-                                        bottom: 0;
-                                        left: 0;
-                                        height: 4px;
-                                        background: linear-gradient(90deg, #ff4081, #f44336);
-                                        width: 100%;
-                                        border-radius: 0 0 10px 10px;
-                                        transform-origin: left;
-                                        animation: countdown 10s linear forwards;
-                                        z-index: 10;
-                                      `;
-                                      
-                                      // Adicionar keyframe para animação
-                                      if (!document.querySelector('#countdown-keyframe')) {
-                                        const style = document.createElement('style');
-                                        style.id = 'countdown-keyframe';
-                                        style.textContent = `
-                                          @keyframes countdown {
-                                            from { transform: scaleX(1); opacity: 0.9; }
-                                            to { transform: scaleX(0); opacity: 0.5; }
-                                          }
-                                        `;
-                                        document.head.appendChild(style);
-                                      }
-                                      
-                                      container.style.position = 'relative';
-                                      container.appendChild(progressBar);
-                                    }
-                                    
-                                    // Configurar exclusão automática após 10 segundos
-                                    setTimeout(() => {
-                                      if (container) {
-                                        container.style.transition = 'all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                                        container.style.opacity = '0';
-                                        container.style.transform = 'scale(0.85) translateY(-20px) rotateX(5deg)';
-                                        container.style.filter = 'blur(3px)';
-                                        
-                                        setTimeout(() => {
-                                          container.style.display = 'none';
-                                        }, 1000);
-                                      }
-                                    }, 10000); // 10 segundos
-                                  }
-                                }}
+                                src={msg.content}
                                 onPlay={(e) => {
                                   handlePlayPause(msg.id, e.target as HTMLVideoElement);
                                 }}
-                                onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
-                                onLoadStart={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  video.style.opacity = '0.7';
-                                }}
-                                onCanPlay={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  video.style.opacity = '1';
-                                }}
-                                onEnded={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  if (msg.is_temporary) {
-                                    const container = video.closest('.video-container') as HTMLElement;
-                                    if (container) {
-                                      container.style.opacity = '0.5';
-                                      container.style.transition = 'opacity 0.5s ease';
-                                      setTimeout(() => {
-                                        container.style.display = 'none';
-                                      }, 500);
-                                    }
-                                  }
+                                onPause={(e) => {
+                                  handlePlayPause(msg.id, e.target as HTMLVideoElement);
                                 }}
                               >
                                 <source src={msg.content} type="video/webm" />
@@ -964,19 +860,24 @@ const ChatPage: React.FC = () => {
                                 preload="none"
                                 style={{
                                   width: '100%',
-                                  height: '40px'
+                                  height: '35px'
                                 }}
                                 src={msg.content}
-                                onClick={() => handleViewTemporaryMessage(msg.id)}
                                 onLoadedMetadata={(e) => {
                                   const audio = e.target as HTMLAudioElement;
                                   audio.volume = 1.0;
+                                  audio.playbackRate = 1.0;
                                 }}
                                 onPlay={(e) => {
-                                  handlePlayPause(msg.id, e.target as HTMLAudioElement);
+                                  const audio = e.target as HTMLAudioElement;
+                                  audio.playbackRate = 1.0;
+                                  handlePlayPause(msg.id, audio);
                                 }}
                                 onPause={(e) => {
                                   handlePlayPause(msg.id, e.target as HTMLAudioElement);
+                                }}
+                                onLoadStart={() => {
+                                  // Carregamento rápido
                                 }}
                               >
                                 <source src={msg.content} type="audio/webm" />
