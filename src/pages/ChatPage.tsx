@@ -728,6 +728,70 @@ const ChatPage: React.FC = () => {
     navigate('/premium');
   };
 
+  // Funções para buscar dados dos usuários (simulado - em produção viria do banco)
+  const getUserPhotos = (userName: string): string[] => {
+    // Dados simulados para demonstração - apenas usuários premium têm fotos
+    const userPhotosData: { [key: string]: string[] } = {
+      'rodrigo': [
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
+      ]
+    };
+    
+    return userPhotosData[userName.toLowerCase()] || [];
+  };
+
+  const getUserBio = (userName: string): string => {
+    const userBiosData: { [key: string]: string } = {
+      'rodrigo': 'Desenvolvedor apaixonado por tecnologia e inovação. Gosto de criar soluções que impactam positivamente a vida das pessoas.',
+      'joana': 'Designer criativa com foco em UX/UI. Amo transformar ideias em experiências digitais incríveis.',
+      'carlos': 'Engenheiro sustentável, amante da natureza e trilhas. Busco equilibrio entre tecnologia e meio ambiente.'
+    };
+    
+    return userBiosData[userName.toLowerCase()] || 'Usuário da plataforma 100matchs.';
+  };
+
+  const getUserAge = (userName: string): number => {
+    const userAgesData: { [key: string]: number } = {
+      'rodrigo': 28,
+      'joana': 25,
+      'carlos': 30
+    };
+    
+    return userAgesData[userName.toLowerCase()] || 25;
+  };
+
+  const getUserLocation = (userName: string): string => {
+    const userLocationsData: { [key: string]: string } = {
+      'rodrigo': 'São Paulo, SP',
+      'joana': 'Rio de Janeiro, RJ',
+      'carlos': 'Belo Horizonte, MG'
+    };
+    
+    return userLocationsData[userName.toLowerCase()] || 'Brasil';
+  };
+
+  const getUserProfession = (userName: string): string => {
+    const userProfessionsData: { [key: string]: string } = {
+      'rodrigo': 'Desenvolvedor Full Stack',
+      'joana': 'UX/UI Designer',
+      'carlos': 'Engenheiro Ambiental'
+    };
+    
+    return userProfessionsData[userName.toLowerCase()] || 'Profissional';
+  };
+
+  const getUserInterests = (userName: string): string[] => {
+    const userInterestsData: { [key: string]: string[] } = {
+      'rodrigo': ['Tecnologia', 'Programação', 'Inovação', 'Startups'],
+      'joana': ['Design', 'Arte', 'UX/UI', 'Criatividade'],
+      'carlos': ['Sustentabilidade', 'Natureza', 'Trilhas', 'Engenharia']
+    };
+    
+    return userInterestsData[userName.toLowerCase()] || ['Conversas', 'Amizades'];
+  };
+
   const handleStartGifRecording = async () => {
     try {
       setIsRecording(true);
@@ -906,6 +970,13 @@ const ChatPage: React.FC = () => {
                           nomeUsuario={msg.user_name}
                           isUserPremium={msg.is_premium || false}
                           isViewerPremium={isPremiumUser()}
+                          userPhotos={getUserPhotos(msg.user_name)}
+                          userBio={getUserBio(msg.user_name)}
+                          userAge={getUserAge(msg.user_name)}
+                          userLocation={getUserLocation(msg.user_name)}
+                          userProfession={getUserProfession(msg.user_name)}
+                          userInterests={getUserInterests(msg.user_name)}
+                          mainPhotoIndex={0}
                         />
                       </span>
                       <span className="time">{formatTime(msg.created_at)}</span>
