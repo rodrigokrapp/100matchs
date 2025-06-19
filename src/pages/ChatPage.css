@@ -168,7 +168,7 @@
 /* Messages Container */
 .messages-container {
   flex: 1;
-  background: rgba(255, 255, 255, 0.15);
+  background: #8B5CF6;
   border-radius: 25px;
   margin-bottom: 20px;
   overflow: hidden;
