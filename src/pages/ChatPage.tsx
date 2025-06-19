@@ -304,81 +304,35 @@ const ChatPage: React.FC = () => {
       setRecordingTime(0);
       setShowMediaOptions(false);
 
-      // Obter stream da câmera
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { 
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user'
-        },
-        audio: true
-      });
-
-      // Mostrar preview da câmera durante gravação
-      if (videoPreviewRef.current) {
-        videoPreviewRef.current.srcObject = stream;
-        videoPreviewRef.current.play();
-      }
-
       // Iniciar contador de tempo
-      let timeCount = 0;
       recordingIntervalRef.current = setInterval(() => {
-        timeCount++;
-        setRecordingTime(timeCount);
-        
-        // Parar automaticamente aos 10 segundos
-        if (timeCount >= 10) {
-          clearInterval(recordingIntervalRef.current!);
-          finalizarGravacao();
-        }
+        setRecordingTime(prev => {
+          const newTime = prev + 1;
+          // Parar automaticamente aos 10 segundos
+          if (newTime >= 10) {
+            handleStopRecording();
+          }
+          return newTime;
+        });
       }, 1000);
 
-      // Função para finalizar gravação
-      const finalizarGravacao = async () => {
-        try {
-          MediaService.stopRecording();
-          
-          // Aguardar um pouco para garantir que o blob seja criado
-          setTimeout(async () => {
-            const videoBlob = await MediaService.getLastRecordedBlob();
-            
-            // Parar stream
-            stream.getTracks().forEach(track => track.stop());
-            
-            // Reset states
-            setIsRecording(false);
-            setRecordingType(null);
-            setRecordingTime(0);
-            
-            if (videoBlob && videoBlob.size > 0) {
-              const url = MediaService.createTempUrl(videoBlob);
-              setPreviewMedia({type: 'video', url, blob: videoBlob});
-              setIsPreviewMode(true);
-              console.log('✅ Vídeo capturado:', videoBlob.size, 'bytes');
-            } else {
-              console.error('❌ Blob inválido');
-              alert('Erro ao processar vídeo. Tente novamente.');
-            }
-          }, 500);
-          
-        } catch (error) {
-          console.error('❌ Erro ao finalizar:', error);
-          alert('Erro ao processar vídeo. Tente novamente.');
-        }
-      };
-
-      // Iniciar gravação no MediaService
-      MediaService.startVideoRecording(stream);
+      // Gravar vídeo
+      const videoBlob = await MediaService.captureVideo(10);
+      
+      if (videoBlob) {
+        const url = MediaService.createTempUrl(videoBlob);
+        setPreviewMedia({type: 'video', url, blob: videoBlob});
+        setIsPreviewMode(true);
+        console.log('✅ Vídeo gravado com sucesso');
+      }
       
     } catch (error) {
-      console.error('❌ Erro ao capturar vídeo:', error);
+      console.error('❌ Erro ao gravar vídeo:', error);
       alert('Erro ao acessar câmera. Verifique as permissões do navegador.');
       setIsRecording(false);
       setRecordingType(null);
-      setRecordingTime(0);
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
-        recordingIntervalRef.current = null;
       }
     }
   };
