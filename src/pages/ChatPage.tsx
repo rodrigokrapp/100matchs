@@ -859,45 +859,10 @@ const ChatPage: React.FC = () => {
                               <span>Vídeo expirado</span>
                             </div>
                           ) : (
-                            <div className="video-container">
-                              <video 
-                                controls 
-                                preload="none"
-                                playsInline
-                                style={{
-                                  maxWidth: '100%',
-                                  height: 'auto',
-                                  borderRadius: '8px'
-                                }}
-                                src={msg.content}
-                                onLoadedMetadata={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  video.volume = 1.0;
-                                  video.playbackRate = 1.0;
-                                }}
-                                onPlay={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  video.playbackRate = 1.0;
-                                  handlePlayPause(msg.id, video);
-                                }}
-                                onPause={(e) => {
-                                  handlePlayPause(msg.id, e.target as HTMLVideoElement);
-                                }}
-                                onLoadStart={() => {
-                                  // Carregamento rápido
-                                }}
-                              >
-                                <source src={msg.content} type="video/webm" />
-                                <source src={msg.content} type="video/mp4" />
-                                Seu navegador não suporta vídeo.
-                              </video>
-                              {msg.is_temporary && (
-                                <div className="video-temp-indicator">
-                                  <FiClock />
-                                  <span>Clique para assistir - Desaparece em 10s</span>
-                                </div>
-                              )}
-                            </div>
+                            <VideoWithThumbnail
+                              videoUrl={msg.content}
+                              messageId={msg.id}
+                            />
                           )}
                         </div>
                       )}
@@ -1183,6 +1148,88 @@ const ChatPage: React.FC = () => {
           </button>
         </div>
       </div>
+    </div>
+  );
+};
+
+interface VideoWithThumbnailProps {
+  videoUrl: string;
+  messageId: string;
+}
+
+const VideoWithThumbnail: React.FC<VideoWithThumbnailProps> = ({ videoUrl, messageId }) => {
+  const [showVideo, setShowVideo] = useState(false);
+  const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Gera a thumbnail do vídeo ao montar
+  React.useEffect(() => {
+    if (!showVideo && !thumbnail) {
+      const video = document.createElement('video');
+      video.src = videoUrl;
+      video.crossOrigin = 'anonymous';
+      video.preload = 'metadata';
+      video.muted = true;
+      video.currentTime = 0.1;
+      video.addEventListener('loadeddata', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          setThumbnail(canvas.toDataURL('image/png'));
+        }
+      });
+    }
+  }, [videoUrl, showVideo, thumbnail]);
+
+  return (
+    <div className="video-container">
+      {!showVideo ? (
+        <div style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }} onClick={() => setShowVideo(true)}>
+          {thumbnail ? (
+            <img
+              src={thumbnail}
+              alt="Prévia do vídeo"
+              style={{ maxWidth: '100%', borderRadius: '8px', display: 'block' }}
+            />
+          ) : (
+            <div style={{ width: 200, height: 120, background: '#eee', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span>Ver vídeo</span>
+            </div>
+          )}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'rgba(0,0,0,0.5)',
+            borderRadius: '50%',
+            width: 48,
+            height: 48,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      ) : (
+        <video
+          ref={videoRef}
+          controls
+          preload="none"
+          playsInline
+          style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+          src={videoUrl}
+          autoPlay
+        >
+          <source src={videoUrl} type="video/webm" />
+          <source src={videoUrl} type="video/mp4" />
+          Seu navegador não suporta vídeo.
+        </video>
+      )}
     </div>
   );
 };
