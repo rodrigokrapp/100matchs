@@ -131,7 +131,7 @@ const InicioPage: React.FC = () => {
           {/* Formulário Entrar Usuário Premium */}
           <div className="entrada-card card premium-login-card">
             <h2>Entrar Usuário Premium</h2>
-            <p>Acesso completo e ilimitado (vídeo, áudio, imagem, texto e emoticons)</p>
+            <p>Acesso completo e ilimitado (áudio, imagem, texto e emoticons)</p>
             
             <div className="input-group">
               <input
@@ -193,11 +193,7 @@ const InicioPage: React.FC = () => {
         <div className="features-section">
           <h2>Funcionalidades do Chat</h2>
           <div className="features-grid grid grid-4">
-            <div className="feature-card card">
-              <div className="feature-icon">🎥</div>
-              <h3>Vídeo</h3>
-              <p>Grave vídeos de até 10 segundos (Premium)</p>
-            </div>
+
             <div className="feature-card card">
               <div className="feature-icon">🎤</div>
               <h3>Áudio</h3>
