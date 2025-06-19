@@ -809,11 +809,9 @@ const ChatPage: React.FC = () => {
                               <div className="simple-media-player">
                                 <video 
                                   key={msg.id}
-                                  preload="metadata"
+                                  preload="auto"
                                   playsInline
-                                  muted={false}
                                   controls
-                                  controlsList="nodownload"
                                   style={{
                                     width: '100%',
                                     maxWidth: '300px',
@@ -822,21 +820,9 @@ const ChatPage: React.FC = () => {
                                     display: 'block'
                                   }}
                                   src={msg.content}
-                                  onPlay={() => {
-                                    console.log('▶️ Vídeo iniciado:', msg.id);
-                                  }}
                                   onEnded={() => {
                                     console.log('✅ Vídeo finalizado, marcando como visualizado:', msg.id);
                                     setVideosVisualizados(prev => new Set([...prev, msg.id]));
-                                  }}
-                                  onLoadedData={() => {
-                                    console.log('🎬 Vídeo carregado:', msg.content);
-                                  }}
-                                  onError={(e) => {
-                                    console.error('❌ Erro no vídeo:', e);
-                                  }}
-                                  onCanPlay={() => {
-                                    console.log('✅ Vídeo pronto para reproduzir');
                                   }}
                                 >
                                   <source src={msg.content} type="video/webm" />
