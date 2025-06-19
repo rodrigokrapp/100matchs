@@ -446,24 +446,122 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  // NOVA FUNCIONALIDADE: Selecionar imagem com preview
+  // NOVA FUNCIONALIDADE: Selecionar imagem com galeria OU câmera
   const handleSelectImage = async () => {
     try {
-      console.log('📷 Selecionando imagem...');
+      console.log('📷 Opções de imagem: galeria ou câmera...');
       setShowMediaOptions(false);
       
-      const file = await MediaService.selectImage();
-      if (file) {
-        console.log('✅ Imagem selecionada:', file.name);
-        const url = MediaService.createTempUrl(file);
-        setPreviewMedia({type: 'image', url, blob: file});
-        setIsPreviewMode(true);
-      } else {
-        console.log('❌ Nenhuma imagem selecionada');
+      // Criar input que aceita tanto câmera quanto galeria
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      
+      // No mobile, mostrar ambas as opções - galeria E câmera
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        input.capture = 'environment'; // Câmera traseira por padrão no mobile
+        input.setAttribute('capture', 'camera'); // Força câmera no mobile
       }
+      
+      // Adicionar multiple para permitir diferentes fontes
+      input.multiple = false;
+      
+      input.onchange = async (event) => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (file) {
+          console.log('✅ Imagem selecionada:', file.name);
+          const url = MediaService.createTempUrl(file);
+          setPreviewMedia({type: 'image', url, blob: file});
+          setIsPreviewMode(true);
+        }
+      };
+      
+      // No desktop, dar opção de escolha
+      if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        const choice = confirm('📷 CÂMERA ou GALERIA?\n\nOK = Tirar foto com câmera\nCancelar = Escolher da galeria');
+        
+        if (choice) {
+          // Tentar usar câmera diretamente
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+              video: { facingMode: 'user' }, // Câmera frontal no desktop
+              audio: false 
+            });
+            
+            // Criar preview da câmera
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.autoplay = true;
+            video.playsInline = true;
+            video.style.position = 'fixed';
+            video.style.top = '50%';
+            video.style.left = '50%';
+            video.style.transform = 'translate(-50%, -50%)';
+            video.style.zIndex = '9999';
+            video.style.border = '3px solid #be185d';
+            video.style.borderRadius = '10px';
+            video.style.width = '300px';
+            video.style.height = '225px';
+            
+            // Criar botão para capturar
+            const captureBtn = document.createElement('button');
+            captureBtn.textContent = '📸 CAPTURAR FOTO';
+            captureBtn.style.position = 'fixed';
+            captureBtn.style.top = '70%';
+            captureBtn.style.left = '50%';
+            captureBtn.style.transform = 'translateX(-50%)';
+            captureBtn.style.zIndex = '10000';
+            captureBtn.style.padding = '10px 20px';
+            captureBtn.style.fontSize = '16px';
+            captureBtn.style.backgroundColor = '#be185d';
+            captureBtn.style.color = 'white';
+            captureBtn.style.border = 'none';
+            captureBtn.style.borderRadius = '5px';
+            captureBtn.style.cursor = 'pointer';
+            
+            document.body.appendChild(video);
+            document.body.appendChild(captureBtn);
+            
+            captureBtn.onclick = () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              const ctx = canvas.getContext('2d');
+              
+              if (ctx) {
+                ctx.drawImage(video, 0, 0);
+                
+                canvas.toBlob((blob) => {
+                  if (blob) {
+                    const url = URL.createObjectURL(blob);
+                    setPreviewMedia({type: 'image', url, blob});
+                    setIsPreviewMode(true);
+                    console.log('✅ Foto capturada com câmera');
+                  }
+                }, 'image/jpeg', 0.9);
+              }
+              
+              // Limpar
+              stream.getTracks().forEach(track => track.stop());
+              document.body.removeChild(video);
+              document.body.removeChild(captureBtn);
+            };
+            
+            return; // Não executar input.click()
+            
+          } catch (error) {
+            console.error('❌ Erro ao acessar câmera:', error);
+            alert('Erro ao acessar câmera. Abrindo galeria...');
+          }
+        }
+      }
+      
+      // Abrir seletor padrão (galeria ou câmera no mobile)
+      input.click();
+      
     } catch (error) {
       console.error('❌ Erro ao selecionar imagem:', error);
-      alert('Erro ao selecionar imagem. Tente novamente.');
+      alert('Erro ao acessar imagem. Tente novamente.');
     }
   };
 
