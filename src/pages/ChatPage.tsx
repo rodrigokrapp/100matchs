@@ -600,23 +600,16 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="chat-page" style={{
-      background: 'linear-gradient(135deg, #6a0572 0%, #ab83a1 30%, #ffeaa7 70%, #ffffff 100%)'
-    }}>
+    <div className="chat-page">
       <Header />
       
       <div className="chat-container">
-        <div className="chat-header" style={{
-          borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
-          <button className="back-button" onClick={handleVoltar} style={{
-            background: 'rgba(190, 24, 93, 0.2)',
-            border: '1px solid rgba(190, 24, 93, 0.3)'
-          }}>
+        <div className="chat-header">
+          <button className="back-button" onClick={handleVoltar}>
             <FiArrowLeft />
           </button>
           <div className="room-info">
-            <h2 style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)' }}>{nomeSala}</h2>
+            <h2>{nomeSala}</h2>
             <div className="online-users">
               <FiUsers />
               <span>{usuariosOnline} online</span>
@@ -624,10 +617,7 @@ const ChatPage: React.FC = () => {
             </div>
           </div>
           {!usuario?.premium && (
-            <button className="upgrade-button" onClick={handleUpgradePremium} style={{
-              background: 'linear-gradient(45deg, #be185d, #831843)',
-              boxShadow: '0 4px 15px rgba(190, 24, 93, 0.3)'
-            }}>
+            <button className="upgrade-button" onClick={handleUpgradePremium}>
               <FiStar />
               Premium
             </button>
@@ -635,75 +625,28 @@ const ChatPage: React.FC = () => {
         </div>
 
         {/* Hero Banner Section */}
-        <div className="hero-banner-section" style={{
-          width: '100%',
-          height: '300px',
-          background: 'linear-gradient(135deg, #6a0572 0%, #ab83a1 50%, #ffeaa7 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '20px',
-          borderRadius: '0 0 25px 25px',
-          overflow: 'hidden',
-          position: 'relative'
-        }}>
+        <div className="hero-banner-section">
           <img 
             src="/hero-banner.jpg" 
             alt="Banner 100 Matchs"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center'
-            }}
             onError={(e) => {
               // Se a imagem não carregar, mostra um fundo com as cores da foto original
               (e.target as HTMLImageElement).style.display = 'none';
             }}
           />
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(135deg, rgba(106, 5, 114, 0.7) 0%, rgba(171, 131, 161, 0.5) 50%, rgba(255, 234, 167, 0.3) 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <div style={{
-              textAlign: 'center',
-              color: 'white'
-            }}>
-              <h1 style={{
-                fontSize: '3rem',
-                fontWeight: '900',
-                margin: '0',
-                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)',
-                background: 'linear-gradient(135deg, #ffeaa7 0%, #fd79a8 50%, #6c5ce7 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>
+          <div className="hero-overlay">
+            <div className="hero-content">
+              <h1>
                 CONECTE-SE AGORA!
               </h1>
-              <p style={{
-                fontSize: '1.2rem',
-                margin: '10px 0 0 0',
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.7)'
-              }}>
+              <p>
                 Converse grátis com pessoas incríveis
               </p>
             </div>
           </div>
         </div>
 
-        <div className="messages-container" style={{
-          background: 'rgba(255, 255, 255, 0.15)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
+        <div className="messages-container">
           {mensagens.length === 0 ? (
             <div className="empty-chat">
               <div className="welcome-message">
@@ -781,14 +724,22 @@ const ChatPage: React.FC = () => {
                             <div className="video-container">
                               <video 
                                 controls 
-                                preload="auto"
+                                preload="metadata"
                                 playsInline
                                 muted={false}
+                                style={{
+                                  willChange: 'transform',
+                                  backfaceVisibility: 'hidden',
+                                  transform: 'translateZ(0)',
+                                  WebkitTransform: 'translateZ(0)'
+                                }}
                                 onClick={() => {
                                   handleViewTemporaryMessage(msg.id);
                                 }}
-                                onPlay={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
-                                onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
+                                onLoadStart={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  video.playbackRate = 1.0;
+                                }}
                                 onLoadedMetadata={(e) => {
                                   const video = e.target as HTMLVideoElement;
                                   video.playbackRate = 1.0;
@@ -808,22 +759,26 @@ const ChatPage: React.FC = () => {
                                     video.playbackRate = 1.0;
                                   }
                                 }}
+                                onPlay={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  video.playbackRate = 1.0;
+                                  handlePlayPause(msg.id, video);
+                                }}
+                                onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
                                 onEnded={(e) => {
-                                  // Quando o vídeo termina, marca como visualizado e some
-                                  const videoElement = e.target as HTMLVideoElement;
-                                  const videoContainer = videoElement.closest('.video-message') as HTMLElement;
-                                  if (videoContainer) {
-                                    videoContainer.style.opacity = '0';
-                                    videoContainer.style.transition = 'opacity 0.5s ease';
+                                  const video = e.target as HTMLVideoElement;
+                                  const container = video.closest('.video-container') as HTMLElement;
+                                  if (container && msg.is_temporary) {
+                                    container.style.opacity = '0.5';
+                                    container.style.transition = 'opacity 0.5s ease';
                                     setTimeout(() => {
-                                      videoContainer.style.display = 'none';
+                                      container.style.display = 'none';
                                     }, 500);
                                   }
                                 }}
-                                data-msg-id={msg.id}
                               >
-                                <source src={msg.content} type="video/webm" />
                                 <source src={msg.content} type="video/mp4" />
+                                <source src={msg.content} type="video/webm" />
                                 Seu navegador não suporta vídeo.
                               </video>
                             </div>
@@ -840,44 +795,45 @@ const ChatPage: React.FC = () => {
                             </div>
                           ) : (
                             <div className="audio-container">
-                              <button 
-                                className="audio-play-button"
-                                onClick={(e) => {
-                                  const audio = e.currentTarget.nextElementSibling as HTMLAudioElement;
-                                  handlePlayPause(msg.id, audio);
-                                  handleViewTemporaryMessage(msg.id);
-                                }}
-                              >
-                                {isPlaying.get(msg.id) ? <FiPause /> : <FiPlay />}
-                              </button>
                               <audio 
+                                controls 
                                 preload="metadata"
-                                ref={(el) => {
-                                  if (el) {
-                                    el.onended = () => {
-                                      const newState = new Map(isPlaying);
-                                      newState.set(msg.id, false);
-                                      setIsPlaying(newState);
-                                    };
-                                    el.onloadedmetadata = () => {
-                                      el.playbackRate = 1.0;
-                                      el.defaultPlaybackRate = 1.0;
-                                    };
-                                    el.ontimeupdate = () => {
-                                      if (el.playbackRate !== 1.0) {
-                                        el.playbackRate = 1.0;
-                                      }
-                                    };
+                                style={{
+                                  willChange: 'transform',
+                                  backfaceVisibility: 'hidden'
+                                }}
+                                onClick={() => handleViewTemporaryMessage(msg.id)}
+                                onLoadedMetadata={(e) => {
+                                  const audio = e.target as HTMLAudioElement;
+                                  audio.playbackRate = 1.0;
+                                  audio.defaultPlaybackRate = 1.0;
+                                }}
+                                onLoadedData={(e) => {
+                                  const audio = e.target as HTMLAudioElement;
+                                  audio.playbackRate = 1.0;
+                                }}
+                                onCanPlay={(e) => {
+                                  const audio = e.target as HTMLAudioElement;
+                                  audio.playbackRate = 1.0;
+                                }}
+                                onTimeUpdate={(e) => {
+                                  const audio = e.target as HTMLAudioElement;
+                                  if (audio.playbackRate !== 1.0) {
+                                    audio.playbackRate = 1.0;
                                   }
                                 }}
+                                onPlay={(e) => {
+                                  const audio = e.target as HTMLAudioElement;
+                                  audio.playbackRate = 1.0;
+                                  handlePlayPause(msg.id, audio);
+                                }}
+                                onPause={(e) => handlePlayPause(msg.id, e.target as HTMLAudioElement)}
                               >
+                                <source src={msg.content} type="audio/mp4" />
                                 <source src={msg.content} type="audio/webm" />
-                                <source src={msg.content} type="audio/mp3" />
+                                <source src={msg.content} type="audio/wav" />
                                 Seu navegador não suporta áudio.
                               </audio>
-                              <div className="audio-waveform">
-                                <span>🎵 Mensagem de áudio</span>
-                              </div>
                             </div>
                           )}
                         </div>
@@ -891,41 +847,93 @@ const ChatPage: React.FC = () => {
           )}
         </div>
 
-        {/* Preview de mídia */}
+        {/* Preview Modal */}
         {isPreviewMode && previewMedia && (
           <div className="media-preview-overlay">
             <div className="media-preview-container">
               <div className="preview-header">
-                <h3>Visualizar antes de enviar</h3>
+                <h3>Prévia da {previewMedia.type === 'video' ? 'Gravação' : previewMedia.type === 'audio' ? 'Gravação de Áudio' : 'Imagem'}</h3>
                 <button onClick={handleCancelPreview}>✕</button>
               </div>
               
               <div className="preview-content">
-                {previewMedia.type === 'image' && (
-                  <img src={previewMedia.url} alt="Preview" />
-                )}
-                
                 {previewMedia.type === 'video' && (
-                  <video ref={videoPreviewRef} controls autoPlay muted playsInline preload="auto">
-                    <source src={previewMedia.url} type="video/webm" />
-                  </video>
+                  <video 
+                    controls 
+                    autoPlay 
+                    muted 
+                    preload="auto"
+                    playsInline
+                    style={{
+                      willChange: 'transform',
+                      backfaceVisibility: 'hidden',
+                      transform: 'translateZ(0)'
+                    }}
+                    src={previewMedia.url}
+                    onLoadedMetadata={(e) => {
+                      const video = e.target as HTMLVideoElement;
+                      video.playbackRate = 1.0;
+                      video.defaultPlaybackRate = 1.0;
+                    }}
+                    onLoadedData={(e) => {
+                      const video = e.target as HTMLVideoElement;
+                      video.playbackRate = 1.0;
+                    }}
+                    onCanPlay={(e) => {
+                      const video = e.target as HTMLVideoElement;
+                      video.playbackRate = 1.0;
+                    }}
+                    onTimeUpdate={(e) => {
+                      const video = e.target as HTMLVideoElement;
+                      if (video.playbackRate !== 1.0) {
+                        video.playbackRate = 1.0;
+                      }
+                    }}
+                  />
                 )}
-                
                 {previewMedia.type === 'audio' && (
                   <div className="audio-preview">
-                    <FiMic />
-                    <audio ref={audioPreviewRef} controls>
-                      <source src={previewMedia.url} type="audio/webm" />
-                    </audio>
+                    <audio 
+                      controls 
+                      autoPlay 
+                      preload="auto"
+                      style={{
+                        willChange: 'transform',
+                        backfaceVisibility: 'hidden'
+                      }}
+                      src={previewMedia.url}
+                      onLoadedMetadata={(e) => {
+                        const audio = e.target as HTMLAudioElement;
+                        audio.playbackRate = 1.0;
+                        audio.defaultPlaybackRate = 1.0;
+                      }}
+                      onLoadedData={(e) => {
+                        const audio = e.target as HTMLAudioElement;
+                        audio.playbackRate = 1.0;
+                      }}
+                      onCanPlay={(e) => {
+                        const audio = e.target as HTMLAudioElement;
+                        audio.playbackRate = 1.0;
+                      }}
+                      onTimeUpdate={(e) => {
+                        const audio = e.target as HTMLAudioElement;
+                        if (audio.playbackRate !== 1.0) {
+                          audio.playbackRate = 1.0;
+                        }
+                      }}
+                    />
                   </div>
+                )}
+                {previewMedia.type === 'image' && (
+                  <img src={previewMedia.url} alt="Preview" />
                 )}
               </div>
               
               <div className="preview-actions">
-                <button onClick={handleCancelPreview} className="cancel-button">
+                <button className="cancel-button" onClick={handleCancelPreview}>
                   Cancelar
                 </button>
-                <button onClick={handleSendMedia} className="send-button">
+                <button className="send-button" onClick={handleSendMedia}>
                   <FiSend />
                   Enviar
                 </button>
@@ -934,264 +942,154 @@ const ChatPage: React.FC = () => {
           </div>
         )}
 
-        {/* Preview da câmera durante gravação */}
+        {/* Recording Preview */}
         {isRecording && recordingType === 'video' && (
           <div className="video-recording-preview">
             <div className="recording-preview-container">
-              <video ref={videoPreviewRef} autoPlay muted playsInline className="camera-preview" />
+              <video 
+                ref={videoPreviewRef} 
+                className="camera-preview" 
+                autoPlay 
+                muted 
+                playsInline
+                style={{
+                  willChange: 'transform',
+                  backfaceVisibility: 'hidden',
+                  transform: 'translateZ(0)'
+                }}
+              />
               <div className="recording-overlay">
                 <div className="recording-info">
                   <div className="recording-dot"></div>
-                  <span>Gravando: {formatRecordingTime(recordingTime)}</span>
+                  <span>Gravando... {formatRecordingTime(recordingTime)}</span>
                 </div>
-                <button onClick={handleStopRecording} className="stop-recording-btn">
-                  Parar Gravação
+                <button 
+                  className="stop-recording-btn"
+                  onClick={handleStopRecording}
+                >
+                  <FiPause />
+                  Parar ({10 - recordingTime}s)
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Indicador de gravação */}
-        {isRecording && (
+        {/* Audio Recording Indicator */}
+        {isRecording && recordingType === 'audio' && (
           <div className="recording-indicator">
             <div className="recording-content">
               <div className="recording-dot"></div>
-              <span>
-                {recordingType === 'video' ? 'Gravando vídeo' : 'Gravando áudio'}
-              </span>
               <span className="recording-time">
-                {formatRecordingTime(recordingTime)}
+                Gravando áudio... {formatRecordingTime(recordingTime)}
               </span>
-              <button onClick={handleStopRecording} className="stop-button">
-                Parar
+              <button className="stop-button" onClick={handleStopRecording}>
+                <FiMicOff />
+                Parar ({10 - recordingTime}s)
               </button>
             </div>
           </div>
         )}
 
-        <div className="chat-input-area">
-          {/* Painel de emojis */}
-          {showEmojis && (
-            <div className="emoji-panel" style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              border: '1px solid rgba(190, 24, 93, 0.2)',
-              backdropFilter: 'blur(15px)'
-            }}>
-              <div className="emoji-categories">
-                {Object.keys(EMOJI_CATEGORIES).map(category => (
-                  <button
-                    key={category}
-                    className={selectedEmojiCategory === category ? 'active' : ''}
-                    onClick={() => setSelectedEmojiCategory(category)}
-                    style={{
-                      background: selectedEmojiCategory === category 
-                        ? 'linear-gradient(135deg, #be185d, #831843)' 
-                        : 'rgba(190, 24, 93, 0.1)',
-                      border: '1px solid rgba(190, 24, 93, 0.3)',
-                      color: selectedEmojiCategory === category ? 'white' : '#831843'
-                    }}
-                  >
-                    {category === 'smileys' && '😀'}
-                    {category === 'hearts' && '❤️'}
-                    {category === 'gestures' && '👋'}
-                    {category === 'activities' && '🎉'}
-                    {category === 'nature' && '🌈'}
-                  </button>
-                ))}
-              </div>
-              <div className="emoji-grid">
-                {EMOJI_CATEGORIES[selectedEmojiCategory as keyof typeof EMOJI_CATEGORIES]?.map((emoji, index) => (
-                  <button
-                    key={index}
-                    className="emoji-button"
-                    onClick={() => handleEnviarEmoji(emoji)}
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
+        {/* Emoji Panel */}
+        {showEmojis && (
+          <div className="emoji-panel">
+            <div className="emoji-categories">
+              {Object.keys(EMOJI_CATEGORIES).map(category => (
+                <button
+                  key={category}
+                  className={selectedEmojiCategory === category ? 'active' : ''}
+                  onClick={() => setSelectedEmojiCategory(category)}
+                >
+                  {EMOJI_CATEGORIES[category as keyof typeof EMOJI_CATEGORIES][0]}
+                </button>
+              ))}
             </div>
-          )}
-
-          {/* Opções de mídia */}
-          {showMediaOptions && (
-            <div className="media-options-panel" style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              border: '1px solid rgba(30, 64, 175, 0.2)',
-              backdropFilter: 'blur(15px)'
-            }}>
-              <div className="media-options-grid" style={{
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '20px'
-              }}>
-                <button 
-                  className="media-option image-option"
-                  onClick={() => {
-                    if (usuario?.tipo === 'chat') {
-                      alert('🔒 Recurso disponível apenas para usuários Premium!\nSeja Premium para enviar fotos, vídeos e áudios.');
-                      return;
-                    }
-                    console.log('🖼️ Clicou na opção Galeria');
-                    handleSelectImage();
-                  }}
-                  disabled={usuario?.tipo === 'chat'}
-                  style={{
-                    background: usuario?.tipo === 'chat' ? '#9ca3af' : 'rgba(30, 64, 175, 0.1)',
-                    border: '1px solid rgba(30, 64, 175, 0.3)',
-                    cursor: usuario?.tipo === 'chat' ? 'not-allowed' : 'pointer',
-                    opacity: usuario?.tipo === 'chat' ? 0.5 : 1
-                  }}
+            <div className="emoji-grid">
+              {EMOJI_CATEGORIES[selectedEmojiCategory as keyof typeof EMOJI_CATEGORIES]?.map((emoji: string, index: number) => (
+                <button
+                  key={index}
+                  className="emoji-button"
+                  onClick={() => handleEnviarEmoji(emoji)}
                 >
-                  <FiImage />
-                  <span>Galeria</span>
-                  {usuario?.tipo === 'chat' && <span className="lock-icon">🔒</span>}
+                  {emoji}
                 </button>
-                
-                <button 
-                  className="media-option video-option"
-                  onClick={() => {
-                    if (usuario?.tipo === 'chat') {
-                      alert('🔒 Recurso disponível apenas para usuários Premium!\nSeja Premium para enviar fotos, vídeos e áudios.');
-                      return;
-                    }
-                    console.log('🎥 Clicou na opção Câmera');
-                    handleStartVideoRecording();
-                  }}
-                  disabled={!MediaService.isMediaSupported() || isRecording || usuario?.tipo === 'chat'}
-                  style={{
-                    background: usuario?.tipo === 'chat' ? '#9ca3af' : 'rgba(190, 24, 93, 0.1)',
-                    border: '1px solid rgba(190, 24, 93, 0.3)',
-                    cursor: usuario?.tipo === 'chat' ? 'not-allowed' : 'pointer',
-                    opacity: usuario?.tipo === 'chat' ? 0.5 : 1
-                  }}
-                >
-                  <FiVideo />
-                  <span>Câmera</span>
-                  {usuario?.tipo === 'chat' && <span className="lock-icon">🔒</span>}
-                </button>
-                
-                <button 
-                  className="media-option audio-option"
-                  onClick={() => {
-                    if (usuario?.tipo === 'chat') {
-                      alert('🔒 Recurso disponível apenas para usuários Premium!\nSeja Premium para enviar fotos, vídeos e áudios.');
-                      return;
-                    }
-                    console.log('🎤 Clicou na opção Áudio');
-                    handleStartAudioRecording();
-                  }}
-                  disabled={!MediaService.isMediaSupported() || isRecording || usuario?.tipo === 'chat'}
-                  style={{
-                    background: usuario?.tipo === 'chat' ? '#9ca3af' : 'rgba(131, 24, 67, 0.1)',
-                    border: '1px solid rgba(131, 24, 67, 0.3)',
-                    cursor: usuario?.tipo === 'chat' ? 'not-allowed' : 'pointer',
-                    opacity: usuario?.tipo === 'chat' ? 0.5 : 1
-                  }}
-                >
-                  <FiMic />
-                  <span>Áudio</span>
-                  {usuario?.tipo === 'chat' && <span className="lock-icon">🔒</span>}
-                </button>
-              </div>
-              
-              {!MediaService.isMediaSupported() && (
-                <div className="media-not-supported">
-                  <p>⚠️ Seu navegador não suporta captura de mídia</p>
-                </div>
-              )}
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          <div className="input-container" style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(15px)',
-            border: '1px solid rgba(255, 255, 255, 0.3)'
-          }}>
-            <div className="media-buttons">
+        {/* Media Options Panel */}
+        {showMediaOptions && (
+          <div className="media-options-panel">
+            <div className="media-options-grid">
               <button 
-                className={`media-toggle ${showMediaOptions ? 'active' : ''} ${usuario?.tipo === 'chat' ? 'disabled-for-chat' : ''}`}
-                onClick={() => {
-                  if (usuario?.tipo === 'chat') {
-                    alert('🔒 Recurso disponível apenas para usuários Premium!\nSeja Premium para enviar fotos, vídeos e áudios.');
-                    return;
-                  }
-                  console.log('📷 Clicou no botão de mídia');
-                  setShowMediaOptions(!showMediaOptions);
-                  setShowEmojis(false);
-                }}
-                title={usuario?.tipo === 'chat' ? 'Apenas Premium' : 'Enviar mídia'}
-                style={{
-                  background: usuario?.tipo === 'chat' 
-                    ? '#9ca3af' 
-                    : showMediaOptions 
-                      ? 'linear-gradient(135deg, #1e40af, #3b82f6)' 
-                      : 'rgba(30, 64, 175, 0.1)',
-                  border: '1px solid rgba(30, 64, 175, 0.3)',
-                  color: usuario?.tipo === 'chat' 
-                    ? '#6b7280' 
-                    : showMediaOptions ? 'white' : '#1e40af',
-                  cursor: usuario?.tipo === 'chat' ? 'not-allowed' : 'pointer'
-                }}
-                disabled={usuario?.tipo === 'chat'}
+                className="media-option" 
+                onClick={handleSelectImage}
+                disabled={!mediaPermissions.camera}
               >
                 <FiImage />
-                {usuario?.tipo === 'chat' && <span className="lock-icon">🔒</span>}
+                <span>Foto</span>
               </button>
-              
               <button 
-                className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
-                onClick={() => {
-                  console.log('😀 Clicou no botão de emoji');
-                  setShowEmojis(!showEmojis);
-                  setShowMediaOptions(false);
-                }}
-                title="Emojis"
-                style={{
-                  background: showEmojis 
-                    ? 'linear-gradient(135deg, #be185d, #831843)' 
-                    : 'rgba(190, 24, 93, 0.1)',
-                  border: '1px solid rgba(190, 24, 93, 0.3)',
-                  color: showEmojis ? 'white' : '#be185d'
-                }}
+                className="media-option" 
+                onClick={handleStartVideoRecording}
+                disabled={!mediaPermissions.camera}
               >
-                <FiSmile />
+                <FiVideo />
+                <span>Vídeo</span>
+              </button>
+              <button 
+                className="media-option" 
+                onClick={handleStartAudioRecording}
+                disabled={!mediaPermissions.microphone}
+              >
+                <FiMic />
+                <span>Áudio</span>
               </button>
             </div>
+            {(!mediaPermissions.camera || !mediaPermissions.microphone) && (
+              <div className="media-not-supported">
+                <p>Algumas funcionalidades podem não estar disponíveis.</p>
+                <p>Verifique as permissões do navegador.</p>
+              </div>
+            )}
+          </div>
+        )}
 
-            <input
-              type="text"
-              value={mensagem}
-              onChange={(e) => setMensagem(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleEnviarMensagem()}
-              placeholder="Digite sua mensagem..."
-              className="message-input"
-              disabled={isRecording}
-              style={{
-                background: 'transparent',
-                color: '#1f2937'
-              }}
-            />
-
+        {/* Input Area */}
+        <div className="input-container">
+          <div className="media-buttons">
             <button 
-              onClick={() => {
-                console.log('🖱️ Botão de envio clicado!');
-                handleEnviarMensagem();
-              }}
-              className="send-button"
-              disabled={!mensagem.trim() || isRecording}
-              style={{
-                background: !mensagem.trim() || isRecording 
-                  ? '#9ca3af' 
-                  : 'linear-gradient(135deg, #be185d, #831843)',
-                boxShadow: !mensagem.trim() || isRecording 
-                  ? 'none' 
-                  : '0 4px 15px rgba(190, 24, 93, 0.3)'
-              }}
+              className={`media-toggle ${showMediaOptions ? 'active' : ''}`}
+              onClick={() => setShowMediaOptions(!showMediaOptions)}
             >
-              <FiSend />
+              <FiCamera />
+            </button>
+            <button 
+              className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
+              onClick={() => setShowEmojis(!showEmojis)}
+            >
+              <FiSmile />
             </button>
           </div>
+          
+          <input
+            type="text"
+            value={mensagem}
+            onChange={(e) => setMensagem(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleEnviarMensagem()}
+            placeholder="Digite sua mensagem..."
+            className="message-input"
+          />
+          
+          <button 
+            className="send-button"
+            onClick={handleEnviarMensagem}
+            disabled={!mensagem.trim()}
+          >
+            <FiSend />
+          </button>
         </div>
       </div>
     </div>
