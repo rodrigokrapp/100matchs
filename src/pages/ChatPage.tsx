@@ -829,17 +829,21 @@ const ChatPage: React.FC = () => {
                             <div className="audio-container">
                               <audio 
                                 controls 
-                                preload="metadata"
+                                preload="auto"
                                 style={{
                                   width: '100%',
-                                  height: '40px',
+                                  height: '45px',
                                   borderRadius: '8px'
                                 }}
                                 src={msg.content}
                                 onLoadedMetadata={(e) => {
                                   const audio = e.target as HTMLAudioElement;
-                                  audio.volume = 0.8;
+                                  audio.volume = 0.9;
                                   audio.playbackRate = 1.0;
+                                }}
+                                onLoadedData={(e) => {
+                                  const audio = e.target as HTMLAudioElement;
+                                  audio.currentTime = 0;
                                 }}
                                 onPlay={(e) => {
                                   const audio = e.target as HTMLAudioElement;
@@ -850,21 +854,34 @@ const ChatPage: React.FC = () => {
                                   handlePlayPause(msg.id, e.target as HTMLAudioElement);
                                 }}
                                 onCanPlay={() => {
-                                  // Áudio pronto para reprodução
+                                  // Áudio pronto para reprodução fluida
+                                }}
+                                onWaiting={() => {
+                                  console.log('Aguardando buffer de áudio...');
+                                }}
+                                onPlaying={() => {
+                                  console.log('Áudio reproduzindo normalmente');
                                 }}
                                 onError={(e) => {
                                   console.error('Erro ao carregar áudio:', e);
+                                  const audio = e.target as HTMLAudioElement;
+                                  audio.load(); // Tentar recarregar
+                                }}
+                                onStalled={(e) => {
+                                  console.log('Áudio pausado por falta de dados');
+                                  const audio = e.target as HTMLAudioElement;
+                                  audio.load(); // Recarregar se travou
                                 }}
                               >
-                                <source src={msg.content} type="audio/webm" />
+                                <source src={msg.content} type="audio/webm;codecs=opus" />
                                 <source src={msg.content} type="audio/mp4" />
                                 <source src={msg.content} type="audio/wav" />
-                                <source src={msg.content} type="audio/ogg" />
+                                <source src={msg.content} type="audio/ogg;codecs=vorbis" />
                                 Seu navegador não suporta áudio.
                               </audio>
                               {msg.is_temporary && (
                                 <div className="audio-temp-indicator">
-                                  <span>�� Áudio temporário (5min)</span>
+                                  <span>🔊 Áudio temporário (5min)</span>
                                 </div>
                               )}
                             </div>
@@ -912,7 +929,7 @@ const ChatPage: React.FC = () => {
                     </div>
                     <audio 
                       controls 
-                      preload="metadata"
+                      preload="auto"
                       autoPlay={false}
                       style={{
                         width: '100%',
@@ -923,10 +940,21 @@ const ChatPage: React.FC = () => {
                       onLoadedMetadata={(e) => {
                         const audio = e.target as HTMLAudioElement;
                         audio.playbackRate = 1.0;
-                        audio.volume = 0.8;
+                        audio.volume = 0.9;
+                        audio.currentTime = 0;
                       }}
                       onCanPlay={() => {
-                        console.log('Áudio preview pronto');
+                        console.log('Áudio preview pronto para reprodução');
+                      }}
+                      onError={(e) => {
+                        console.error('Erro no preview de áudio:', e);
+                        const audio = e.target as HTMLAudioElement;
+                        audio.load();
+                      }}
+                      onStalled={(e) => {
+                        console.log('Áudio pausado por falta de dados');
+                        const audio = e.target as HTMLAudioElement;
+                        audio.load();
                       }}
                     />
                   </div>
@@ -1150,12 +1178,34 @@ const VideoWithThumbnail: React.FC<VideoWithThumbnailProps> = ({ videoUrl, messa
         <video
           ref={videoRef}
           controls
-          preload="none"
+          preload="auto"
           playsInline
           style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
           src={videoUrl}
           autoPlay
+          onLoadedMetadata={(e) => {
+            const video = e.target as HTMLVideoElement;
+            video.currentTime = 0;
+            video.playbackRate = 1.0;
+          }}
+          onCanPlay={() => {
+            console.log('Vídeo pronto para reprodução');
+          }}
+          onWaiting={() => {
+            console.log('Aguardando buffer de vídeo...');
+          }}
+          onStalled={(e) => {
+            console.log('Vídeo pausado por falta de dados');
+            const video = e.target as HTMLVideoElement;
+            video.load();
+          }}
+          onError={(e) => {
+            console.error('Erro ao carregar vídeo:', e);
+            const video = e.target as HTMLVideoElement;
+            video.load();
+          }}
         >
+          <source src={videoUrl} type="video/webm;codecs=vp9,opus" />
           <source src={videoUrl} type="video/webm" />
           <source src={videoUrl} type="video/mp4" />
           Seu navegador não suporta vídeo.

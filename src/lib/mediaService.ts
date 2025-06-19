@@ -202,12 +202,27 @@ class MediaService {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          sampleRate: 44100
+          sampleRate: 48000,
+          sampleSize: 16,
+          channelCount: 1
         }
       });
 
+      // Verificar formatos suportados e usar o melhor disponível
+      let mimeType = 'audio/webm;codecs=opus';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/webm';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'audio/mp4';
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = 'audio/wav';
+          }
+        }
+      }
+
       MediaService.mediaRecorder = new MediaRecorder(MediaService.stream, {
-        mimeType: 'audio/webm'
+        mimeType: mimeType,
+        audioBitsPerSecond: 128000
       });
       MediaService.chunks = [];
 
@@ -217,7 +232,8 @@ class MediaService {
         }
       };
 
-      MediaService.mediaRecorder.start();
+      MediaService.mediaRecorder.start(250); // Coleta dados a cada 250ms para melhor fluidez
+      console.log('🎤 Gravação iniciada com codec:', mimeType);
     } catch (error) {
       console.error('Erro ao iniciar gravação de áudio:', error);
       throw error;
@@ -234,18 +250,31 @@ class MediaService {
 
       MediaService.mediaRecorder.onstop = () => {
         try {
+          // Determinar o tipo MIME do blob baseado nos chunks
+          const firstChunkType = MediaService.chunks[0]?.type;
+          let mimeType = firstChunkType || 'audio/webm;codecs=opus';
+          
+          // Se não tiver tipo, usar padrão otimizado
+          if (!mimeType || mimeType === '') {
+            mimeType = 'audio/webm;codecs=opus';
+          }
+
           const blob = new Blob(MediaService.chunks, { 
-            type: MediaService.chunks[0]?.type || 'audio/webm' 
+            type: mimeType
           });
+          
           MediaService.lastBlob = blob;
           MediaService.cleanup();
+          console.log('🎵 Áudio processado:', blob.size, 'bytes, tipo:', mimeType);
           resolve(blob);
         } catch (error) {
+          console.error('Erro ao processar áudio:', error);
           reject(error);
         }
       };
 
       MediaService.mediaRecorder.onerror = (event: Event) => {
+        console.error('Erro na gravação:', event);
         MediaService.cleanup();
         reject(event);
       };
