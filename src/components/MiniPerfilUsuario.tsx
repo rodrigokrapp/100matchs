@@ -49,12 +49,13 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
   }
 
   const handleOpenModal = () => {
-    // Só abrir modal se o usuário visualizador for premium
-    if (!isViewerPremium) {
-      return;
+    // Permitir abrir modal se:
+    // 1. Visualizador é premium (vê tudo)
+    // 2. OU se o usuário do perfil é premium (gratuito pode ver limitado)
+    if (isViewerPremium || isUserPremium) {
+      setShowModal(true);
+      setCurrentPhotoIndex(0);
     }
-    setShowModal(true);
-    setCurrentPhotoIndex(0);
   };
 
   const handleCloseModal = () => {
@@ -62,12 +63,22 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
   };
 
   const nextPhoto = () => {
-    setCurrentPhotoIndex((prev) => (prev + 1) % userPhotos.length);
+    // Se visualizador não é premium, só pode ver 1 foto
+    const maxPhotos = isViewerPremium ? userPhotos.length : 1;
+    setCurrentPhotoIndex((prev) => (prev + 1) % maxPhotos);
   };
 
   const prevPhoto = () => {
-    setCurrentPhotoIndex((prev) => (prev - 1 + userPhotos.length) % userPhotos.length);
+    // Se visualizador não é premium, só pode ver 1 foto
+    const maxPhotos = isViewerPremium ? userPhotos.length : 1;
+    setCurrentPhotoIndex((prev) => (prev - 1 + maxPhotos) % maxPhotos);
   };
+
+  // Determinar quantas fotos e quanto da bio mostrar
+  const fotosParaMostrar = isViewerPremium ? userPhotos : [userPhotos[0]];
+  const bioParaMostrar = isViewerPremium 
+    ? userBio 
+    : userBio.substring(0, Math.floor(userBio.length / 2)) + '...';
 
   // Foto principal para mostrar na mini foto
   const fotoPrincipal = userPhotos[mainPhotoIndex] || userPhotos[0];
@@ -76,9 +87,9 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
     <>
       {/* Mini foto do perfil - só para usuários premium com fotos */}
       <div 
-        className={`mini-perfil-trigger ${!isViewerPremium ? 'no-click' : ''}`}
+        className="mini-perfil-trigger"
         onClick={handleOpenModal}
-        title={isViewerPremium ? "Ver perfil" : "Upgrade para Premium para ver perfis"}
+        title="Ver perfil"
       >
         <img 
           src={fotoPrincipal} 
@@ -86,15 +97,10 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
           className="mini-foto-perfil"
         />
         <FiStar className="mini-premium-icon" />
-        {!isViewerPremium && (
-          <div className="premium-overlay">
-            <FiLock />
-          </div>
-        )}
       </div>
 
-      {/* Modal do perfil - só abre para viewers premium */}
-      {showModal && isViewerPremium && (
+      {/* Modal do perfil - abre para qualquer um se o usuário for premium */}
+      {showModal && (isViewerPremium || isUserPremium) && (
         <div className="mini-perfil-overlay" onClick={handleCloseModal}>
           <div className="mini-perfil-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
@@ -113,12 +119,12 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
               <div className="photos-section">
                 <div className="photo-container">
                   <img 
-                    src={userPhotos[currentPhotoIndex]} 
+                    src={fotosParaMostrar[currentPhotoIndex]} 
                     alt={`Foto ${currentPhotoIndex + 1} de ${nomeUsuario}`}
                     className="main-photo"
                   />
                   
-                  {userPhotos.length > 1 && (
+                  {fotosParaMostrar.length > 1 && (
                     <>
                       <button className="photo-nav prev" onClick={prevPhoto}>‹</button>
                       <button className="photo-nav next" onClick={nextPhoto}>›</button>
@@ -126,19 +132,24 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
                   )}
                   
                   <div className="photo-counter">
-                    {currentPhotoIndex + 1} / {userPhotos.length}
+                    {currentPhotoIndex + 1} / {fotosParaMostrar.length}
                     {currentPhotoIndex === mainPhotoIndex && (
                       <span className="main-photo-indicator">
                         ⭐ Principal
                       </span>
                     )}
+                    {!isViewerPremium && (
+                      <span className="limited-access">
+                        <FiLock /> Limitado
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                {/* Thumbnails das fotos */}
-                {userPhotos.length > 1 && (
+                {/* Thumbnails das fotos - só para viewers premium */}
+                {isViewerPremium && fotosParaMostrar.length > 1 && (
                   <div className="photo-thumbnails">
-                    {userPhotos.map((foto: string, index: number) => (
+                    {fotosParaMostrar.map((foto: string, index: number) => (
                       <img
                         key={index}
                         src={foto}
@@ -167,19 +178,27 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
 
                 <div className="bio-section">
                   <h4>Sobre mim</h4>
-                  <p>{userBio}</p>
+                  <p>{bioParaMostrar}</p>
+                  {!isViewerPremium && (
+                    <div className="premium-upgrade-hint">
+                      <FiLock />
+                      <span>Faça upgrade para ver o perfil completo</span>
+                    </div>
+                  )}
                 </div>
 
-                <div className="interests-section">
-                  <h4>Interesses</h4>
-                  <div className="interests-tags">
-                    {userInterests.map((interesse: string, index: number) => (
-                      <span key={index} className="interest-tag">
-                        {interesse}
-                      </span>
-                    ))}
+                {isViewerPremium && (
+                  <div className="interests-section">
+                    <h4>Interesses</h4>
+                    <div className="interests-tags">
+                      {userInterests.map((interesse: string, index: number) => (
+                        <span key={index} className="interest-tag">
+                          {interesse}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Ações */}
@@ -188,10 +207,18 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
                   <FiHeart />
                   <span>Curtir</span>
                 </button>
-                <button className="action-button chat">
-                  <FiUser />
-                  <span>Conversar</span>
-                </button>
+                {!isViewerPremium && (
+                  <button className="action-button upgrade">
+                    <FiStar />
+                    <span>Upgrade Premium</span>
+                  </button>
+                )}
+                {isViewerPremium && (
+                  <button className="action-button chat">
+                    <FiUser />
+                    <span>Conversar</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

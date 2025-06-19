@@ -731,10 +731,14 @@ const ChatPage: React.FC = () => {
   // Funções para buscar dados dos usuários (simulado - em produção viria do banco)
   const getUserPhotos = (userName: string): string[] => {
     // Em produção, aqui buscaríamos as fotos reais do usuário do banco de dados
-    // Por enquanto, retorna array vazio - usuários devem fazer upload de suas próprias fotos
+    // Adicionando algumas fotos para demonstração do sistema
     const userPhotosData: { [key: string]: string[] } = {
-      // Usuários premium podem ter fotos quando fizerem upload
-      // Exemplo: 'rodrigo': ['url_foto1.jpg', 'url_foto2.jpg']
+      'rodrigo': [
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
+      ]
+      // Outros usuários podem ter fotos quando fizerem upload
     };
     
     return userPhotosData[userName.toLowerCase()] || [];
