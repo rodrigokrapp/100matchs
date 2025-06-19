@@ -4,11 +4,11 @@
 }
 
 .menu-toggle {
-  background: #1e3a8a;
-  border: none;
-  border-radius: 8px;
-  width: 45px;
-  height: 45px;
+  background: linear-gradient(135deg, #663399 0%, #8B5CF6 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -19,25 +19,31 @@
   transition: all 0.3s ease;
   position: relative;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
 }
 
 .menu-toggle::before,
-.menu-toggle::after,
-.menu-toggle {
+.menu-toggle::after {
   content: '';
+  position: absolute;
+  width: 24px;
+  height: 3px;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .menu-toggle::before {
-  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 22px;
-  height: 2px;
-  background: white;
-  border-radius: 1px;
-  box-shadow: 0 -6px 0 white, 0 6px 0 white;
+  box-shadow: 
+    0 -8px 0 white, 
+    0 8px 0 white,
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 -7px 2px rgba(0, 0, 0, 0.2),
+    0 9px 2px rgba(0, 0, 0, 0.2);
 }
 
 .menu-toggle.active::before {
@@ -46,15 +52,9 @@
 }
 
 .menu-toggle.active::after {
-  content: '';
-  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(-45deg);
-  width: 22px;
-  height: 2px;
-  background: white;
-  border-radius: 1px;
 }
 
 .menu-toggle svg {
@@ -63,7 +63,18 @@
 
 .menu-toggle:hover {
   transform: scale(1.05);
-  background: #3b82f6;
+  background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.menu-toggle:hover::before {
+  box-shadow: 
+    0 -8px 0 rgba(255, 255, 255, 0.9), 
+    0 8px 0 rgba(255, 255, 255, 0.9),
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 -7px 3px rgba(0, 0, 0, 0.3),
+    0 9px 3px rgba(0, 0, 0, 0.3);
 }
 
 .menu-overlay {

@@ -370,17 +370,21 @@
   position: relative;
   border-radius: 15px;
   overflow: hidden;
-  max-width: 350px;
+  background: linear-gradient(135deg, rgba(102, 51, 153, 0.1), rgba(244, 114, 182, 0.05));
+  padding: 5px;
+  transition: all 0.3s ease;
+}
+
+.video-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(102, 51, 153, 0.3);
 }
 
 .video-container video {
   width: 100%;
   height: auto;
-  max-height: 400px;
-  display: block;
-  border-radius: 15px;
-  cursor: pointer;
-  object-fit: contain;
+  border-radius: 10px;
+  object-fit: cover;
 }
 
 .video-overlay {
@@ -1168,4 +1172,57 @@
   font-size: 1.2rem;
   color: white;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* Video temporary indicator */
+.video-temp-indicator {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(102, 51, 153, 0.9);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* Enhanced media messages */
+.media-message {
+  max-width: 300px;
+  margin: 8px 0;
+}
+
+.media-message.video-message {
+  background: linear-gradient(135deg, rgba(102, 51, 153, 0.05), rgba(139, 92, 246, 0.05));
+  border-radius: 15px;
+  padding: 8px;
+  border: 1px solid rgba(102, 51, 153, 0.2);
+}
+
+/* Temporary message styling */
+.temporary-message {
+  border-left: 4px solid #FF4081;
+  background: linear-gradient(135deg, rgba(255, 64, 129, 0.1), rgba(102, 51, 153, 0.05));
+}
+
+.temporary-indicator {
+  background: linear-gradient(135deg, #FF4081, #663399);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 } 

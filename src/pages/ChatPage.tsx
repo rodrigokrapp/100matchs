@@ -666,6 +666,38 @@ const ChatPage: React.FC = () => {
     }
   };
 
+  // MELHORADA: Função para manusear vídeos temporários com auto-exclusão
+  const handleTemporaryVideoClick = async (messageId: string, videoElement: HTMLVideoElement) => {
+    if (usuario?.nome) {
+      // Marcar que este usuário específico visualizou a mensagem
+      const currentTime = Date.now();
+      setViewedMessages(prev => {
+        const newMap = new Map(prev);
+        newMap.set(messageId, currentTime);
+        return newMap;
+      });
+      
+      await chatService.markTemporaryMessageViewed(messageId, usuario.nome);
+      
+      // Auto play o vídeo
+      videoElement.play();
+      
+      // Configurar exclusão automática após 10 segundos
+      setTimeout(() => {
+        const container = videoElement.closest('.video-container') as HTMLElement;
+        if (container) {
+          container.style.transition = 'all 0.5s ease';
+          container.style.opacity = '0';
+          container.style.transform = 'scale(0.95)';
+          
+          setTimeout(() => {
+            container.style.display = 'none';
+          }, 500);
+        }
+      }, 10000); // 10 segundos
+    }
+  };
+
   if (!usuario) {
     return <div className="loading">Carregando...</div>;
   }
@@ -801,24 +833,58 @@ const ChatPage: React.FC = () => {
                                 style={{
                                   maxWidth: '100%',
                                   height: 'auto',
-                                  borderRadius: '10px'
+                                  borderRadius: '10px',
+                                  transition: 'all 0.3s ease',
+                                  cursor: 'pointer',
+                                  filter: 'contrast(1.1) saturate(1.1)',
+                                  willChange: 'transform, opacity'
                                 }}
-                                onClick={() => {
+                                onClick={(e) => {
+                                  const video = e.target as HTMLVideoElement;
                                   handleViewTemporaryMessage(msg.id);
+                                  
+                                  // Se é temporário, iniciar contagem para exclusão
+                                  if (msg.is_temporary) {
+                                    video.play();
+                                    
+                                    // Configurar exclusão automática após 10 segundos
+                                    setTimeout(() => {
+                                      const container = video.closest('.video-container') as HTMLElement;
+                                      if (container) {
+                                        container.style.transition = 'all 0.5s ease';
+                                        container.style.opacity = '0';
+                                        container.style.transform = 'scale(0.95)';
+                                        
+                                        setTimeout(() => {
+                                          container.style.display = 'none';
+                                        }, 500);
+                                      }
+                                    }, 10000); // 10 segundos
+                                  }
                                 }}
                                 onPlay={(e) => {
                                   handlePlayPause(msg.id, e.target as HTMLVideoElement);
                                 }}
                                 onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
+                                onLoadStart={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  video.style.opacity = '0.7';
+                                }}
+                                onCanPlay={(e) => {
+                                  const video = e.target as HTMLVideoElement;
+                                  video.style.opacity = '1';
+                                }}
                                 onEnded={(e) => {
                                   const video = e.target as HTMLVideoElement;
-                                  const container = video.closest('.video-container') as HTMLElement;
-                                  if (container && msg.is_temporary) {
-                                    container.style.opacity = '0.5';
-                                    container.style.transition = 'opacity 0.5s ease';
-                                    setTimeout(() => {
-                                      container.style.display = 'none';
-                                    }, 500);
+                                  if (msg.is_temporary) {
+                                    const container = video.closest('.video-container') as HTMLElement;
+                                    if (container) {
+                                      container.style.opacity = '0.5';
+                                      container.style.transition = 'opacity 0.5s ease';
+                                      setTimeout(() => {
+                                        container.style.display = 'none';
+                                      }, 500);
+                                    }
                                   }
                                 }}
                               >
@@ -826,6 +892,12 @@ const ChatPage: React.FC = () => {
                                 <source src={msg.content} type="video/mp4" />
                                 Seu navegador não suporta vídeo.
                               </video>
+                              {msg.is_temporary && (
+                                <div className="video-temp-indicator">
+                                  <FiClock />
+                                  <span>Clique para assistir - Desaparece em 10s</span>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
