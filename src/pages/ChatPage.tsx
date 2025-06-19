@@ -523,8 +523,9 @@ const ChatPage: React.FC = () => {
     // Simplesmente pausa outros elementos para não sobrecarregar
     const otherMediaElements = document.querySelectorAll('video, audio');
     otherMediaElements.forEach((el) => {
-      if (el !== element && !el.paused) {
-        el.pause();
+      const mediaElement = el as HTMLMediaElement;
+      if (mediaElement !== element && !mediaElement.paused) {
+        mediaElement.pause();
       }
     });
   };
