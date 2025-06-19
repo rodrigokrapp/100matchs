@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   FiSend, FiImage, FiMic, FiSmile, FiArrowLeft, 
   FiUsers, FiStar, FiClock, FiCheck, FiEye, FiPlay, FiPause,
-  FiMicOff
+  FiMicOff, FiCamera, FiFolder
 } from 'react-icons/fi';
 import { MdGif } from 'react-icons/md';
 import { chatService, ChatMessage } from '../lib/chatService';
@@ -375,39 +375,48 @@ const ChatPage: React.FC = () => {
 
   // NOVA FUNCIONALIDADE: Gravar áudio com preview otimizado
   const handleStartAudioRecording = async () => {
+    if (!checkPremiumAccess('Gravação de Áudio')) return;
+    
+    if (isRecording) {
+      console.log('⚠️ Já gravando');
+      return;
+    }
+
     try {
       console.log('🎤 Iniciando gravação de áudio...');
-      
-      // Verificar permissões primeiro
-      if (!mediaPermissions.microphone) {
-        const permission = await navigator.mediaDevices.getUserMedia({ audio: true });
-        if (permission) {
-          setMediaPermissions(prev => ({ ...prev, microphone: true }));
-        }
-      }
-
       setIsRecording(true);
       setRecordingType('audio');
       setRecordingTime(0);
-      setShowMediaOptions(false);
-      setShowEmojis(false);
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
 
-      // Iniciar contador de tempo (sem limitação)
+      // Configurar bitrate mais baixo para melhor performance
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          const audioBlob = new Blob([event.data], { type: 'audio/webm' });
+          const url = MediaService.createTempUrl(audioBlob);
+          console.log('🎵 Áudio gravado, tamanho:', audioBlob.size);
+          setPreviewMedia({type: 'audio', url, blob: audioBlob});
+          setIsPreviewMode(true);
+        }
+      };
+
+      // Começar gravação
+      mediaRecorder.start();
+      
+      // Iniciar timer
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
 
-      // Começar gravação imediatamente
-      MediaService.startAudioRecording();
-      
     } catch (error) {
-      console.error('❌ Erro ao gravar áudio:', error);
-      alert('Erro ao acessar microfone. Verifique as permissões do navegador.');
+      console.error('❌ Erro ao iniciar gravação de áudio:', error);
+      alert('Erro ao acessar microfone. Verifique as permissões.');
       setIsRecording(false);
       setRecordingType(null);
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-      }
     }
   };
 
@@ -446,122 +455,148 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  // NOVA FUNCIONALIDADE: Selecionar imagem com galeria OU câmera
-  const handleSelectImage = async () => {
+  // Verificar se usuário é premium
+  const isPremiumUser = () => {
+    return usuario?.premium === true || localStorage.getItem('usuarioPremium') !== null;
+  };
+
+  // Função para verificar premium e bloquear se necessário
+  const checkPremiumAccess = (feature: string) => {
+    if (!isPremiumUser()) {
+      alert(`🔒 Funcionalidade ${feature} disponível apenas para usuários Premium!\n\nFaça upgrade para acessar todas as funcionalidades.`);
+      return false;
+    }
+    return true;
+  };
+
+  // NOVA FUNCIONALIDADE: Tirar foto com câmera (APENAS PREMIUM)
+  const handleTakePhoto = async () => {
+    if (!checkPremiumAccess('Câmera')) return;
+    
     try {
-      console.log('📷 Opções de imagem: galeria ou câmera...');
+      console.log('📸 Abrindo câmera para tirar foto...');
       setShowMediaOptions(false);
       
-      // Criar input que aceita tanto câmera quanto galeria
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
+      // Tentar usar câmera diretamente
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' }, // Câmera traseira por padrão
+        audio: false 
+      });
       
-      // No mobile, mostrar ambas as opções - galeria E câmera
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        input.capture = 'environment'; // Câmera traseira por padrão no mobile
-        input.setAttribute('capture', 'camera'); // Força câmera no mobile
-      }
+      // Criar preview da câmera
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.autoplay = true;
+      video.playsInline = true;
+      video.style.position = 'fixed';
+      video.style.top = '50%';
+      video.style.left = '50%';
+      video.style.transform = 'translate(-50%, -50%)';
+      video.style.zIndex = '9999';
+      video.style.border = '3px solid #be185d';
+      video.style.borderRadius = '10px';
+      video.style.width = '300px';
+      video.style.height = '225px';
       
-      // Adicionar multiple para permitir diferentes fontes
-      input.multiple = false;
+      // Criar botão para capturar
+      const captureBtn = document.createElement('button');
+      captureBtn.textContent = '📸 CAPTURAR FOTO';
+      captureBtn.style.position = 'fixed';
+      captureBtn.style.top = '70%';
+      captureBtn.style.left = '50%';
+      captureBtn.style.transform = 'translateX(-50%)';
+      captureBtn.style.zIndex = '10000';
+      captureBtn.style.padding = '10px 20px';
+      captureBtn.style.fontSize = '16px';
+      captureBtn.style.backgroundColor = '#be185d';
+      captureBtn.style.color = 'white';
+      captureBtn.style.border = 'none';
+      captureBtn.style.borderRadius = '5px';
+      captureBtn.style.cursor = 'pointer';
       
-      input.onchange = async (event) => {
-        const file = (event.target as HTMLInputElement).files?.[0];
-        if (file) {
-          console.log('✅ Imagem selecionada:', file.name);
-          const url = MediaService.createTempUrl(file);
-          setPreviewMedia({type: 'image', url, blob: file});
-          setIsPreviewMode(true);
+      // Criar botão para fechar
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = '❌ FECHAR';
+      closeBtn.style.position = 'fixed';
+      closeBtn.style.top = '75%';
+      closeBtn.style.left = '50%';
+      closeBtn.style.transform = 'translateX(-50%)';
+      closeBtn.style.zIndex = '10000';
+      closeBtn.style.padding = '10px 20px';
+      closeBtn.style.fontSize = '14px';
+      closeBtn.style.backgroundColor = '#666';
+      closeBtn.style.color = 'white';
+      closeBtn.style.border = 'none';
+      closeBtn.style.borderRadius = '5px';
+      closeBtn.style.cursor = 'pointer';
+      closeBtn.style.marginTop = '10px';
+      
+      document.body.appendChild(video);
+      document.body.appendChild(captureBtn);
+      document.body.appendChild(closeBtn);
+      
+      const cleanup = () => {
+        stream.getTracks().forEach(track => track.stop());
+        try {
+          document.body.removeChild(video);
+          document.body.removeChild(captureBtn);
+          document.body.removeChild(closeBtn);
+        } catch (e) {
+          console.log('Elementos já removidos');
         }
       };
       
-      // No desktop, dar opção de escolha
-      if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        const choice = confirm('📷 CÂMERA ou GALERIA?\n\nOK = Tirar foto com câmera\nCancelar = Escolher da galeria');
+      captureBtn.onclick = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
         
-        if (choice) {
-          // Tentar usar câmera diretamente
-          try {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-              video: { facingMode: 'user' }, // Câmera frontal no desktop
-              audio: false 
-            });
-            
-            // Criar preview da câmera
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.autoplay = true;
-            video.playsInline = true;
-            video.style.position = 'fixed';
-            video.style.top = '50%';
-            video.style.left = '50%';
-            video.style.transform = 'translate(-50%, -50%)';
-            video.style.zIndex = '9999';
-            video.style.border = '3px solid #be185d';
-            video.style.borderRadius = '10px';
-            video.style.width = '300px';
-            video.style.height = '225px';
-            
-            // Criar botão para capturar
-            const captureBtn = document.createElement('button');
-            captureBtn.textContent = '📸 CAPTURAR FOTO';
-            captureBtn.style.position = 'fixed';
-            captureBtn.style.top = '70%';
-            captureBtn.style.left = '50%';
-            captureBtn.style.transform = 'translateX(-50%)';
-            captureBtn.style.zIndex = '10000';
-            captureBtn.style.padding = '10px 20px';
-            captureBtn.style.fontSize = '16px';
-            captureBtn.style.backgroundColor = '#be185d';
-            captureBtn.style.color = 'white';
-            captureBtn.style.border = 'none';
-            captureBtn.style.borderRadius = '5px';
-            captureBtn.style.cursor = 'pointer';
-            
-            document.body.appendChild(video);
-            document.body.appendChild(captureBtn);
-            
-            captureBtn.onclick = () => {
-              const canvas = document.createElement('canvas');
-              canvas.width = video.videoWidth;
-              canvas.height = video.videoHeight;
-              const ctx = canvas.getContext('2d');
-              
-              if (ctx) {
-                ctx.drawImage(video, 0, 0);
-                
-                canvas.toBlob((blob) => {
-                  if (blob) {
-                    const url = URL.createObjectURL(blob);
-                    setPreviewMedia({type: 'image', url, blob});
-                    setIsPreviewMode(true);
-                    console.log('✅ Foto capturada com câmera');
-                  }
-                }, 'image/jpeg', 0.9);
-              }
-              
-              // Limpar
-              stream.getTracks().forEach(track => track.stop());
-              document.body.removeChild(video);
-              document.body.removeChild(captureBtn);
-            };
-            
-            return; // Não executar input.click()
-            
-          } catch (error) {
-            console.error('❌ Erro ao acessar câmera:', error);
-            alert('Erro ao acessar câmera. Abrindo galeria...');
-          }
+        if (ctx) {
+          ctx.drawImage(video, 0, 0);
+          
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              setPreviewMedia({type: 'image', url, blob});
+              setIsPreviewMode(true);
+              console.log('✅ Foto capturada com câmera');
+            }
+          }, 'image/jpeg', 0.9);
         }
-      }
+        
+        cleanup();
+      };
       
-      // Abrir seletor padrão (galeria ou câmera no mobile)
-      input.click();
+      closeBtn.onclick = cleanup;
       
     } catch (error) {
-      console.error('❌ Erro ao selecionar imagem:', error);
-      alert('Erro ao acessar imagem. Tente novamente.');
+      console.error('❌ Erro ao acessar câmera:', error);
+      alert('Erro ao acessar câmera. Verifique as permissões do navegador.');
+    }
+  };
+
+  // NOVA FUNCIONALIDADE: Selecionar da galeria (APENAS PREMIUM)
+  const handleSelectFromGallery = async () => {
+    if (!checkPremiumAccess('Galeria')) return;
+    
+    try {
+      console.log('📁 Abrindo galeria para selecionar foto...');
+      setShowMediaOptions(false);
+      
+      const file = await MediaService.selectImage();
+      if (file) {
+        console.log('✅ Imagem selecionada da galeria:', file.name);
+        const url = MediaService.createTempUrl(file);
+        setPreviewMedia({type: 'image', url, blob: file});
+        setIsPreviewMode(true);
+      } else {
+        console.log('❌ Nenhuma imagem selecionada');
+      }
+      
+    } catch (error) {
+      console.error('❌ Erro ao selecionar da galeria:', error);
+      alert('Erro ao acessar galeria. Tente novamente.');
     }
   };
 
@@ -1166,20 +1201,32 @@ const ChatPage: React.FC = () => {
         <div className="input-container">
           <div className="media-buttons">
             <button 
-              className="media-toggle"
-              onClick={handleSelectImage}
-              title="Selecionar foto"
+              className={`media-toggle ${!isPremiumUser() ? 'premium-blocked' : ''}`}
+              onClick={handleTakePhoto}
+              title={isPremiumUser() ? "Tirar foto com câmera" : "🔒 Câmera - Premium"}
             >
-              <FiImage />
+              <FiCamera />
+              {!isPremiumUser() && <span className="premium-lock">🔒</span>}
             </button>
 
             <button 
-              className="media-toggle"
+              className={`media-toggle ${!isPremiumUser() ? 'premium-blocked' : ''}`}
+              onClick={handleSelectFromGallery}
+              title={isPremiumUser() ? "Selecionar da galeria" : "🔒 Galeria - Premium"}
+            >
+              <FiFolder />
+              {!isPremiumUser() && <span className="premium-lock">🔒</span>}
+            </button>
+
+            <button 
+              className={`media-toggle ${!isPremiumUser() ? 'premium-blocked' : ''}`}
               onClick={handleStartAudioRecording}
-              title="Gravar áudio"
+              title={isPremiumUser() ? "Gravar áudio" : "🔒 Áudio - Premium"}
             >
               <FiMic />
+              {!isPremiumUser() && <span className="premium-lock">🔒</span>}
             </button>
+            
             <button 
               className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
               onClick={() => setShowEmojis(!showEmojis)}
