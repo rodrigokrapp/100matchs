@@ -738,6 +738,52 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Seção de Botões Grandes de Mídia */}
+        <div className="media-actions-section">
+          <div className="media-actions-grid">
+            <button 
+              className="media-action-large"
+              onClick={handleSelectImage}
+              title="Selecionar foto da galeria"
+            >
+              <FiImage />
+              <span>Galeria</span>
+            </button>
+            
+            <button 
+              className="media-action-large"
+              onClick={handleStartAudioRecording}
+              title="Gravar áudio"
+            >
+              <FiMic />
+              <span>Áudio</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Seção de Botões Grandes de Mídia */}
+        <div className="media-actions-section">
+          <div className="media-actions-grid">
+            <button 
+              className="media-action-large"
+              onClick={handleSelectImage}
+              title="Selecionar foto da galeria"
+            >
+              <FiImage />
+              <span>Galeria</span>
+            </button>
+            
+            <button 
+              className="media-action-large"
+              onClick={handleStartAudioRecording}
+              title="Gravar áudio"
+            >
+              <FiMic />
+              <span>Áudio</span>
+            </button>
+          </div>
+        </div>
+
         <div className="messages-container">
           {mensagens.length === 0 ? (
             <div className="empty-chat">

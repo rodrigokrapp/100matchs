@@ -1246,4 +1246,59 @@
   display: flex;
   align-items: center;
   gap: 3px;
+}
+
+/* Seção de Botões Grandes de Mídia */
+.media-actions-section {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.media-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.media-action-large {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(102, 51, 153, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.media-action-large:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: #663399;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 51, 153, 0.3);
+}
+
+.media-action-large svg {
+  font-size: 32px;
+  color: #663399;
+}
+
+.media-action-large span {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.media-action-large:hover svg {
+  color: #4a2570;
+}
+
+.media-action-large:hover span {
+  color: #4a2570;
 } 
