@@ -805,35 +805,52 @@ const ChatPage: React.FC = () => {
                             </div>
                           ) : (
                             <div className="video-container">
-                              <video 
-                                controls 
-                                preload="metadata"
-                                playsInline
-                                webkit-playsinline="true"
-                                style={{
-                                  width: '100%',
-                                  maxWidth: '300px',
-                                  borderRadius: '12px',
-                                  backgroundColor: '#000',
-                                  outline: 'none'
-                                }}
-                                src={msg.content}
-                                onLoadStart={() => console.log('🎬 Vídeo começou a carregar')}
-                                onLoadedData={() => console.log('🎬 Vídeo carregado')}
-                                onError={(e) => {
-                                  console.error('❌ Erro no vídeo:', e);
-                                  // Tentar recarregar uma vez
-                                  const video = e.target as HTMLVideoElement;
-                                  setTimeout(() => {
-                                    video.load();
-                                  }, 1000);
-                                }}
-                              >
-                                <source src={msg.content} type="video/webm" />
-                                <source src={msg.content} type="video/mp4" />
-                                <source src={msg.content} type="video/mov" />
-                                Seu navegador não suporta vídeo.
-                              </video>
+                              <div className="simple-media-player">
+                                <video 
+                                  ref={(el) => {
+                                    if (el) {
+                                      el.setAttribute('data-message-id', msg.id);
+                                    }
+                                  }}
+                                  preload="metadata"
+                                  playsInline
+                                  webkit-playsinline="true"
+                                  style={{
+                                    width: '100%',
+                                    maxWidth: '300px',
+                                    borderRadius: '12px',
+                                    backgroundColor: '#000',
+                                    display: 'none'
+                                  }}
+                                  src={msg.content}
+                                >
+                                  <source src={msg.content} type="video/webm" />
+                                  <source src={msg.content} type="video/mp4" />
+                                  <source src={msg.content} type="video/mov" />
+                                </video>
+                                <div className="video-thumbnail">
+                                  <button 
+                                    className="big-play-button"
+                                    onClick={() => {
+                                      const video = document.querySelector(`video[data-message-id="${msg.id}"]`) as HTMLVideoElement;
+                                      if (video) {
+                                        video.style.display = 'block';
+                                        video.controls = true;
+                                        video.play();
+                                        // Esconder o botão após clicar
+                                        const button = document.querySelector(`button[data-video-id="${msg.id}"]`) as HTMLButtonElement;
+                                        if (button) {
+                                          button.style.display = 'none';
+                                        }
+                                      }
+                                    }}
+                                    data-video-id={msg.id}
+                                  >
+                                    <FiPlay size={40} />
+                                    <span>REPRODUZIR VÍDEO</span>
+                                  </button>
+                                </div>
+                              </div>
                               {msg.is_temporary && (
                                 <div className="video-temp-indicator">
                                   <span>📹 Vídeo temporário (5min)</span>
@@ -853,32 +870,51 @@ const ChatPage: React.FC = () => {
                             </div>
                           ) : (
                             <div className="audio-container">
-                              <audio 
-                                controls 
-                                preload="metadata"
-                                controlsList="nodownload"
-                                style={{
-                                  width: '100%',
-                                  height: '50px',
-                                  borderRadius: '10px',
-                                  backgroundColor: '#f5f5f5',
-                                  border: '2px solid #e0e0e0',
-                                  outline: 'none',
-                                  cursor: 'pointer'
-                                }}
-                                src={msg.content}
-                                onLoadStart={() => console.log('🎵 Áudio começou a carregar')}
-                                onLoadedData={() => console.log('🎵 Áudio carregado')}
-                                onError={(e) => {
-                                  console.error('❌ Erro no áudio:', e);
-                                }}
-                              >
-                                <source src={msg.content} type="audio/webm" />
-                                <source src={msg.content} type="audio/mp4" />
-                                <source src={msg.content} type="audio/wav" />
-                                <source src={msg.content} type="audio/ogg" />
-                                Seu navegador não suporta áudio.
-                              </audio>
+                              <div className="simple-media-player">
+                                <audio 
+                                  ref={(el) => {
+                                    if (el) {
+                                      el.setAttribute('data-message-id', msg.id);
+                                    }
+                                  }}
+                                  preload="metadata"
+                                  style={{ display: 'none' }}
+                                  src={msg.content}
+                                  controls
+                                >
+                                  <source src={msg.content} type="audio/webm" />
+                                  <source src={msg.content} type="audio/mp4" />
+                                  <source src={msg.content} type="audio/wav" />
+                                  <source src={msg.content} type="audio/ogg" />
+                                </audio>
+                                <button 
+                                  className="big-play-button audio-button"
+                                  onClick={() => {
+                                    const audio = document.querySelector(`audio[data-message-id="${msg.id}"]`) as HTMLAudioElement;
+                                    if (audio) {
+                                      // Parar outros áudios
+                                      document.querySelectorAll('audio').forEach(a => {
+                                        if (a !== audio) a.pause();
+                                      });
+                                      
+                                      // Mostrar controles e reproduzir
+                                      audio.style.display = 'block';
+                                      audio.controls = true;
+                                      audio.play();
+                                      
+                                      // Esconder o botão após clicar
+                                      const button = document.querySelector(`button[data-audio-id="${msg.id}"]`) as HTMLButtonElement;
+                                      if (button) {
+                                        button.style.display = 'none';
+                                      }
+                                    }
+                                  }}
+                                  data-audio-id={msg.id}
+                                >
+                                  <FiPlay size={30} />
+                                  <span>REPRODUZIR ÁUDIO</span>
+                                </button>
+                              </div>
                               {msg.is_temporary && (
                                 <div className="audio-temp-indicator">
                                   <span>🔊 Áudio temporário (5min)</span>
