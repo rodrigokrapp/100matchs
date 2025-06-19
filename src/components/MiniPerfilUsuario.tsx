@@ -168,7 +168,7 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
                 {/* Thumbnails das fotos (só para premium) */}
                 {isViewerPremium && fotosParaMostrar.length > 1 && (
                   <div className="photo-thumbnails">
-                    {fotosParaMostrar.map((foto, index) => (
+                    {fotosParaMostrar.map((foto: string, index: number) => (
                       <img
                         key={index}
                         src={foto}
