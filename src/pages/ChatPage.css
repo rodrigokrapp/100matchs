@@ -380,12 +380,7 @@
   display: block;
   border-radius: 15px;
   cursor: pointer;
-  will-change: transform;
-  backface-visibility: hidden;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  -webkit-video-playback-quality: high;
-  -webkit-video-format: auto;
+  object-fit: contain;
 }
 
 .video-overlay {
@@ -530,8 +525,7 @@
   max-width: 100%;
   max-height: 100%;
   border-radius: 10px;
-  will-change: transform;
-  backface-visibility: hidden;
+  object-fit: contain;
 }
 
 .audio-preview {

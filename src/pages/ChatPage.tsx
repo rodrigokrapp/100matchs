@@ -764,45 +764,19 @@ const ChatPage: React.FC = () => {
                             <div className="video-container">
                               <video 
                                 controls 
-                                preload="metadata"
+                                preload="auto"
                                 playsInline
                                 muted={false}
                                 style={{
-                                  willChange: 'transform',
-                                  backfaceVisibility: 'hidden',
-                                  transform: 'translateZ(0)',
-                                  WebkitTransform: 'translateZ(0)'
+                                  maxWidth: '100%',
+                                  height: 'auto',
+                                  borderRadius: '10px'
                                 }}
                                 onClick={() => {
                                   handleViewTemporaryMessage(msg.id);
                                 }}
-                                onLoadStart={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  video.playbackRate = 1.0;
-                                }}
-                                onLoadedMetadata={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  video.playbackRate = 1.0;
-                                  video.defaultPlaybackRate = 1.0;
-                                }}
-                                onLoadedData={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  video.playbackRate = 1.0;
-                                }}
-                                onCanPlay={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  video.playbackRate = 1.0;
-                                }}
-                                onTimeUpdate={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  if (video.playbackRate !== 1.0) {
-                                    video.playbackRate = 1.0;
-                                  }
-                                }}
                                 onPlay={(e) => {
-                                  const video = e.target as HTMLVideoElement;
-                                  video.playbackRate = 1.0;
-                                  handlePlayPause(msg.id, video);
+                                  handlePlayPause(msg.id, e.target as HTMLVideoElement);
                                 }}
                                 onPause={(e) => handlePlayPause(msg.id, e.target as HTMLVideoElement)}
                                 onEnded={(e) => {
@@ -817,8 +791,8 @@ const ChatPage: React.FC = () => {
                                   }
                                 }}
                               >
-                                <source src={msg.content} type="video/mp4" />
                                 <source src={msg.content} type="video/webm" />
+                                <source src={msg.content} type="video/mp4" />
                                 Seu navegador não suporta vídeo.
                               </video>
                             </div>
@@ -905,30 +879,11 @@ const ChatPage: React.FC = () => {
                     preload="auto"
                     playsInline
                     style={{
-                      willChange: 'transform',
-                      backfaceVisibility: 'hidden',
-                      transform: 'translateZ(0)'
+                      maxWidth: '100%',
+                      height: 'auto',
+                      borderRadius: '10px'
                     }}
                     src={previewMedia.url}
-                    onLoadedMetadata={(e) => {
-                      const video = e.target as HTMLVideoElement;
-                      video.playbackRate = 1.0;
-                      video.defaultPlaybackRate = 1.0;
-                    }}
-                    onLoadedData={(e) => {
-                      const video = e.target as HTMLVideoElement;
-                      video.playbackRate = 1.0;
-                    }}
-                    onCanPlay={(e) => {
-                      const video = e.target as HTMLVideoElement;
-                      video.playbackRate = 1.0;
-                    }}
-                    onTimeUpdate={(e) => {
-                      const video = e.target as HTMLVideoElement;
-                      if (video.playbackRate !== 1.0) {
-                        video.playbackRate = 1.0;
-                      }
-                    }}
                   />
                 )}
                 {previewMedia.type === 'audio' && (
@@ -993,9 +948,9 @@ const ChatPage: React.FC = () => {
                 muted 
                 playsInline
                 style={{
-                  willChange: 'transform',
-                  backfaceVisibility: 'hidden',
-                  transform: 'translateZ(0)'
+                  maxWidth: '100%',
+                  height: 'auto',
+                  borderRadius: '10px'
                 }}
               />
               <div className="recording-overlay">
