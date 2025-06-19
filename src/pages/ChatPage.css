@@ -1301,4 +1301,119 @@
 
 .media-action-large:hover span {
   color: #4a2570;
+}
+
+/* Estilos melhorados para controles de mídia */
+.audio-container audio {
+  min-height: 50px !important;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+  border: 2px solid #dee2e6 !important;
+  border-radius: 12px !important;
+  padding: 5px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.audio-container audio:hover {
+  border-color: #be185d !important;
+  box-shadow: 0 4px 15px rgba(190, 24, 93, 0.2) !important;
+  transform: translateY(-1px) !important;
+}
+
+.audio-container audio:focus {
+  outline: 2px solid #be185d !important;
+  outline-offset: 2px !important;
+}
+
+/* Controles de áudio maiores e mais clicáveis */
+.audio-container audio::-webkit-media-controls {
+  background: transparent !important;
+}
+
+.audio-container audio::-webkit-media-controls-panel {
+  background: transparent !important;
+  border-radius: 8px !important;
+}
+
+.audio-container audio::-webkit-media-controls-play-button {
+  background: #be185d !important;
+  border-radius: 50% !important;
+  width: 40px !important;
+  height: 40px !important;
+  margin: 5px !important;
+}
+
+.audio-container audio::-webkit-media-controls-play-button:hover {
+  background: #831843 !important;
+  transform: scale(1.1) !important;
+}
+
+.video-container video {
+  border: 2px solid #dee2e6 !important;
+  border-radius: 15px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.video-container video:hover {
+  border-color: #be185d !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  transform: scale(1.02) !important;
+}
+
+.video-container video:focus {
+  outline: 2px solid #be185d !important;
+  outline-offset: 2px !important;
+}
+
+/* Controles de vídeo melhorados */
+.video-container video::-webkit-media-controls {
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)) !important;
+  border-radius: 0 0 13px 13px !important;
+}
+
+.video-container video::-webkit-media-controls-play-button {
+  background: rgba(190, 24, 93, 0.9) !important;
+  border-radius: 50% !important;
+  width: 50px !important;
+  height: 50px !important;
+  margin: 10px !important;
+}
+
+.video-container video::-webkit-media-controls-play-button:hover {
+  background: #be185d !important;
+  transform: scale(1.1) !important;
+}
+
+/* Indicadores de mídia temporária melhorados */
+.audio-temp-indicator,
+.video-temp-indicator {
+  margin-top: 8px !important;
+  padding: 6px 12px !important;
+  background: rgba(190, 24, 93, 0.1) !important;
+  border: 1px solid rgba(190, 24, 93, 0.3) !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  color: #be185d !important;
+  text-align: center !important;
+}
+
+/* Melhorias para mobile */
+@media (max-width: 768px) {
+  .audio-container audio {
+    min-height: 55px !important;
+    padding: 8px !important;
+  }
+  
+  .audio-container audio::-webkit-media-controls-play-button {
+    width: 45px !important;
+    height: 45px !important;
+    margin: 8px !important;
+  }
+  
+  .video-container video::-webkit-media-controls-play-button {
+    width: 55px !important;
+    height: 55px !important;
+    margin: 15px !important;
+  }
 } 

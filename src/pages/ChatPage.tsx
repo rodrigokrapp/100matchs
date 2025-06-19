@@ -729,8 +729,6 @@ const ChatPage: React.FC = () => {
           )}
         </div>
 
-
-
         <div className="messages-container">
           {mensagens.length === 0 ? (
             <div className="empty-chat">
@@ -810,16 +808,30 @@ const ChatPage: React.FC = () => {
                               <video 
                                 controls 
                                 preload="metadata"
+                                playsInline
+                                webkit-playsinline="true"
                                 style={{
                                   width: '100%',
                                   maxWidth: '300px',
                                   borderRadius: '12px',
-                                  backgroundColor: '#000'
+                                  backgroundColor: '#000',
+                                  outline: 'none'
                                 }}
                                 src={msg.content}
+                                onLoadStart={() => console.log('🎬 Vídeo começou a carregar')}
+                                onLoadedData={() => console.log('🎬 Vídeo carregado')}
+                                onError={(e) => {
+                                  console.error('❌ Erro no vídeo:', e);
+                                  // Tentar recarregar uma vez
+                                  const video = e.target as HTMLVideoElement;
+                                  setTimeout(() => {
+                                    video.load();
+                                  }, 1000);
+                                }}
                               >
                                 <source src={msg.content} type="video/webm" />
                                 <source src={msg.content} type="video/mp4" />
+                                <source src={msg.content} type="video/mov" />
                                 Seu navegador não suporta vídeo.
                               </video>
                               {msg.is_temporary && (
@@ -844,16 +856,27 @@ const ChatPage: React.FC = () => {
                               <audio 
                                 controls 
                                 preload="metadata"
+                                controlsList="nodownload"
                                 style={{
                                   width: '100%',
-                                  height: '40px',
-                                  borderRadius: '8px'
+                                  height: '50px',
+                                  borderRadius: '10px',
+                                  backgroundColor: '#f5f5f5',
+                                  border: '2px solid #e0e0e0',
+                                  outline: 'none',
+                                  cursor: 'pointer'
                                 }}
                                 src={msg.content}
+                                onLoadStart={() => console.log('🎵 Áudio começou a carregar')}
+                                onLoadedData={() => console.log('🎵 Áudio carregado')}
+                                onError={(e) => {
+                                  console.error('❌ Erro no áudio:', e);
+                                }}
                               >
                                 <source src={msg.content} type="audio/webm" />
                                 <source src={msg.content} type="audio/mp4" />
                                 <source src={msg.content} type="audio/wav" />
+                                <source src={msg.content} type="audio/ogg" />
                                 Seu navegador não suporta áudio.
                               </audio>
                               {msg.is_temporary && (
