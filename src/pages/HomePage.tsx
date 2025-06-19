@@ -203,7 +203,7 @@ const HomePage: React.FC = () => {
         <section style={styles.hero}>
           <div style={styles.heroBanner}>
             <img 
-              src="/banner-converse-sem-match.jpg" 
+              src="/banner-converse-sem-match-novo.jpg" 
               alt="Converse sem Match - 100 Matchs" 
               style={styles.heroImage}
             />
