@@ -25,7 +25,14 @@ const MenuHamburguer: React.FC = () => {
   };
 
   const handleMeuPerfil = () => {
-    // Liberar acesso para todos os usuários
+    // Verificar se é usuário premium
+    if (usuario.tipo !== 'premium') {
+      alert('Opção apenas para usuário premium');
+      setIsOpen(false);
+      return;
+    }
+    
+    // Apenas usuários premium podem acessar
     navigate('/meuperfil');
     setIsOpen(false);
   };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import './InicioPage.css';
@@ -14,6 +14,7 @@ const InicioPage: React.FC = () => {
   const [fotoPremium, setFotoPremium] = useState<string>('');
   const [aceitarTermos, setAceitarTermos] = useState(false);
   const [aceitarTermosPremium, setAceitarTermosPremium] = useState(false);
+  const [mostrarTrocarFoto, setMostrarTrocarFoto] = useState(false);
 
   // Função para comprimir imagem
   const compressImage = (file: File, maxWidth: number = 300, quality: number = 0.2): Promise<string> => {
@@ -141,16 +142,6 @@ const InicioPage: React.FC = () => {
       return;
     }
 
-    if (!fotoPremium) {
-      alert('Por favor, adicione uma foto para seu perfil');
-      return;
-    }
-
-    if (!aceitarTermosPremium) {
-      alert('Por favor, aceite os termos de políticas e privacidade');
-      return;
-    }
-
     // Verificar se usuário premium existe
     const usuariosPremium = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
     const usuarioPremium = usuariosPremium.find((u: any) => 
@@ -162,20 +153,45 @@ const InicioPage: React.FC = () => {
       return;
     }
 
+    // Se não tem foto atual e também não tem foto salva, exigir foto
+    if (!fotoPremium && !usuarioPremium.foto) {
+      alert('Por favor, adicione uma foto para seu perfil');
+      return;
+    }
+
+    if (!aceitarTermosPremium) {
+      alert('Por favor, aceite os termos de políticas e privacidade');
+      return;
+    }
+
+    // Usar foto atual ou foto salva
+    const fotoFinal = fotoPremium || usuarioPremium.foto;
+
     // Login bem-sucedido com foto
     const usuarioLogado = {
       ...usuarioPremium,
       premium: true,
       tipo: 'premium',
-      foto: fotoPremium
+      foto: fotoFinal
     };
+
+    // Atualizar foto no registro de usuários premium se foi alterada
+    if (fotoPremium && fotoPremium !== usuarioPremium.foto) {
+      const usuariosAtualizados = usuariosPremium.map((u: any) => 
+        u.email === emailPremium.trim() && u.senha === senhaPremium.trim() 
+          ? { ...u, foto: fotoPremium }
+          : u
+      );
+      localStorage.setItem('usuarios-premium', JSON.stringify(usuariosAtualizados));
+      console.log('✅ Foto premium atualizada no registro');
+    }
 
     localStorage.setItem('usuarioPremium', JSON.stringify(usuarioLogado));
     
     // Salvar/atualizar foto no perfil
     const perfilData = {
       nome: usuarioLogado.nome,
-      fotos: [fotoPremium],
+      fotos: [fotoFinal],
       descricao: usuarioLogado.descricao || '',
       idade: usuarioLogado.idade || 25,
       updated_at: new Date().toISOString()
@@ -194,6 +210,54 @@ const InicioPage: React.FC = () => {
   const handleSupporte = () => {
     navigate('/suporte6828');
   };
+
+  // Função para carregar foto salva do usuário premium
+  const carregarFotoSalva = () => {
+    if (!emailPremium.trim() || !senhaPremium.trim()) {
+      setMostrarTrocarFoto(false);
+      setFotoPremium('');
+      return;
+    }
+    
+    const usuariosPremium = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
+    const usuarioEncontrado = usuariosPremium.find((u: any) => 
+      u.email === emailPremium.trim() && u.senha === senhaPremium.trim()
+    );
+    
+    if (usuarioEncontrado) {
+      setNomePremium(usuarioEncontrado.nome || '');
+      
+      // Carregar foto salva se existir
+      if (usuarioEncontrado.foto) {
+        setFotoPremium(usuarioEncontrado.foto);
+        setMostrarTrocarFoto(true);
+        console.log('✅ Foto premium carregada automaticamente');
+      } else {
+        // Tentar carregar do perfil
+        const perfilSalvo = localStorage.getItem(`perfil_${usuarioEncontrado.nome}`);
+        if (perfilSalvo) {
+          try {
+            const perfil = JSON.parse(perfilSalvo);
+            if (perfil.fotos && perfil.fotos.length > 0) {
+              setFotoPremium(perfil.fotos[0]);
+              setMostrarTrocarFoto(true);
+              console.log('✅ Foto carregada do perfil salvo');
+            }
+          } catch (error) {
+            console.warn('⚠️ Erro ao carregar foto do perfil');
+          }
+        }
+      }
+    } else {
+      setMostrarTrocarFoto(false);
+      setFotoPremium('');
+    }
+  };
+
+  // Monitorar mudanças no email/senha para carregar foto automaticamente
+  useEffect(() => {
+    carregarFotoSalva();
+  }, [emailPremium, senhaPremium]);
 
   return (
     <div className="inicio-page">
@@ -310,16 +374,21 @@ const InicioPage: React.FC = () => {
                       {fotoPremium ? (
                         <div className="foto-preview">
                           <img src={fotoPremium} alt="Sua foto" />
-                          <span>📷 Trocar foto</span>
+                          <span>{mostrarTrocarFoto ? '📷 Trocar foto (opcional)' : '📷 Trocar foto'}</span>
                         </div>
                       ) : (
                         <div className="foto-placeholder">
                           <span>📷 Adicionar sua foto</span>
-                          <small>Obrigatório para login premium</small>
+                          <small>{mostrarTrocarFoto ? 'Foto já salva - opcional trocar' : 'Obrigatório para login premium'}</small>
                         </div>
                       )}
                     </div>
                   </label>
+                  {mostrarTrocarFoto && (
+                    <small style={{ color: '#ffd700', textAlign: 'center', display: 'block', marginTop: '5px' }}>
+                      ✅ Foto já salva! Você pode entrar sem alterar ou trocar se quiser.
+                    </small>
+                  )}
                 </div>
                 
                 <div className="terms-checkbox">

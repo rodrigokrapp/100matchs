@@ -63,6 +63,10 @@ const ChatPage: React.FC = () => {
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [userToBlock, setUserToBlock] = useState<string>('');
 
+  // Estados para mini janela de perfil
+  const [showMiniPerfil, setShowMiniPerfil] = useState(false);
+  const [miniPerfilUsuario, setMiniPerfilUsuario] = useState<any>(null);
+
   // Estado para forçar re-render da lista de usuários
   const [forceUpdate, setForceUpdate] = useState(0);
 
@@ -1288,19 +1292,43 @@ const ChatPage: React.FC = () => {
 
   // Função para abrir modal de perfil
   const handleUsuarioClick = async (nomeUsuario: string) => {
-    console.log('🖱️ Clique no usuário:', nomeUsuario);
+    console.log('👤 Clique no usuário:', nomeUsuario);
     
     // Se for o próprio usuário, abrir modal de edição
     if (nomeUsuario === usuario?.nome) {
       handleEditProfile();
       return;
     }
+
+    // Verificar se é usuário premium
+    const usuariosPremium = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
+    const usuarioPremium = usuariosPremium.find((u: any) => u.nome === nomeUsuario);
     
-    // Para outros usuários, abrir modal de visualização
-    const dadosUsuario = await carregarDadosUsuario(nomeUsuario);
-    setUsuarioSelecionado(dadosUsuario);
-    setCurrentPhotoIndex(dadosUsuario.fotoPrincipal || 0);
-    setShowPerfilModal(true);
+    if (usuarioPremium) {
+      // É usuário premium - abrir mini janela
+      console.log('⭐ Usuário premium detectado, abrindo mini perfil');
+      
+      // Carregar dados do perfil
+      const dadosPerfil = await carregarDadosUsuario(nomeUsuario);
+      
+      setMiniPerfilUsuario({
+        nome: nomeUsuario,
+        fotos: dadosPerfil.fotos || [],
+        descricao: dadosPerfil.descricao || 'Usuário premium',
+        idade: dadosPerfil.idade || 25,
+        premium: true
+      });
+      
+      setShowMiniPerfil(true);
+    } else {
+      // Usuário gratuito - abrir modal completo como antes
+      console.log('💬 Usuário gratuito, abrindo perfil completo');
+      
+      const dadosUsuario = await carregarDadosUsuario(nomeUsuario);
+      setUsuarioSelecionado(dadosUsuario);
+      setCurrentPhotoIndex(dadosUsuario.fotoPrincipal || 0);
+      setShowPerfilModal(true);
+    }
   };
 
   // Função para fechar modal
@@ -1308,6 +1336,12 @@ const ChatPage: React.FC = () => {
     setShowPerfilModal(false);
     setUsuarioSelecionado(null);
     setCurrentPhotoIndex(0);
+  };
+
+  // Função para fechar mini janela de perfil
+  const handleCloseMiniPerfil = () => {
+    setShowMiniPerfil(false);
+    setMiniPerfilUsuario(null);
   };
 
   // Navegação de fotos no modal
@@ -2164,6 +2198,54 @@ const ChatPage: React.FC = () => {
                   <FiUserX />
                   <span>Bloquear</span>
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mini Janela de Perfil Premium */}
+      {showMiniPerfil && miniPerfilUsuario && (
+        <div className="mini-perfil-overlay" onClick={handleCloseMiniPerfil}>
+          <div className="mini-perfil-content" onClick={(e) => e.stopPropagation()}>
+            <div className="mini-perfil-header">
+              <div className="mini-perfil-title">
+                <FiStar className="premium-star" />
+                <span>Perfil Premium</span>
+              </div>
+              <button className="mini-close-button" onClick={handleCloseMiniPerfil}>
+                <FiX />
+              </button>
+            </div>
+
+            <div className="mini-perfil-body">
+              {/* Fotos do usuário premium */}
+              <div className="mini-fotos-section">
+                {miniPerfilUsuario.fotos && miniPerfilUsuario.fotos.length > 0 ? (
+                  <div className="mini-fotos-grid">
+                    {miniPerfilUsuario.fotos.slice(0, 5).map((foto: string, index: number) => (
+                      <div key={index} className="mini-foto-item">
+                        <img src={foto} alt={`Foto ${index + 1}`} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mini-no-photos">
+                    <FiUser size={40} />
+                    <span>Sem fotos</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Informações do usuário */}
+              <div className="mini-info-section">
+                <h3>{miniPerfilUsuario.nome}</h3>
+                <div className="mini-idade">
+                  <span>📅 {miniPerfilUsuario.idade} anos</span>
+                </div>
+                <div className="mini-descricao">
+                  <p>{miniPerfilUsuario.descricao || 'Usuário premium'}</p>
+                </div>
               </div>
             </div>
           </div>
