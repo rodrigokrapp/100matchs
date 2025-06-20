@@ -263,6 +263,15 @@ const InicioPage: React.FC = () => {
     <div className="inicio-page">
       <Header />
       
+      {/* Foto de capa no topo */}
+      <div className="hero-banner-section">
+        <img 
+          src="/banner-converse-sem-match-novo.jpg" 
+          alt="100 Matchs - Converse sem Match" 
+          className="hero-banner-image"
+        />
+      </div>
+      
       <div className="inicio-container">
         <div className="main-content">
           {/* Logo da empresa - removido conforme solicitação */}
