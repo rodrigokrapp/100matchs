@@ -28,7 +28,7 @@ function App() {
           <Route path="/salascriadas" element={<SalasCriadasPage />} />
           <Route path="/criarsala" element={<CriarSalaPage />} />
           <Route path="/chat/:salaId" element={<ChatPage />} />
-          <Route path="/meuperfil" element={<MeuPerfilPremiumPage />} />
+          <Route path="/meuperfil" element={<MeuPerfilPage />} />
           <Route path="/suporte6828" element={<SuportePage />} />
           <Route path="/cadastropremium6838k" element={<CadastroPremiumPage />} />
           <Route path="/loginpremium" element={<LoginPremiumPage />} />

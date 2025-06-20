@@ -1,41 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { FiArrowLeft, FiCamera, FiX, FiSave } from 'react-icons/fi';
 
 const MeuPerfilPage: React.FC = () => {
-  const [fotos, setFotos] = useState<File[]>([]);
-  const [fotosUrls, setFotosUrls] = useState<string[]>([]);
-  const [fotoPrincipal, setFotoPrincipal] = useState(0);
+  const [fotos, setFotos] = useState<string[]>([]);
   const [descricao, setDescricao] = useState('');
+  const [idade, setIdade] = useState(25);
   const [nome, setNome] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-
   useEffect(() => {
-    if (!usuario.email) {
+    // Verificar qual tipo de usuário está logado
+    const usuarioPremium = localStorage.getItem('usuarioPremium');
+    const usuarioChat = localStorage.getItem('usuarioChat');
+    const visitante = localStorage.getItem('visitante');
+    
+    let currentUser = null;
+    
+    if (usuarioPremium) {
+      currentUser = JSON.parse(usuarioPremium);
+    } else if (usuarioChat) {
+      currentUser = JSON.parse(usuarioChat);
+    } else if (visitante) {
+      currentUser = JSON.parse(visitante);
+    }
+    
+    if (!currentUser) {
       navigate('/inicio');
       return;
     }
     
-    // Carregar dados do perfil
-    carregarPerfil();
-  }, []);
+    setNome(currentUser.nome || '');
+    
+    // Carregar dados do perfil do localStorage
+    carregarPerfil(currentUser.nome);
+  }, [navigate]);
 
-  const carregarPerfil = async () => {
+  const carregarPerfil = (nomeUsuario: string) => {
     try {
-      const { data } = await supabase
-        .from('perfis')
-        .select('*')
-        .eq('email', usuario.email)
-        .single();
-
-      if (data) {
-        setDescricao(data.descricao || '');
-        setNome(data.nome || usuario.nome);
-        setFotosUrls(data.fotos || []);
-        setFotoPrincipal(data.foto_principal || 0);
+      // Buscar dados em múltiplas chaves
+      const possiveisChaves = [
+        `perfil_${nomeUsuario}`,
+        `usuario_${nomeUsuario}`,
+        `user_${nomeUsuario}`,
+        `profile_${nomeUsuario}`
+      ];
+      
+      for (const chave of possiveisChaves) {
+        const dados = localStorage.getItem(chave);
+        if (dados) {
+          const perfil = JSON.parse(dados);
+          setDescricao(perfil.descricao || '');
+          setIdade(perfil.idade || 25);
+          setFotos(perfil.fotos || []);
+          break;
+        }
       }
     } catch (error) {
       console.error('Erro ao carregar perfil:', error);
@@ -49,80 +69,57 @@ const MeuPerfilPage: React.FC = () => {
       return;
     }
 
-    const newFotos = [...fotos, ...files];
-    setFotos(newFotos);
-
-    // Criar URLs de preview
-    const newUrls = files.map(file => URL.createObjectURL(file));
-    setFotosUrls([...fotosUrls, ...newUrls]);
+    // Converter para base64
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        setFotos(prev => [...prev, base64]);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const removerFoto = (index: number) => {
-    const newFotos = fotos.filter((_, i) => i !== index);
-    const newUrls = fotosUrls.filter((_, i) => i !== index);
-    
-    setFotos(newFotos);
-    setFotosUrls(newUrls);
-    
-    if (fotoPrincipal === index) {
-      setFotoPrincipal(0);
-    } else if (fotoPrincipal > index) {
-      setFotoPrincipal(fotoPrincipal - 1);
-    }
+    setFotos(prev => prev.filter((_, i) => i !== index));
   };
 
   const salvarPerfil = async () => {
-    if (!descricao.trim()) {
-      alert('Adicione uma descrição!');
+    if (!nome) {
+      alert('Nome é obrigatório!');
       return;
     }
 
     setLoading(true);
 
     try {
-      // Upload das fotos se houver
-      const fotosUploadadas = [];
-      
-      for (const foto of fotos) {
-        const fileName = `${usuario.email}_${Date.now()}_${foto.name}`;
-        const { error } = await supabase.storage
-          .from('fotos-perfil')
-          .upload(fileName, foto);
-
-        if (error) {
-          console.error('Erro no upload:', error);
-        } else {
-          const { data: { publicUrl } } = supabase.storage
-            .from('fotos-perfil')
-            .getPublicUrl(fileName);
-          fotosUploadadas.push(publicUrl);
-        }
-      }
-
-      // Salvar perfil no banco
+      // Dados para salvar
       const perfilData = {
-        email: usuario.email,
-        nome: nome || usuario.nome,
+        nome: nome,
         descricao: descricao.trim(),
-        fotos: fotosUploadadas.length > 0 ? fotosUploadadas : fotosUrls,
-        foto_principal: fotoPrincipal,
+        fotos: fotos,
+        idade: idade,
         updated_at: new Date().toISOString()
       };
 
-      const { error } = await supabase
-        .from('perfis')
-        .upsert([perfilData]);
+      // Salvar no localStorage com múltiplas chaves para compatibilidade
+      localStorage.setItem(`perfil_${nome}`, JSON.stringify(perfilData));
+      localStorage.setItem(`usuario_${nome}`, JSON.stringify(perfilData));
+      localStorage.setItem(`user_${nome}`, JSON.stringify(perfilData));
+      localStorage.setItem(`profile_${nome}`, JSON.stringify(perfilData));
 
-      if (error) {
-        console.error('Erro ao salvar perfil:', error);
-        alert('Erro ao salvar perfil. Tente novamente.');
-      } else {
-        alert('Perfil salvo com sucesso!');
-        // Voltar para salas se usuário estava logado
-        if (usuario.tipo) {
-          navigate('/salas');
+      // Broadcast para outros usuários
+      window.dispatchEvent(new CustomEvent('profile_updated', {
+        detail: {
+          nome: nome,
+          fotos: fotos,
+          descricao: descricao,
+          idade: idade
         }
-      }
+      }));
+
+      alert('Perfil salvo com sucesso!');
+      navigate('/salas');
     } catch (error) {
       console.error('Erro:', error);
       alert('Erro ao salvar perfil.');
@@ -206,9 +203,6 @@ const MeuPerfilPage: React.FC = () => {
       border: '3px solid transparent',
       cursor: 'pointer',
     },
-    fotoPrincipal: {
-      border: '3px solid #ff69b4',
-    },
     foto: {
       width: '100%',
       height: '100%',
@@ -281,11 +275,11 @@ const MeuPerfilPage: React.FC = () => {
       {/* Header */}
       <header style={styles.header}>
         <div style={styles.logo} onClick={() => navigate('/inicio')}>
-          🌹 Resenha sem Matchs
+          🌹 100 Matchs
         </div>
         <button 
           style={styles.backButton}
-          onClick={() => navigate(usuario.tipo ? '/salas' : '/inicio')}
+          onClick={() => navigate('/salas')}
         >
           ← Voltar
         </button>
@@ -296,30 +290,14 @@ const MeuPerfilPage: React.FC = () => {
         <div style={styles.card}>
           <h1 style={styles.title}>Meu Perfil</h1>
 
-          {/* Nome */}
-          <div style={styles.section}>
-            <label style={styles.sectionTitle}>Nome:</label>
-            <input
-              type="text"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              style={styles.input}
-              placeholder="Seu nome"
-            />
-          </div>
-
           {/* Fotos */}
           <div style={styles.section}>
             <label style={styles.sectionTitle}>Fotos (máximo 5):</label>
             <div style={styles.fotosGrid}>
-              {fotosUrls.map((url, index) => (
+              {fotos.map((url, index) => (
                 <div 
                   key={index}
-                  style={{
-                    ...styles.fotoItem,
-                    ...(fotoPrincipal === index ? styles.fotoPrincipal : {})
-                  }}
-                  onClick={() => setFotoPrincipal(index)}
+                  style={styles.fotoItem}
                 >
                   <img src={url} alt={`Foto ${index + 1}`} style={styles.foto} />
                   <button
@@ -331,24 +309,10 @@ const MeuPerfilPage: React.FC = () => {
                   >
                     ×
                   </button>
-                  {fotoPrincipal === index && (
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '5px',
-                      left: '5px',
-                      background: '#ff69b4',
-                      color: 'white',
-                      fontSize: '10px',
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                    }}>
-                      Principal
-                    </div>
-                  )}
                 </div>
               ))}
               
-              {fotosUrls.length < 5 && (
+              {fotos.length < 5 && (
                 <label style={styles.uploadButton}>
                   <input
                     type="file"
@@ -361,9 +325,6 @@ const MeuPerfilPage: React.FC = () => {
                 </label>
               )}
             </div>
-            <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
-              Clique na foto para defini-la como principal
-            </p>
           </div>
 
           {/* Descrição */}
@@ -379,6 +340,19 @@ const MeuPerfilPage: React.FC = () => {
             <p style={{ fontSize: '14px', color: '#666', textAlign: 'right' }}>
               {descricao.length}/500 caracteres
             </p>
+          </div>
+
+          {/* Idade */}
+          <div style={styles.section}>
+            <label style={styles.sectionTitle}>Idade:</label>
+            <input
+              type="number"
+              value={idade}
+              onChange={(e) => setIdade(parseInt(e.target.value) || 25)}
+              style={styles.input}
+              min="18"
+              max="99"
+            />
           </div>
 
           {/* Botão Salvar */}

@@ -290,13 +290,17 @@
 .message-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
   gap: 10px;
-  margin-bottom: 5px;
 }
 
 .sender {
   font-weight: 600;
-  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .premium-icon {
@@ -2476,4 +2480,41 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* Estilos para mini fotos dos usuários nas mensagens */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.user-info:hover {
+  opacity: 0.8;
+}
+
+.user-mini-photo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.mini-profile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.default-user-icon {
+  color: white;
+  font-size: 16px;
 } 

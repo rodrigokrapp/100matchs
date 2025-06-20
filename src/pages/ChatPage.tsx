@@ -1502,6 +1502,7 @@ const ChatPage: React.FC = () => {
               {mensagensFiltradas.map((msg) => {
                 const isExpired = isMessageExpired(msg);
                 const isOwn = msg.user_name === usuario?.nome;
+                const userPhoto = getUserPhoto(msg.user_name);
                 
                 if (isExpired && !isOwn) {
                   return null;
@@ -1513,10 +1514,23 @@ const ChatPage: React.FC = () => {
                     className={`message ${isOwn ? 'own-message' : 'other-message'} ${msg.is_temporary ? 'temporary-message' : ''}`}
                   >
                     <div className="message-header">
-                      <span className="sender">
-                        {msg.user_name}
-                        {msg.is_premium && <FiStar className="premium-icon" />}
-                      </span>
+                      <div className="user-info" onClick={() => handleUsuarioClick(msg.user_name)}>
+                        <div className="user-mini-photo">
+                          {userPhoto ? (
+                            <img 
+                              src={userPhoto} 
+                              alt={msg.user_name}
+                              className="mini-profile-photo"
+                            />
+                          ) : (
+                            <FiUser className="default-user-icon" />
+                          )}
+                        </div>
+                        <span className="sender">
+                          {msg.user_name}
+                          {msg.is_premium && <FiStar className="premium-icon" />}
+                        </span>
+                      </div>
                       <span className="time">{formatTime(msg.created_at)}</span>
                       {msg.is_temporary && (
                         <div className="temporary-indicator">
@@ -1836,46 +1850,7 @@ const ChatPage: React.FC = () => {
           </div>
         )}
 
-        {/* Lista Horizontal de Usuários */}
-        <div className="lista-usuarios-horizontal">
-          <div className="lista-horizontal-header">
-            <FiUsers />
-            <span>Usuários Online ({usuariosOnlineList.length})</span>
-          </div>
-          
-          <div className="usuarios-horizontal-scroll">
-            {usuariosOnlineList.map((nomeUsuario) => {
-              const isCurrentUser = nomeUsuario === usuario?.nome;
-              const userPhoto = getUserPhoto(nomeUsuario);
-              console.log('🔄 Renderizando usuário:', nomeUsuario, 'Foto:', userPhoto ? 'Sim' : 'Não', 'ForceUpdate:', forceUpdate);
-              return (
-                <div 
-                  key={nomeUsuario}
-                  className={`usuario-horizontal-item ${isCurrentUser ? 'current-user' : ''}`}
-                  onClick={() => handleUsuarioClick(nomeUsuario)}
-                  title={isCurrentUser ? 'Meu perfil' : `Ver perfil de ${nomeUsuario}`}
-                >
-                  <div className="usuario-horizontal-foto">
-                    {userPhoto ? (
-                      <img 
-                        src={userPhoto} 
-                        alt={nomeUsuario}
-                        className="user-profile-photo"
-                      />
-                    ) : (
-                      <FiUser className="icone-usuario-horizontal" />
-                    )}
-                    <div className="status-horizontal-online"></div>
-                    {isCurrentUser && <div className="current-user-badge">EU</div>}
-                  </div>
-                  <span className="nome-usuario-horizontal">
-                    {isCurrentUser ? 'Eu' : nomeUsuario}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        {/* Seção de usuários horizontais removida */}
 
         {/* Input Area */}
         <div className="input-container">

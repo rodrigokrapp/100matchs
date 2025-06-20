@@ -25,13 +25,9 @@ const MenuHamburguer: React.FC = () => {
   };
 
   const handleMeuPerfil = () => {
-    if (usuario?.tipo === 'premium') {
-      navigate('/meuperfil');
-      setIsOpen(false);
-    } else {
-      // Para usuários de chat gratuito, não fazer nada
-      return;
-    }
+    // Liberar acesso para todos os usuários
+    navigate('/meuperfil');
+    setIsOpen(false);
   };
 
   const handleSair = () => {
@@ -66,12 +62,11 @@ const MenuHamburguer: React.FC = () => {
 
             <div className="menu-items">
               <button 
-                className={`menu-item ${usuario.tipo !== 'premium' ? 'disabled' : ''}`}
+                className="menu-item"
                 onClick={handleMeuPerfil}
               >
                 <FiUser />
-                <span>Meu Perfil Premium</span>
-                {usuario.tipo !== 'premium' && <span className="lock">🔒</span>}
+                <span>Meu Perfil</span>
               </button>
 
               <button className="menu-item logout" onClick={handleSair}>
