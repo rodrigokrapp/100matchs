@@ -341,23 +341,25 @@ const ChatPage: React.FC = () => {
       const mensagensValidas = chatService.filterValidMessages(mensagensExistentes);
       setMensagens(mensagensValidas);
       
-      // Conectar ao chat em tempo real com callback melhorado
+      // Conectar ao chat em tempo real com callback ULTRA OTIMIZADO
       const connected = await chatService.joinRoom(salaId, (novaMsg) => {
         console.log('📨 Nova mensagem recebida:', novaMsg);
+        
+        // 🚀 ATUALIZAÇÃO INSTANTÂNEA - sem verificações demoradas
         setMensagens(prev => {
-          // Evitar mensagens duplicadas baseado no ID
-          const exists = prev.some(msg => 
-            msg.id === novaMsg.id || 
-            (msg.content === novaMsg.content && 
-             msg.user_name === novaMsg.user_name && 
-             Math.abs(new Date(msg.created_at).getTime() - new Date(novaMsg.created_at).getTime()) < 2000)
-          );
+          // Verificação rápida de duplicata apenas por ID
+          const exists = prev.some(msg => msg.id === novaMsg.id);
           
           if (!exists) {
-            const allMessages = [...prev, novaMsg];
-            return chatService.filterValidMessages(allMessages).sort(
-              (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-            );
+            // Adicionar imediatamente no final (mais rápido que sort)
+            const newMessages = [...prev, novaMsg];
+            
+            // Scroll instantâneo
+            setTimeout(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 10);
+            
+            return newMessages;
           }
           return prev;
         });
@@ -392,7 +394,8 @@ const ChatPage: React.FC = () => {
   }, [mensagens]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // 🚀 SCROLL ULTRA RÁPIDO - sem animação para melhor performance
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
   };
 
   const handleEnviarMensagem = async () => {
@@ -435,10 +438,8 @@ const ChatPage: React.FC = () => {
     // Adicionar mensagem imediatamente à interface
     setMensagens(prev => [...prev, mensagemOtimista]);
 
-    // Scroll imediato
-    setTimeout(() => {
-      scrollToBottom();
-    }, 50);
+    // Scroll IMEDIATO - sem delay
+    scrollToBottom();
 
     try {
       console.log('📤 Enviando mensagem:', mensagemParaEnviar);
@@ -1485,6 +1486,36 @@ const ChatPage: React.FC = () => {
       }
     }
     
+    // 🚀 BUSCA OTIMIZADA: Verificar dados dos usuários (premium e chat)
+    const usuarioPremium = localStorage.getItem('usuarioPremium');
+    const usuarioChat = localStorage.getItem('usuarioChat');
+    
+    // Se for usuário premium logado
+    if (usuarioPremium) {
+      try {
+        const dadosPremium = JSON.parse(usuarioPremium);
+        if (dadosPremium.nome === nomeUsuario && dadosPremium.foto) {
+          console.log('✅ Foto encontrada nos dados premium:', nomeUsuario);
+          return dadosPremium.foto;
+        }
+      } catch (error) {
+        console.warn('⚠️ Erro ao parsear dados premium');
+      }
+    }
+    
+    // Se for usuário de chat gratuito logado
+    if (usuarioChat) {
+      try {
+        const dadosChat = JSON.parse(usuarioChat);
+        if (dadosChat.nome === nomeUsuario && dadosChat.foto) {
+          console.log('✅ Foto encontrada nos dados chat:', nomeUsuario);
+          return dadosChat.foto;
+        }
+      } catch (error) {
+        console.warn('⚠️ Erro ao parsear dados chat');
+      }
+    }
+    
     // Buscar foto no localStorage com múltiplas chaves (ordem otimizada)
     const possiveisChaves = [
       `perfil_${nomeUsuario}`,
@@ -1507,14 +1538,52 @@ const ChatPage: React.FC = () => {
               return foto;
             }
           }
+          
+          // Verificar se tem foto diretamente no objeto (para usuários de entrada)
+          if (dados.foto && dados.foto.startsWith('data:image/')) {
+            console.log('📸 Foto direta encontrada para', nomeUsuario, 'em', chave);
+            return dados.foto;
+          }
         }
       } catch (error) {
         console.warn('⚠️ Erro ao parsear dados de', chave, ':', error);
       }
     }
     
+    // 🆕 NOVA BUSCA: Verificar em todas as chaves de usuário no localStorage
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.includes(nomeUsuario) || key.includes('usuario') || key.includes('premium'))) {
+          const dados = localStorage.getItem(key);
+          if (dados) {
+            try {
+              const parsed = JSON.parse(dados);
+              // Se é um objeto de usuário com nome correspondente e tem foto
+              if (parsed.nome === nomeUsuario && parsed.foto && parsed.foto.startsWith('data:image/')) {
+                console.log('🎯 Foto encontrada em busca ampla:', key, 'para', nomeUsuario);
+                return parsed.foto;
+              }
+              // Se é um perfil com fotos
+              if (parsed.fotos && Array.isArray(parsed.fotos) && parsed.fotos.length > 0) {
+                const foto = parsed.fotos[0];
+                if (foto && foto.startsWith('data:image/')) {
+                  console.log('🎯 Foto de perfil encontrada em busca ampla:', key);
+                  return foto;
+                }
+              }
+            } catch (e) {
+              // Ignorar erros de parse
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️ Erro na busca ampla:', error);
+    }
+    
     // Buscar nas mensagens como fallback
-    const mensagensDoUsuario = mensagens.filter(msg => 
+    const mensagensDoUsuario = mensagens.filter((msg: ChatMessage) => 
       msg.user_name === nomeUsuario && 
       msg.message_type === 'imagem' && 
       msg.content && 
