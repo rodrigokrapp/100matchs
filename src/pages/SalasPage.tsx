@@ -80,19 +80,39 @@ const SalasPage: React.FC = () => {
     setSalasCapitais(capitais);
 
     // Carregar salas personalizadas do localStorage
-    const salasPersonalizadasSalvas = localStorage.getItem('salas-personalizadas');
-    if (salasPersonalizadasSalvas) {
-      const salas = JSON.parse(salasPersonalizadasSalvas);
-      // Filtrar salas que não expiraram (24 horas)
-      const salasValidas = salas.filter((sala: any) => {
-        const agora = new Date().getTime();
-        const criacao = new Date(sala.criada_em).getTime();
-        const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
-        return diferencaHoras < 24;
-      });
-      setSalasPersonalizadas(salasValidas);
-      localStorage.setItem('salas-personalizadas', JSON.stringify(salasValidas));
-    }
+    const carregarSalasPersonalizadas = () => {
+      const salasPersonalizadasSalvas = localStorage.getItem('salas-personalizadas');
+      console.log('📂 Carregando salas personalizadas:', salasPersonalizadasSalvas);
+      
+      if (salasPersonalizadasSalvas) {
+        const salas = JSON.parse(salasPersonalizadasSalvas);
+        // Filtrar salas que não expiraram (24 horas)
+        const salasValidas = salas.filter((sala: any) => {
+          const agora = new Date().getTime();
+          const criacao = new Date(sala.criada_em).getTime();
+          const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
+          console.log(`⏰ Sala "${sala.nome}" criada há ${diferencaHoras.toFixed(1)} horas`);
+          return diferencaHoras < 24;
+        });
+        
+        console.log('✅ Salas personalizadas válidas:', salasValidas);
+        setSalasPersonalizadas(salasValidas);
+        localStorage.setItem('salas-personalizadas', JSON.stringify(salasValidas));
+      } else {
+        console.log('📭 Nenhuma sala personalizada encontrada');
+        setSalasPersonalizadas([]);
+      }
+    };
+    
+    carregarSalasPersonalizadas();
+    
+    // Atualizar salas personalizadas a cada 30 segundos
+    const interval = setInterval(() => {
+      console.log('🔄 Atualizando salas personalizadas...');
+      carregarSalasPersonalizadas();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, [navigate]);
 
   const handleEntrarSala = (salaId: string, nomeSala: string) => {

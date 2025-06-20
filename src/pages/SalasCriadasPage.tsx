@@ -33,6 +33,14 @@ const SalasCriadasPage: React.FC = () => {
     }
 
     carregarSalasCriadas();
+    
+    // Atualizar salas a cada 30 segundos
+    const interval = setInterval(() => {
+      console.log('🔄 Atualizando lista de salas...');
+      carregarSalasCriadas();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, [navigate]);
 
   const carregarSalasCriadas = () => {
@@ -49,6 +57,7 @@ const SalasCriadasPage: React.FC = () => {
         const salasValidas = salas.filter((sala: SalaCriada) => {
           const criacao = new Date(sala.criada_em).getTime();
           const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
+          console.log(`⏰ Sala "${sala.nome}" criada há ${diferencaHoras.toFixed(1)} horas`);
           return diferencaHoras < 24;
         });
         
@@ -66,7 +75,29 @@ const SalasCriadasPage: React.FC = () => {
       }
     } else {
       console.log('📭 Nenhuma sala personalizada encontrada no localStorage');
-      setSalasPersonalizadas([]);
+      // Criar algumas salas de exemplo para teste
+      const salasExemplo = [
+        {
+          id: `exemplo-1-${Date.now()}`,
+          nome: 'Chat Geral - Centro, São Paulo',
+          bairro: 'Centro',
+          cidade: 'São Paulo',
+          criada_em: new Date().toISOString(),
+          usuarios: 0
+        },
+        {
+          id: `exemplo-2-${Date.now() + 1}`,
+          nome: 'Galera da Praia - Copacabana, Rio de Janeiro',
+          bairro: 'Copacabana',
+          cidade: 'Rio de Janeiro',
+          criada_em: new Date().toISOString(),
+          usuarios: 0
+        }
+      ];
+      
+      localStorage.setItem('salas-personalizadas', JSON.stringify(salasExemplo));
+      setSalasPersonalizadas(salasExemplo);
+      console.log('🎯 Salas de exemplo criadas para demonstração');
     }
   };
 
@@ -118,6 +149,13 @@ const SalasCriadasPage: React.FC = () => {
             <h1>🏠 Salas Criadas</h1>
             <p>Todas as salas personalizadas criadas pelos usuários</p>
             <small>⏰ Salas ficam ativas por 24 horas após a criação</small>
+            <button 
+              onClick={carregarSalasCriadas}
+              className="btn btn-secondary"
+              style={{ marginTop: '10px' }}
+            >
+              🔄 Atualizar Lista
+            </button>
           </div>
         </div>
 
