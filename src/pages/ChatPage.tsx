@@ -419,19 +419,19 @@ const ChatPage: React.FC = () => {
   };
 
   const handleEnviarMensagem = async () => {
-    // 🚀 VELOCIDADE ABSOLUTA - sem logs desnecessários
+    // ⚡ ULTRA VELOCIDADE - Zero delays
     if (!mensagem.trim() || !usuario || !salaId) return;
 
-    // ⚡ IMEDIATO: Capturar e limpar input
-    const mensagemParaEnviar = mensagem.trim();
+    // ⚡ INSTANTÂNEO: Capturar e limpar
+    const msg = mensagem.trim();
     setMensagem('');
 
-    // ⚡ IMEDIATO: Criar e mostrar mensagem instantaneamente
-    const mensagemOtimista: ChatMessage = {
-      id: `instant_${Date.now()}_${Math.random()}`,
+    // ⚡ INSTANTÂNEO: Criar mensagem otimista
+    const optimisticMsg: ChatMessage = {
+      id: `ultra_${Date.now()}${Math.random()}`,
       room_id: salaId,
       user_name: usuario.nome,
-      content: mensagemParaEnviar,
+      content: msg,
       message_type: 'texto',
       is_premium: usuario.premium || false,
       is_temporary: false,
@@ -439,75 +439,50 @@ const ChatPage: React.FC = () => {
       isOptimistic: true
     };
 
-    // ⚡ ADICIONAR INSTANTANEAMENTE (sem spread operator para máxima velocidade)
-    setMensagens(prev => {
-      prev.push(mensagemOtimista);
-      return [...prev];
+    // ⚡ INSTANTÂNEO: Mostrar na tela (método mais rápido)
+    setMensagens(prev => [...prev, optimisticMsg]);
+
+    // ⚡ INSTANTÂNEO: Scroll automático ultra rápido
+    requestAnimationFrame(() => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+      }
     });
 
-    // ⚡ SCROLL IMEDIATO
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
-    }
-
-    // 📤 ENVIO EM BACKGROUND (não aguarda)
-    chatService.sendMessage(salaId, usuario.nome, mensagemParaEnviar, 'texto', usuario.premium || false)
-      .catch(() => {}); // Ignorar erros para não afetar UI
+    // 📤 Background fire-and-forget (sem await, sem catch)
+    chatService.sendMessage(salaId, usuario.nome, msg, 'texto', usuario.premium || false);
   };
 
   const handleEnviarEmoji = async (emoji: string) => {
     if (!checkPremiumAccess('Emoticons e Figurinhas')) return;
-    
     if (!salaId || !usuario) return;
 
-    // 🚀 EMOJI INSTANTÂNEO - mesmo sistema otimista
-    const agora = new Date();
-    const mensagemEmojiOtimista: ChatMessage = {
-      id: `emoji_optimistic_${agora.getTime()}_${Math.random()}`,
+    // ⚡ EMOJI ULTRA RÁPIDO
+    const emojiMsg: ChatMessage = {
+      id: `emoji_ultra_${Date.now()}${Math.random()}`,
       room_id: salaId,
       user_name: usuario.nome,
       content: emoji,
       message_type: 'emoji',
       is_premium: usuario.premium || false,
       is_temporary: false,
-      created_at: agora.toISOString(),
+      created_at: new Date().toISOString(),
       isOptimistic: true
     };
 
-    // Mostrar emoji INSTANTANEAMENTE
-    setMensagens(prev => [...prev, mensagemEmojiOtimista]);
+    // ⚡ INSTANTÂNEO: Mostrar emoji
+    setMensagens(prev => [...prev, emojiMsg]);
     
-    // Scroll instantâneo
+    // ⚡ INSTANTÂNEO: Scroll e fechar painel
     requestAnimationFrame(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+      }
     });
-
-    // Fechar painel imediatamente
     setShowEmojis(false);
 
-    try {
-      console.log('😊 Enviando emoji em background:', emoji);
-      
-      // Envio em background
-      const envioPromise = chatService.sendMessage(
-        salaId,
-        usuario.nome,
-        emoji,
-        'texto',
-        usuario.premium || false
-      );
-
-      envioPromise.then((sucesso) => {
-        if (sucesso) {
-          console.log('✅ Emoji confirmado no servidor');
-        }
-      }).catch((error) => {
-        console.error('❌ Erro no envio do emoji (não afeta UI):', error);
-      });
-      
-    } catch (error) {
-      console.error('❌ Erro ao enviar emoji (mantendo na interface):', error);
-    }
+    // 📤 Background fire-and-forget
+    chatService.sendMessage(salaId, usuario.nome, emoji, 'texto', usuario.premium || false);
   };
 
   // NOVA FUNCIONALIDADE: Capturar vídeo com preview
