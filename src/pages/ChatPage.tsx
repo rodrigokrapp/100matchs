@@ -1257,93 +1257,44 @@ const ChatPage: React.FC = () => {
   };
 
   const handleSaveProfile = async () => {
-    try {
-      console.log('💾 Iniciando salvamento do perfil...', editingProfile);
-      
-      // Validar se há dados para salvar
-      if (!usuario?.nome) {
-        alert('❌ Erro: Usuário não identificado.');
-        return;
-      }
+    console.log('🔥 INICIANDO SALVAMENTO - Dados atuais:', editingProfile);
+    console.log('🔥 Usuário atual:', usuario);
+    
+    if (!usuario || !usuario.nome) {
+      console.error('❌ ERRO: Usuário não encontrado');
+      alert('❌ Erro: Usuário não identificado');
+      return;
+    }
 
-      // Salvar no localStorage primeiro (sempre funciona)
-      const perfilData = {
+    try {
+      // Dados simples para salvar
+      const dadosParaSalvar = {
         nome: usuario.nome,
         fotos: editingProfile.fotos || [],
         descricao: editingProfile.descricao || '',
         idade: editingProfile.idade || 25,
-        localizacao: editingProfile.localizacao || 'Brasil',
-        profissao: editingProfile.profissao || 'Usuário',
         updated_at: new Date().toISOString()
       };
 
-      localStorage.setItem(`perfil_${usuario.nome}`, JSON.stringify(perfilData));
-      localStorage.setItem(`usuario_${usuario.nome}`, JSON.stringify(perfilData));
+      console.log('💾 Salvando dados:', dadosParaSalvar);
+
+      // Salvar no localStorage
+      localStorage.setItem(`perfil_${usuario.nome}`, JSON.stringify(dadosParaSalvar));
+      localStorage.setItem(`usuario_${usuario.nome}`, JSON.stringify(dadosParaSalvar));
       
-      console.log('✅ Dados salvos no localStorage:', perfilData);
+      console.log('✅ DADOS SALVOS NO LOCALSTORAGE');
 
-      // Tentar salvar no Supabase (opcional, não bloqueia se falhar)
-      // Comentado temporariamente para evitar erros
-      /*
-      try {
-        const { error } = await supabase
-          .from('perfis')
-          .upsert(perfilData);
-
-        if (error) {
-          console.warn('⚠️ Aviso: Erro no Supabase (mas dados salvos localmente):', error);
-        } else {
-          console.log('☁️ Dados salvos no Supabase também');
-        }
-      } catch (supabaseError) {
-        console.warn('⚠️ Supabase indisponível, mas dados salvos localmente:', supabaseError);
-      }
-      */
-
-      // Broadcast para outros usuários
-      try {
-        window.dispatchEvent(new CustomEvent('profile_updated', {
-          detail: {
-            nome: usuario.nome,
-            fotos: editingProfile.fotos,
-            descricao: editingProfile.descricao,
-            idade: editingProfile.idade
-          }
-        }));
-        console.log('📡 Broadcast enviado para outros usuários');
-      } catch (broadcastError) {
-        console.warn('⚠️ Erro no broadcast:', broadcastError);
-      }
-
-      // Fechar modal e mostrar sucesso
+      // Fechar modal
       setShowEditPerfilModal(false);
+      
+      // Mostrar sucesso
       alert('✅ Perfil salvo com sucesso!');
       
-      // Forçar atualização da interface
-      setUsuariosOnlineList(prev => [...prev]);
-      
-      console.log('🎉 Salvamento concluído com sucesso!');
+      console.log('🎉 SALVAMENTO CONCLUÍDO COM SUCESSO');
       
     } catch (error) {
-      console.error('💥 Erro crítico ao salvar perfil:', error);
-      
-      // Tentar salvar pelo menos no localStorage como fallback
-      try {
-        const fallbackData = {
-          nome: usuario?.nome || 'Usuario',
-          fotos: editingProfile.fotos || [],
-          descricao: editingProfile.descricao || '',
-          idade: editingProfile.idade || 25,
-          updated_at: new Date().toISOString()
-        };
-        
-        localStorage.setItem(`perfil_${usuario?.nome}`, JSON.stringify(fallbackData));
-        alert('⚠️ Perfil salvo localmente (erro na sincronização)');
-        setShowEditPerfilModal(false);
-      } catch (fallbackError) {
-        console.error('💥 Erro crítico no fallback:', fallbackError);
-        alert('❌ Erro ao salvar perfil. Verifique sua conexão e tente novamente.');
-      }
+      console.error('💥 ERRO CRÍTICO:', error);
+      alert('❌ Erro ao salvar: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));
     }
   };
 
@@ -2080,7 +2031,10 @@ const ChatPage: React.FC = () => {
                 <h4>✍️ Descrição</h4>
                 <textarea
                   value={editingProfile.descricao}
-                  onChange={(e) => setEditingProfile(prev => ({ ...prev, descricao: e.target.value }))}
+                  onChange={(e) => {
+                    console.log('🔥 DESCRIÇÃO ALTERADA:', e.target.value);
+                    setEditingProfile(prev => ({ ...prev, descricao: e.target.value }));
+                  }}
                   placeholder="Conte um pouco sobre você..."
                   maxLength={500}
                   rows={4}
@@ -2096,7 +2050,10 @@ const ChatPage: React.FC = () => {
                     <input
                       type="number"
                       value={editingProfile.idade}
-                      onChange={(e) => setEditingProfile(prev => ({ ...prev, idade: parseInt(e.target.value) || 25 }))}
+                      onChange={(e) => {
+                        console.log('🔥 IDADE ALTERADA:', e.target.value);
+                        setEditingProfile(prev => ({ ...prev, idade: parseInt(e.target.value) || 25 }));
+                      }}
                       min="18"
                       max="99"
                     />
@@ -2108,7 +2065,13 @@ const ChatPage: React.FC = () => {
                 <button className="cancel-button" onClick={() => setShowEditPerfilModal(false)}>
                   Cancelar
                 </button>
-                <button className="save-button" onClick={handleSaveProfile}>
+                <button 
+                  className="save-button" 
+                  onClick={() => {
+                    console.log('🔥 BOTÃO SALVAR CLICADO!');
+                    handleSaveProfile();
+                  }}
+                >
                   <FiSave />
                   Salvar Perfil
                 </button>
