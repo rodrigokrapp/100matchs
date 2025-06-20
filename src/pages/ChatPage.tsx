@@ -45,6 +45,7 @@ const ChatPage: React.FC = () => {
   const [usuarioSelecionado, setUsuarioSelecionado] = useState<any>(null);
   const [showPerfilModal, setShowPerfilModal] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [usuariosReaisOnline, setUsuariosReaisOnline] = useState<{[key: string]: number}>({});
 
   const nomeSala = location.state?.nomeSala || 'Chat';
 
@@ -1039,15 +1040,51 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  // Função para atualizar lista de usuários online
+  // Função para atualizar lista de usuários realmente online
   const atualizarUsuariosOnline = () => {
-    const usuariosUnicos = Array.from(new Set(mensagens.map(msg => msg.user_name)));
-    setUsuariosOnlineList(usuariosUnicos.filter(nome => nome !== usuario?.nome));
+    const agora = Date.now();
+    const TEMPO_ONLINE = 5 * 60 * 1000; // 5 minutos
+
+    // Filtrar usuários que estiveram ativos nos últimos 5 minutos
+    const usuariosAtivos = Object.entries(usuariosReaisOnline)
+      .filter(([nome, ultimaAtividade]) => {
+        const tempoInativo = agora - ultimaAtividade;
+        return tempoInativo <= TEMPO_ONLINE && nome !== usuario?.nome;
+      })
+      .map(([nome]) => nome);
+
+    setUsuariosOnlineList(usuariosAtivos);
+    
+    // Atualizar contador de usuários online (incluindo o usuário atual)
+    const totalOnline = usuariosAtivos.length + 1; // +1 para o usuário atual
+    setUsuariosOnline(totalOnline);
   };
 
-  // Atualizar lista quando mensagens mudarem
+  // Registrar atividade do usuário atual
+  const registrarAtividade = (nomeUsuario: string) => {
+    setUsuariosReaisOnline(prev => ({
+      ...prev,
+      [nomeUsuario]: Date.now()
+    }));
+  };
+
+  // Atualizar lista quando usuários online mudarem
   useEffect(() => {
     atualizarUsuariosOnline();
+    
+    // Atualizar a cada 30 segundos para remover usuários inativos
+    const interval = setInterval(atualizarUsuariosOnline, 30000);
+    
+    return () => clearInterval(interval);
+  }, [usuariosReaisOnline, usuario]);
+
+  // Registrar atividade quando mensagens chegarem
+  useEffect(() => {
+    mensagens.forEach(msg => {
+      if (msg.user_name && msg.user_name !== usuario?.nome) {
+        registrarAtividade(msg.user_name);
+      }
+    });
   }, [mensagens, usuario]);
 
   // Função para carregar dados do usuário selecionado
