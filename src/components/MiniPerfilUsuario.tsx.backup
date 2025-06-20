@@ -217,10 +217,8 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
 
   if (loading) {
     return (
-      <div className="mini-perfil-trigger">
-        <div className="mini-foto-perfil loading-placeholder">
-          <FiUser />
-        </div>
+      <div className="mini-perfil-loading">
+        <FiUser className="default-user-icon" />
       </div>
     );
   }
@@ -265,9 +263,9 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
     console.log('👤 É próprio perfil?:', isOwnProfile);
     console.log('📸 Fotos disponíveis:', userPhotos.length);
     
-    // CORREÇÃO TOTAL: Todos podem ver todos os perfis sempre
-    // A diferenciação será no conteúdo mostrado (premium vs free)
-    console.log('✅ ACESSO SEMPRE LIBERADO - Modal será exibido');
+    // CORREÇÃO: Removendo restrição para corrigir o bug do risco na tela
+    // Todos podem ver todos os perfis (diferenciação será no conteúdo mostrado)
+    console.log('✅ ACESSO LIBERADO - Modal será exibido para todos');
     setShowModal(true);
     setCurrentPhotoIndex(0);
   };
@@ -307,12 +305,13 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
   if (userPhotos.length === 0) {
     return (
       <div 
-        className="user-icon-only"
+        className={`user-icon-only ${!isViewerPremium && !isOwnProfile ? 'restricted-access' : ''}`}
         onClick={handleOpenModal}
-        title="Ver perfil"
+        title={!isViewerPremium && !isOwnProfile ? 'Funcionalidade Premium - Clique para saber mais' : 'Ver perfil'}
       >
         <FiUser className="default-user-icon" />
         {isUserPremium && <FiStar className="mini-premium-icon-no-photo" />}
+        {!isViewerPremium && !isOwnProfile && <FiLock className="lock-icon" />}
         
         {/* Modal para usuários sem foto */}
         {showModal && (
@@ -338,9 +337,9 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
                     </div>
                   ) : (
                     <div className="blocked-photo-section">
-                      <FiUser size={60} />
-                      <p>👤 Usuário sem fotos</p>
-                      <p>Este usuário ainda não adicionou fotos ao perfil</p>
+                      <FiLock size={60} />
+                      <p>🔒 Fotos bloqueadas</p>
+                      <p>Faça upgrade para Premium para ver fotos</p>
                     </div>
                   )}
                 </div>
@@ -360,12 +359,16 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
 
                   <div className="bio-section">
                     <h4>Sobre mim</h4>
-                    <p>{bioParaMostrar}</p>
-                    {!canViewFull && userBio.length > 50 && (
-                      <div className="premium-upgrade-hint">
-                        <FiStar />
-                        <span>Faça upgrade para ver descrição completa</span>
-                      </div>
+                    {canViewFull ? (
+                      <p>{userBio}</p>
+                    ) : (
+                      <>
+                        <div className="blocked-bio">
+                          <FiLock />
+                          <p>🔒 Descrição bloqueada</p>
+                          <p>Faça upgrade para Premium para ver descrição completa</p>
+                        </div>
+                      </>
                     )}
                   </div>
 
@@ -421,9 +424,9 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
     <>
       {/* Mini foto do perfil - para todos que têm foto */}
       <div 
-        className="mini-perfil-trigger"
+        className={`mini-perfil-trigger ${!isViewerPremium && !isOwnProfile ? 'restricted-access' : ''}`}
         onClick={handleOpenModal}
-        title="Ver perfil"
+        title={!isViewerPremium && !isOwnProfile ? 'Funcionalidade Premium - Clique para saber mais' : 'Ver perfil'}
       >
         <img 
           src={fotoPrincipal} 
@@ -431,6 +434,7 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
           className="mini-foto-perfil"
         />
         {isUserPremium && <FiStar className="mini-premium-icon" />}
+        {!isViewerPremium && !isOwnProfile && <FiLock className="lock-icon-photo" />}
       </div>
 
       {/* Modal do perfil */}
@@ -460,40 +464,34 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
                   
                   {fotosParaMostrar.length > 1 && (
                     <>
-                      <button 
-                        className="photo-nav prev" 
-                        onClick={prevPhoto}
-                        title="Foto anterior"
-                      >
-                        ❮
-                      </button>
-                      <button 
-                        className="photo-nav next" 
-                        onClick={nextPhoto}
-                        title="Próxima foto"
-                      >
-                        ❯
-                      </button>
+                      <button className="photo-nav prev" onClick={prevPhoto}>‹</button>
+                      <button className="photo-nav next" onClick={nextPhoto}>›</button>
                     </>
                   )}
                   
                   <div className="photo-counter">
-                    {currentPhotoIndex + 1} de {fotosParaMostrar.length}
-                    {!canViewFull && userPhotos.length > 1 && (
+                    {currentPhotoIndex + 1} / {fotosParaMostrar.length}
+                    {currentPhotoIndex === mainPhotoIndex && (
+                      <span className="main-photo-indicator">
+                        ⭐ Principal
+                      </span>
+                    )}
+                    {!canViewFull && (
                       <span className="limited-access">
-                        (Total: {userPhotos.length} - Premium para ver todas)
+                        <FiLock /> Limitado
                       </span>
                     )}
                   </div>
                 </div>
 
-                {fotosParaMostrar.length > 1 && (
+                {/* Thumbnails das fotos - só para quem pode ver tudo */}
+                {canViewFull && fotosParaMostrar.length > 1 && (
                   <div className="photo-thumbnails">
-                    {fotosParaMostrar.map((foto, index) => (
+                    {fotosParaMostrar.map((foto: string, index: number) => (
                       <img
                         key={index}
                         src={foto}
-                        alt={`Miniatura ${index + 1}`}
+                        alt={`Thumbnail ${index + 1}`}
                         className={`thumbnail ${index === currentPhotoIndex ? 'active' : ''} ${index === mainPhotoIndex ? 'main-thumbnail' : ''}`}
                         onClick={() => setCurrentPhotoIndex(index)}
                       />
@@ -519,10 +517,10 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
                 <div className="bio-section">
                   <h4>Sobre mim</h4>
                   <p>{bioParaMostrar}</p>
-                  {!canViewFull && userBio.length > 50 && (
+                  {!canViewFull && (
                     <div className="premium-upgrade-hint">
-                      <FiStar />
-                      <span>Faça upgrade para ver descrição completa</span>
+                      <FiLock />
+                      <span>Faça upgrade para ver o perfil completo</span>
                     </div>
                   )}
                 </div>
