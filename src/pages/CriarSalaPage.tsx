@@ -23,19 +23,28 @@ const CriarSalaPage: React.FC = () => {
       const salaId = `${nome.toLowerCase().replace(/\s/g, '-')}-${bairro.toLowerCase().replace(/\s/g, '-')}-${cidade.toLowerCase().replace(/\s/g, '-')}-${Date.now()}`;
       
       // Criar objeto da sala
+      const usuarioChat = localStorage.getItem('usuarioChat');
+      const usuarioPremium = localStorage.getItem('usuarioPremium');
+      const usuario = usuarioChat ? JSON.parse(usuarioChat) : (usuarioPremium ? JSON.parse(usuarioPremium) : {});
+      
       const novaSala = {
         id: salaId,
         nome: `${nome} - ${bairro}, ${cidade}`,
+        bairro: bairro.trim(),
+        cidade: cidade.trim(),
         tipo: 'personalizada',
         usuarios: 0,
         criada_em: new Date().toISOString(),
-        criador: JSON.parse(localStorage.getItem('visitante') || localStorage.getItem('usuario') || '{}').nome
+        criador: usuario.nome || 'Usuário'
       };
 
       // Salvar no localStorage
       const salasExistentes = JSON.parse(localStorage.getItem('salas-personalizadas') || '[]');
       salasExistentes.push(novaSala);
       localStorage.setItem('salas-personalizadas', JSON.stringify(salasExistentes));
+
+      console.log('🏠 Nova sala criada:', novaSala);
+      console.log('📂 Salas no localStorage:', salasExistentes);
 
       alert('Sala criada com sucesso!');
       navigate('/salas');

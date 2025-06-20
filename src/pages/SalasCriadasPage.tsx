@@ -20,11 +20,11 @@ const SalasCriadasPage: React.FC = () => {
 
   useEffect(() => {
     // Verificar se usuário está logado
-    const visitante = localStorage.getItem('visitante');
-    const usuarioPremium = localStorage.getItem('usuario');
+    const usuarioChat = localStorage.getItem('usuarioChat');
+    const usuarioPremium = localStorage.getItem('usuarioPremium');
     
-    if (visitante) {
-      setUsuario(JSON.parse(visitante));
+    if (usuarioChat) {
+      setUsuario(JSON.parse(usuarioChat));
     } else if (usuarioPremium) {
       setUsuario(JSON.parse(usuarioPremium));
     } else {
@@ -37,23 +37,36 @@ const SalasCriadasPage: React.FC = () => {
 
   const carregarSalasCriadas = () => {
     const salasPersonalizadasSalvas = localStorage.getItem('salas-personalizadas');
+    console.log('📂 Carregando salas do localStorage:', salasPersonalizadasSalvas);
+    
     if (salasPersonalizadasSalvas) {
-      const salas = JSON.parse(salasPersonalizadasSalvas);
-      
-      // Filtrar salas que não expiraram (24 horas) e remover as expiradas
-      const agora = new Date().getTime();
-      const salasValidas = salas.filter((sala: SalaCriada) => {
-        const criacao = new Date(sala.criada_em).getTime();
-        const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
-        return diferencaHoras < 24;
-      });
-      
-      setSalasPersonalizadas(salasValidas);
-      
-      // Atualizar localStorage removendo salas expiradas
-      if (salasValidas.length !== salas.length) {
-        localStorage.setItem('salas-personalizadas', JSON.stringify(salasValidas));
+      try {
+        const salas = JSON.parse(salasPersonalizadasSalvas);
+        console.log('🏠 Salas encontradas:', salas);
+        
+        // Filtrar salas que não expiraram (24 horas) e remover as expiradas
+        const agora = new Date().getTime();
+        const salasValidas = salas.filter((sala: SalaCriada) => {
+          const criacao = new Date(sala.criada_em).getTime();
+          const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
+          return diferencaHoras < 24;
+        });
+        
+        console.log('✅ Salas válidas (não expiradas):', salasValidas);
+        setSalasPersonalizadas(salasValidas);
+        
+        // Atualizar localStorage removendo salas expiradas
+        if (salasValidas.length !== salas.length) {
+          localStorage.setItem('salas-personalizadas', JSON.stringify(salasValidas));
+          console.log('🗑️ Salas expiradas removidas do localStorage');
+        }
+      } catch (error) {
+        console.error('❌ Erro ao carregar salas:', error);
+        setSalasPersonalizadas([]);
       }
+    } else {
+      console.log('📭 Nenhuma sala personalizada encontrada no localStorage');
+      setSalasPersonalizadas([]);
     }
   };
 
