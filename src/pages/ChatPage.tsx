@@ -69,6 +69,8 @@ const ChatPage: React.FC = () => {
 
   // Simular outros usuários para demonstração
   const simulateOtherUsers = () => {
+    // REMOVIDO: Não simular usuários falsos
+    /*
     const otherUsers = ['Ana', 'Carlos', 'Maria', 'João', 'Paula', 'Bruno'];
     const sampleMessages = [
       'Oi pessoal! Como vocês estão?',
@@ -94,6 +96,7 @@ const ChatPage: React.FC = () => {
         false
       );
     }
+    */
   };
 
   // Cleanup ao sair da página
@@ -1045,7 +1048,7 @@ const ChatPage: React.FC = () => {
     const agora = Date.now();
     const TEMPO_ONLINE = 5 * 60 * 1000; // 5 minutos
 
-    // Filtrar usuários que estiveram ativos nos últimos 5 minutos
+    // Filtrar usuários que estiveram ativos nos últimos 5 minutos (SEM o usuário atual)
     const usuariosAtivos = Object.entries(usuariosReaisOnline)
       .filter(([nome, ultimaAtividade]) => {
         const tempoInativo = agora - ultimaAtividade;
@@ -1053,7 +1056,9 @@ const ChatPage: React.FC = () => {
       })
       .map(([nome]) => nome);
 
-    setUsuariosOnlineList(usuariosAtivos);
+    // Incluir o usuário atual na lista horizontal
+    const listaCompleta = usuario?.nome ? [usuario.nome, ...usuariosAtivos] : usuariosAtivos;
+    setUsuariosOnlineList(listaCompleta);
     
     // Atualizar contador de usuários online (incluindo o usuário atual)
     const totalOnline = usuariosAtivos.length + 1; // +1 para o usuário atual
@@ -1087,11 +1092,51 @@ const ChatPage: React.FC = () => {
     });
   }, [mensagens, usuario]);
 
+  // Registrar atividade do usuário atual quando entra no chat
+  useEffect(() => {
+    if (usuario?.nome) {
+      registrarAtividade(usuario.nome);
+      console.log('👤 Usuário registrado como ativo:', usuario.nome);
+    }
+  }, [usuario]);
+
   // Função para carregar dados do usuário selecionado
   const carregarDadosUsuario = async (nomeUsuario: string) => {
     try {
       console.log('🔍 Carregando dados do usuário:', nomeUsuario);
       
+      // Se for o próprio usuário, carregar dados reais
+      if (nomeUsuario === usuario?.nome) {
+        // Buscar dados do perfil do usuário logado
+        let perfilData = null;
+        
+        try {
+          const { data } = await supabase
+            .from('perfis')
+            .select('*')
+            .eq('nome', nomeUsuario)
+            .maybeSingle();
+          perfilData = data;
+        } catch (error) {
+          console.log('Perfil não encontrado no Supabase, usando dados locais');
+        }
+
+        const dadosUsuarioAtual = {
+          nome: usuario.nome,
+          isPremium: usuario.tipo === 'premium' || usuario.premium || false,
+          fotos: perfilData?.fotos?.filter((foto: string) => foto !== '') || [],
+          descricao: perfilData?.descricao || 'Meu perfil na plataforma 100matchs.',
+          idade: perfilData?.idade || 25,
+          localizacao: perfilData?.localizacao || 'Brasil',
+          profissao: perfilData?.profissao || 'Usuário Premium',
+          interesses: perfilData?.interesses || ['Conversas', 'Amizades', 'Relacionamentos'],
+          fotoPrincipal: perfilData?.foto_principal || 0
+        };
+
+        return dadosUsuarioAtual;
+      }
+      
+      // Para outros usuários, buscar no Supabase
       let { data: perfilData } = await supabase
         .from('perfis')
         .select('*')
@@ -1100,7 +1145,7 @@ const ChatPage: React.FC = () => {
 
       const dadosUsuario = {
         nome: nomeUsuario,
-        isPremium: Math.random() > 0.5, // Simulação
+        isPremium: Math.random() > 0.5, // Simulação para outros usuários
         fotos: perfilData?.fotos?.filter((foto: string) => foto !== '') || [],
         descricao: perfilData?.descricao || 'Usuário da plataforma 100matchs.',
         idade: perfilData?.idade || Math.floor(Math.random() * 20) + 20,
@@ -1113,6 +1158,22 @@ const ChatPage: React.FC = () => {
       return dadosUsuario;
     } catch (error) {
       console.error('Erro ao carregar usuário:', error);
+      
+      // Fallback - se for o usuário atual, usar dados dele
+      if (nomeUsuario === usuario?.nome) {
+        return {
+          nome: usuario.nome,
+          isPremium: usuario.tipo === 'premium' || usuario.premium || false,
+          fotos: [],
+          descricao: 'Meu perfil na plataforma 100matchs.',
+          idade: 25,
+          localizacao: 'Brasil',
+          profissao: 'Usuário Premium',
+          interesses: ['Conversas', 'Amizades', 'Relacionamentos'],
+          fotoPrincipal: 0
+        };
+      }
+      
       return {
         nome: nomeUsuario,
         isPremium: false,
@@ -1541,20 +1602,26 @@ const ChatPage: React.FC = () => {
           </div>
           
           <div className="usuarios-horizontal-scroll">
-            {usuariosOnlineList.map((nomeUsuario) => (
-              <div 
-                key={nomeUsuario}
-                className="usuario-horizontal-item"
-                onClick={() => handleUsuarioClick(nomeUsuario)}
-                title={`Ver perfil de ${nomeUsuario}`}
-              >
-                <div className="usuario-horizontal-foto">
-                  <FiUser className="icone-usuario-horizontal" />
-                  <div className="status-horizontal-online"></div>
+            {usuariosOnlineList.map((nomeUsuario) => {
+              const isCurrentUser = nomeUsuario === usuario?.nome;
+              return (
+                <div 
+                  key={nomeUsuario}
+                  className={`usuario-horizontal-item ${isCurrentUser ? 'current-user' : ''}`}
+                  onClick={() => handleUsuarioClick(nomeUsuario)}
+                  title={isCurrentUser ? 'Meu perfil' : `Ver perfil de ${nomeUsuario}`}
+                >
+                  <div className="usuario-horizontal-foto">
+                    <FiUser className="icone-usuario-horizontal" />
+                    <div className="status-horizontal-online"></div>
+                    {isCurrentUser && <div className="current-user-badge">EU</div>}
+                  </div>
+                  <span className="nome-usuario-horizontal">
+                    {isCurrentUser ? 'Eu' : nomeUsuario}
+                  </span>
                 </div>
-                <span className="nome-usuario-horizontal">{nomeUsuario}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
