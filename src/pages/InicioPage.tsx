@@ -97,23 +97,20 @@ const InicioPage: React.FC = () => {
       return;
     }
 
-    if (!fotoChat) {
-      alert('Por favor, adicione uma foto para seu perfil');
-      return;
-    }
+
 
     if (!aceitarTermos) {
       alert('Por favor, aceite os termos de políticas e privacidade');
       return;
     }
 
-    // Salvar usuário de chat gratuito com tempo de sessão e foto
+    // Salvar usuário de chat gratuito com tempo de sessão (foto opcional)
     const usuarioChat = {
       nome: nome.trim(),
       email: email.trim() || `${nome.trim().toLowerCase().replace(/\s+/g, '')}@chat.com`,
       premium: false,
       tipo: 'chat',
-      foto: fotoChat,
+      foto: fotoChat || null, // Foto opcional
       limiteTempo: 15 * 60 * 1000, // 15 minutos em milissegundos
       inicioSessao: new Date().getTime()
     };
@@ -121,17 +118,19 @@ const InicioPage: React.FC = () => {
     localStorage.setItem('usuarioChat', JSON.stringify(usuarioChat));
     localStorage.setItem(`acesso_${usuarioChat.email}`, 'true');
     
-    // Salvar foto no perfil também
-    const perfilData = {
-      nome: usuarioChat.nome,
-      fotos: [fotoChat],
-      descricao: '',
-      idade: 25,
-      updated_at: new Date().toISOString()
-    };
-    
-    localStorage.setItem(`perfil_${usuarioChat.nome}`, JSON.stringify(perfilData));
-    localStorage.setItem(`usuario_${usuarioChat.nome}`, JSON.stringify(perfilData));
+    // Salvar foto no perfil também (apenas se houver foto)
+    if (fotoChat) {
+      const perfilData = {
+        nome: usuarioChat.nome,
+        fotos: [fotoChat],
+        descricao: '',
+        idade: 25,
+        updated_at: new Date().toISOString()
+      };
+      
+      localStorage.setItem(`perfil_${usuarioChat.nome}`, JSON.stringify(perfilData));
+      localStorage.setItem(`usuario_${usuarioChat.nome}`, JSON.stringify(perfilData));
+    }
 
     navigate('/salas');
   };
@@ -153,21 +152,17 @@ const InicioPage: React.FC = () => {
       return;
     }
 
-    // Se não tem foto atual e também não tem foto salva, exigir foto
-    if (!fotoPremium && !usuarioPremium.foto) {
-      alert('Por favor, adicione uma foto para seu perfil');
-      return;
-    }
+
 
     if (!aceitarTermosPremium) {
       alert('Por favor, aceite os termos de políticas e privacidade');
       return;
     }
 
-    // Usar foto atual ou foto salva
-    const fotoFinal = fotoPremium || usuarioPremium.foto;
+    // Usar foto atual ou foto salva (opcional)
+    const fotoFinal = fotoPremium || usuarioPremium.foto || null;
 
-    // Login bem-sucedido com foto
+    // Login bem-sucedido (foto opcional)
     const usuarioLogado = {
       ...usuarioPremium,
       premium: true,
@@ -188,17 +183,19 @@ const InicioPage: React.FC = () => {
 
     localStorage.setItem('usuarioPremium', JSON.stringify(usuarioLogado));
     
-    // Salvar/atualizar foto no perfil
-    const perfilData = {
-      nome: usuarioLogado.nome,
-      fotos: [fotoFinal],
-      descricao: usuarioLogado.descricao || '',
-      idade: usuarioLogado.idade || 25,
-      updated_at: new Date().toISOString()
-    };
-    
-    localStorage.setItem(`perfil_${usuarioLogado.nome}`, JSON.stringify(perfilData));
-    localStorage.setItem(`usuario_${usuarioLogado.nome}`, JSON.stringify(perfilData));
+    // Salvar/atualizar foto no perfil (apenas se houver foto)
+    if (fotoFinal) {
+      const perfilData = {
+        nome: usuarioLogado.nome,
+        fotos: [fotoFinal],
+        descricao: usuarioLogado.descricao || '',
+        idade: usuarioLogado.idade || 25,
+        updated_at: new Date().toISOString()
+      };
+      
+      localStorage.setItem(`perfil_${usuarioLogado.nome}`, JSON.stringify(perfilData));
+      localStorage.setItem(`usuario_${usuarioLogado.nome}`, JSON.stringify(perfilData));
+    }
 
     navigate('/salas');
   };
