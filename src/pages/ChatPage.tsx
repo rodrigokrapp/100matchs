@@ -1496,6 +1496,31 @@ const ChatPage: React.FC = () => {
           </div>
         )}
 
+        {/* Lista Horizontal de Usuários */}
+        <div className="lista-usuarios-horizontal">
+          <div className="lista-horizontal-header">
+            <FiUsers />
+            <span>Usuários Online ({usuariosOnlineList.length})</span>
+          </div>
+          
+          <div className="usuarios-horizontal-scroll">
+            {usuariosOnlineList.map((nomeUsuario) => (
+              <div 
+                key={nomeUsuario}
+                className="usuario-horizontal-item"
+                onClick={() => handleUsuarioClick(nomeUsuario)}
+                title={`Ver perfil de ${nomeUsuario}`}
+              >
+                <div className="usuario-horizontal-foto">
+                  <FiUser className="icone-usuario-horizontal" />
+                  <div className="status-horizontal-online"></div>
+                </div>
+                <span className="nome-usuario-horizontal">{nomeUsuario}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Input Area */}
         <div className="input-container">
           <div className="media-buttons">
@@ -1555,35 +1580,6 @@ const ChatPage: React.FC = () => {
           >
             <FiSend />
           </button>
-        </div>
-      </div>
-      
-      {/* Lista Lateral de Usuários */}
-      <div className="lista-usuarios-lateral">
-        <div className="lista-header">
-          <FiUsers />
-          <span>Usuários Online ({usuariosOnlineList.length})</span>
-        </div>
-        
-        <div className="lista-usuarios">
-          {usuariosOnlineList.map((nomeUsuario) => (
-            <div 
-              key={nomeUsuario}
-              className="usuario-item"
-              onClick={() => handleUsuarioClick(nomeUsuario)}
-              title={`Ver perfil de ${nomeUsuario}`}
-            >
-              <div className="usuario-foto">
-                <FiUser className="icone-usuario-default" />
-                <div className="status-online"></div>
-              </div>
-              
-              <div className="usuario-info">
-                <span className="nome-usuario">{nomeUsuario}</span>
-                <span className="idade-usuario">Online</span>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 

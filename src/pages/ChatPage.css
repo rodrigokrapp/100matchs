@@ -27,6 +27,7 @@
   margin: 0 auto;
   width: 100%;
   padding: 0 20px;
+  margin-right: 0;
 }
 
 /* Chat Header */
@@ -1691,56 +1692,74 @@
   transform: scale(1.05);
 }
 
-/* Lista Lateral de Usuários */
-.lista-usuarios-lateral {
-  position: fixed;
-  right: 0;
-  top: 60px;
-  width: 280px;
-  height: calc(100vh - 60px);
+/* Lista Horizontal de Usuários */
+.lista-usuarios-horizontal {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-left: 2px solid rgba(255, 255, 255, 0.1);
-  z-index: 100;
-  overflow-y: auto;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  margin-bottom: 15px;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.lista-header {
+.lista-horizontal-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 12px;
   color: white;
   font-weight: 600;
   font-size: 14px;
 }
 
-.lista-usuarios {
-  padding: 10px;
+.usuarios-horizontal-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 5px;
 }
 
-.usuario-item {
+.usuarios-horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.usuarios-horizontal-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.usuarios-horizontal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.usuarios-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.usuario-horizontal-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  margin-bottom: 8px;
+  gap: 8px;
+  padding: 10px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   border: 1px solid transparent;
+  min-width: 80px;
+  flex-shrink: 0;
 }
 
-.usuario-item:hover {
+.usuario-horizontal-item:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.3);
-  transform: translateX(-2px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.usuario-foto {
+.usuario-horizontal-foto {
   position: relative;
   width: 45px;
   height: 45px;
@@ -1753,12 +1772,12 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.icone-usuario-default {
+.icone-usuario-horizontal {
   color: rgba(255, 255, 255, 0.7);
   font-size: 20px;
 }
 
-.status-online {
+.status-horizontal-online {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -1769,25 +1788,15 @@
   border: 2px solid white;
 }
 
-.usuario-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.nome-usuario {
+.nome-usuario-horizontal {
   color: white;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
+  text-align: center;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-}
-
-.idade-usuario {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
+  max-width: 70px;
 }
 
 /* Modal do Perfil */
@@ -2057,25 +2066,90 @@
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
-/* Ajustar chat para dar espaço para lista lateral */
-.chat-container {
-  margin-right: 280px;
-}
-
 /* Responsivo */
 @media (max-width: 768px) {
-  .lista-usuarios-lateral {
-    width: 100%;
-    right: -100%;
-    transition: right 0.3s ease;
+  .lista-usuarios-horizontal {
+    margin-bottom: 10px;
+    padding: 12px;
   }
   
-  .chat-container {
-    margin-right: 0;
+  .lista-horizontal-header {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  
+  .usuarios-horizontal-scroll {
+    gap: 10px;
+  }
+  
+  .usuario-horizontal-item {
+    min-width: 70px;
+    padding: 8px;
+    gap: 6px;
+  }
+  
+  .usuario-horizontal-foto {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .icone-usuario-horizontal {
+    font-size: 18px;
+  }
+  
+  .status-horizontal-online {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .nome-usuario-horizontal {
+    font-size: 11px;
+    max-width: 60px;
   }
   
   .modal-perfil {
     width: 95%;
     margin: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lista-usuarios-horizontal {
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+  
+  .lista-horizontal-header {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .usuarios-horizontal-scroll {
+    gap: 8px;
+  }
+  
+  .usuario-horizontal-item {
+    min-width: 60px;
+    padding: 6px;
+    gap: 4px;
+  }
+  
+  .usuario-horizontal-foto {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .icone-usuario-horizontal {
+    font-size: 16px;
+  }
+  
+  .status-horizontal-online {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .nome-usuario-horizontal {
+    font-size: 10px;
+    max-width: 50px;
   }
 } 
