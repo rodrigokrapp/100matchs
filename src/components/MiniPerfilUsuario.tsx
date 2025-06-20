@@ -258,8 +258,17 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
 
   const handleOpenModal = () => {
     console.log('🖱️ CLIQUE NA MINI FOTO detectado para:', nomeUsuario);
+    console.log('👤 Usuário que clicou é premium?:', isViewerPremium);
     console.log('📸 Fotos disponíveis:', userPhotos.length);
-    console.log('🔧 Modal será exibido:', true);
+    
+    // RESTRIÇÃO: Apenas usuários premium podem abrir perfis de outros usuários
+    if (!isViewerPremium && !isOwnProfile) {
+      console.log('🚫 ACESSO NEGADO: Usuário gratuito tentando ver perfil');
+      alert('⭐ Funcionalidade Premium!\n\nApenas usuários premium podem visualizar perfis de outros usuários.\n\nFaça upgrade para ter acesso completo!');
+      return;
+    }
+    
+    console.log('✅ ACESSO PERMITIDO - Modal será exibido');
     setShowModal(true);
     setCurrentPhotoIndex(0);
   };
@@ -298,9 +307,14 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
   // Se não tem foto, mostrar ícone padrão
   if (userPhotos.length === 0) {
     return (
-      <div className="user-icon-only" onClick={handleOpenModal}>
+      <div 
+        className={`user-icon-only ${!isViewerPremium && !isOwnProfile ? 'restricted-access' : ''}`}
+        onClick={handleOpenModal}
+        title={!isViewerPremium && !isOwnProfile ? 'Funcionalidade Premium - Clique para saber mais' : 'Ver perfil'}
+      >
         <FiUser className="default-user-icon" />
         {isUserPremium && <FiStar className="mini-premium-icon-no-photo" />}
+        {!isViewerPremium && !isOwnProfile && <FiLock className="lock-icon" />}
         
         {/* Modal para usuários sem foto */}
         {showModal && (
@@ -413,9 +427,9 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
     <>
       {/* Mini foto do perfil - para todos que têm foto */}
       <div 
-        className="mini-perfil-trigger"
+        className={`mini-perfil-trigger ${!isViewerPremium && !isOwnProfile ? 'restricted-access' : ''}`}
         onClick={handleOpenModal}
-        title="Ver perfil"
+        title={!isViewerPremium && !isOwnProfile ? 'Funcionalidade Premium - Clique para saber mais' : 'Ver perfil'}
       >
         <img 
           src={fotoPrincipal} 
@@ -423,6 +437,7 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
           className="mini-foto-perfil"
         />
         {isUserPremium && <FiStar className="mini-premium-icon" />}
+        {!isViewerPremium && !isOwnProfile && <FiLock className="lock-icon-photo" />}
       </div>
 
       {/* Modal do perfil */}
