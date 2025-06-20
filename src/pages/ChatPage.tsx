@@ -1685,7 +1685,6 @@ const ChatPage: React.FC = () => {
               {mensagensFiltradas.map((msg) => {
                 const isExpired = isMessageExpired(msg);
                 const isOwn = msg.user_name === usuario?.nome;
-                const userPhoto = getUserPhoto(msg.user_name);
                 
                 if (isExpired && !isOwn) {
                   return null;
@@ -1698,21 +1697,11 @@ const ChatPage: React.FC = () => {
                   >
                     <div className="message-header">
                       <div className="user-info" onClick={() => handleUsuarioClick(msg.user_name)}>
-                        <div className="user-mini-photo">
-                          {userPhoto ? (
-                            <img 
-                              src={userPhoto} 
-                              alt={msg.user_name}
-                              className="mini-profile-photo"
-                            />
-                          ) : (
-                            <FiUser className="default-user-icon" />
-                          )}
-                        </div>
-                      <span className="sender">
-                        {msg.user_name}
-                        {msg.is_premium && <FiStar className="premium-icon" />}
-                      </span>
+                        <FiUser className="default-user-icon" />
+                        <span className="sender">
+                          {msg.user_name}
+                          {msg.is_premium && <FiStar className="premium-icon" />}
+                        </span>
                       </div>
                       <span className="time">{formatTime(msg.created_at)}</span>
                       {msg.is_temporary && (

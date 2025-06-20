@@ -68,14 +68,6 @@ const MenuHamburguer: React.FC = () => {
             </div>
 
             <div className="menu-items">
-              <button 
-                className="menu-item"
-                onClick={handleMeuPerfil}
-              >
-                <FiUser />
-                <span>Meu Perfil</span>
-              </button>
-
               <button className="menu-item logout" onClick={handleSair}>
                 <FiLogOut />
                 <span>Sair</span>
