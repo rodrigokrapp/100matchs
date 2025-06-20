@@ -63,21 +63,54 @@ const MeuPerfilPage: React.FC = () => {
   };
 
   const handleFotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('📱 Upload iniciado no mobile/desktop');
     const files = Array.from(e.target.files || []);
+    console.log('📁 Arquivos selecionados:', files.length);
+    
     if (fotos.length + files.length > 5) {
       alert('Máximo 5 fotos permitidas!');
       return;
     }
 
-    // Converter para base64
-    files.forEach(file => {
+    // Converter para base64 com melhor tratamento para mobile
+    files.forEach((file, index) => {
+      console.log(`📸 Processando foto ${index + 1}:`, file.name, file.size);
+      
+      // Verificar se é imagem
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecione apenas imagens.');
+        return;
+      }
+
+      // Verificar tamanho (máximo 10MB para mobile)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Imagem muito grande. Máximo 10MB.');
+        return;
+      }
+
       const reader = new FileReader();
+      
       reader.onload = (event) => {
+        console.log('✅ Foto convertida para base64');
         const base64 = event.target?.result as string;
-        setFotos(prev => [...prev, base64]);
+        
+        setFotos(prev => {
+          const novasFotos = [...prev, base64];
+          console.log('📷 Total de fotos agora:', novasFotos.length);
+          return novasFotos;
+        });
       };
+
+      reader.onerror = (error) => {
+        console.error('❌ Erro ao processar imagem:', error);
+        alert('Erro ao processar imagem. Tente novamente.');
+      };
+
       reader.readAsDataURL(file);
     });
+
+    // Limpar input para permitir selecionar a mesma foto novamente
+    e.target.value = '';
   };
 
   const removerFoto = (index: number) => {
@@ -85,9 +118,20 @@ const MeuPerfilPage: React.FC = () => {
   };
 
   const salvarPerfil = async () => {
+    console.log('💾 INICIANDO SALVAMENTO DO PERFIL');
+    console.log('📝 Nome:', nome);
+    console.log('📸 Fotos:', fotos.length);
+    console.log('📄 Descrição:', descricao.length, 'caracteres');
+    console.log('🎂 Idade:', idade);
+    
     if (!nome) {
       alert('Nome é obrigatório!');
       return;
+    }
+
+    if (fotos.length === 0) {
+      const confirmar = confirm('Você não adicionou nenhuma foto. Deseja continuar mesmo assim?');
+      if (!confirmar) return;
     }
 
     setLoading(true);
@@ -102,11 +146,28 @@ const MeuPerfilPage: React.FC = () => {
         updated_at: new Date().toISOString()
       };
 
+      console.log('💾 Dados preparados para salvar:', perfilData);
+
       // Salvar no localStorage com múltiplas chaves para compatibilidade
-      localStorage.setItem(`perfil_${nome}`, JSON.stringify(perfilData));
-      localStorage.setItem(`usuario_${nome}`, JSON.stringify(perfilData));
-      localStorage.setItem(`user_${nome}`, JSON.stringify(perfilData));
-      localStorage.setItem(`profile_${nome}`, JSON.stringify(perfilData));
+      try {
+        localStorage.setItem(`perfil_${nome}`, JSON.stringify(perfilData));
+        console.log('✅ Salvo em perfil_' + nome);
+        
+        localStorage.setItem(`usuario_${nome}`, JSON.stringify(perfilData));
+        console.log('✅ Salvo em usuario_' + nome);
+        
+        localStorage.setItem(`user_${nome}`, JSON.stringify(perfilData));
+        console.log('✅ Salvo em user_' + nome);
+        
+        localStorage.setItem(`profile_${nome}`, JSON.stringify(perfilData));
+        console.log('✅ Salvo em profile_' + nome);
+        
+      } catch (storageError) {
+        console.error('❌ ERRO no localStorage:', storageError);
+        throw storageError;
+      }
+
+      console.log('📡 Enviando broadcasts...');
 
       // Broadcast para outros usuários
       window.dispatchEvent(new CustomEvent('profile_updated', {
@@ -117,38 +178,35 @@ const MeuPerfilPage: React.FC = () => {
           idade: idade
         }
       }));
+      console.log('✅ Broadcast profile_updated enviado');
 
       // Broadcast específico para atualizar mini fotos no chat
+      const fotoParaChat = fotos.length > 0 ? fotos[0] : null;
       window.dispatchEvent(new CustomEvent('mini_photo_updated', {
         detail: {
           userName: nome,
-          photo: fotos.length > 0 ? fotos[0] : null
+          photo: fotoParaChat
         }
       }));
+      console.log('✅ Broadcast mini_photo_updated enviado com foto:', fotoParaChat ? 'SIM' : 'NÃO');
 
       // Forçar atualização global
       window.dispatchEvent(new CustomEvent('force_chat_update', {
         detail: { timestamp: Date.now() }
       }));
+      console.log('✅ Broadcast force_chat_update enviado');
 
-      // Broadcast específico para atualizar mini fotos no chat
-      window.dispatchEvent(new CustomEvent('mini_photo_updated', {
-        detail: {
-          userName: nome,
-          photo: fotos.length > 0 ? fotos[0] : null
-        }
-      }));
+      // Aguardar um pouco para garantir que os eventos foram processados
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Forçar atualização global
-      window.dispatchEvent(new CustomEvent('force_chat_update', {
-        detail: { timestamp: Date.now() }
-      }));
-
-      alert('Perfil salvo com sucesso!');
+      console.log('🎉 PERFIL SALVO COM SUCESSO!');
+      alert('✅ Perfil salvo com sucesso! Sua foto já aparece no chat!');
+      
+      // Voltar para o chat em vez de salas
       navigate('/salas');
     } catch (error) {
-      console.error('Erro:', error);
-      alert('Erro ao salvar perfil.');
+      console.error('💥 ERRO CRÍTICO ao salvar:', error);
+      alert('❌ Erro ao salvar perfil: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));
     } finally {
       setLoading(false);
     }
@@ -344,10 +402,11 @@ const MeuPerfilPage: React.FC = () => {
                     type="file"
                     accept="image/*"
                     multiple
+                    capture="environment"
                     onChange={handleFotoUpload}
                     style={{ display: 'none' }}
                   />
-                  + Adicionar Foto
+                  📷 Adicionar Foto
                 </label>
               )}
             </div>
