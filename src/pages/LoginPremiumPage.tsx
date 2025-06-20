@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import './LoginPremiumPage.css';
@@ -12,6 +12,47 @@ const LoginPremiumPage: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [dadosSalvos, setDadosSalvos] = useState(false);
+
+  // 🔄 AUTO-LOGIN: Carregar dados salvos automaticamente
+  useEffect(() => {
+    const carregarDadosSalvos = () => {
+      try {
+        const loginSalvo = localStorage.getItem('login-premium-salvo');
+        if (loginSalvo) {
+          const dados = JSON.parse(loginSalvo);
+          setFormData(prev => ({
+            ...prev,
+            email: dados.email || '',
+            senha: dados.senha || '',
+            aceitarTermos: dados.aceitarTermos || false
+          }));
+          setDadosSalvos(true);
+          console.log('✅ Dados de login carregados automaticamente');
+        }
+      } catch (error) {
+        console.error('❌ Erro ao carregar dados salvos:', error);
+      }
+    };
+
+    carregarDadosSalvos();
+  }, []);
+
+  // 💾 Salvar dados automaticamente quando alterados
+  const salvarDados = (novoFormData: any) => {
+    try {
+      const dadosParaSalvar = {
+        email: novoFormData.email,
+        senha: novoFormData.senha,
+        aceitarTermos: novoFormData.aceitarTermos,
+        dataUltimoLogin: new Date().toISOString()
+      };
+      localStorage.setItem('login-premium-salvo', JSON.stringify(dadosParaSalvar));
+      console.log('💾 Dados salvos para próximo login');
+    } catch (error) {
+      console.error('❌ Erro ao salvar dados:', error);
+    }
+  };
 
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
@@ -34,7 +75,12 @@ const LoginPremiumPage: React.FC = () => {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    const novoFormData = { ...formData, [field]: value };
+    setFormData(novoFormData);
+    
+    // 💾 Salvar automaticamente quando dados mudarem
+    salvarDados(novoFormData);
+    
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -86,6 +132,12 @@ const LoginPremiumPage: React.FC = () => {
             <div className="premium-badge">⭐ PREMIUM</div>
             <h1>Login Premium</h1>
             <p>Acesse sua conta premium</p>
+            {dadosSalvos && (
+              <div className="dados-salvos-info">
+                <span className="icone-salvo">💾</span>
+                <span>Dados salvos! Você pode entrar rapidamente</span>
+              </div>
+            )}
           </div>
 
           <div className="form-section">

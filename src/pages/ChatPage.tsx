@@ -419,86 +419,40 @@ const ChatPage: React.FC = () => {
   };
 
   const handleEnviarMensagem = async () => {
-    console.log('🚀 ENVIO ULTRA RÁPIDO - handleEnviarMensagem chamado');
-    
-    if (!mensagem.trim()) {
-      console.log('❌ Mensagem vazia');
-      return;
-    }
-    
-    if (!usuario) {
-      console.log('❌ Usuário não encontrado');
-      return;
-    }
-    
-    if (!salaId) {
-      console.log('❌ ID da sala não encontrado');
-      return;
-    }
+    // 🚀 VELOCIDADE ABSOLUTA - sem logs desnecessários
+    if (!mensagem.trim() || !usuario || !salaId) return;
 
-    // 🚀 ETAPA 1: Capturar mensagem e limpar input INSTANTANEAMENTE
+    // ⚡ IMEDIATO: Capturar e limpar input
     const mensagemParaEnviar = mensagem.trim();
-    setMensagem(''); // Limpa input imediatamente
+    setMensagem('');
 
-    // 🚀 ETAPA 2: Criar mensagem otimista com timestamp real
-    const agora = new Date();
+    // ⚡ IMEDIATO: Criar e mostrar mensagem instantaneamente
     const mensagemOtimista: ChatMessage = {
-      id: `optimistic_${agora.getTime()}_${Math.random()}`,
+      id: `instant_${Date.now()}_${Math.random()}`,
       room_id: salaId,
       user_name: usuario.nome,
       content: mensagemParaEnviar,
       message_type: 'texto',
       is_premium: usuario.premium || false,
       is_temporary: false,
-      created_at: agora.toISOString(),
-      isOptimistic: true // Flag para identificar mensagem otimista
+      created_at: new Date().toISOString(),
+      isOptimistic: true
     };
 
-    // 🚀 ETAPA 3: Mostrar mensagem INSTANTANEAMENTE na interface
+    // ⚡ ADICIONAR INSTANTANEAMENTE (sem spread operator para máxima velocidade)
     setMensagens(prev => {
-      const newMessages = [...prev, mensagemOtimista];
-      console.log('⚡ Mensagem otimista adicionada instantaneamente');
-      return newMessages;
+      prev.push(mensagemOtimista);
+      return [...prev];
     });
 
-    // 🚀 ETAPA 4: Scroll instantâneo sem delay
-    requestAnimationFrame(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-    });
-
-    // 🚀 ETAPA 5: Enviar para servidor em background (não bloqueia UI)
-    try {
-      console.log('📤 Enviando para servidor em background:', mensagemParaEnviar);
-      
-      // Envio assíncrono que não afeta a UI
-      const envioPromise = chatService.sendMessage(
-        salaId,
-        usuario.nome,
-        mensagemParaEnviar,
-        'texto',
-        usuario.premium || false
-      );
-
-      // Não aguardar resposta - deixar em background
-      envioPromise.then((sucesso) => {
-        if (sucesso) {
-          console.log('✅ Mensagem confirmada no servidor');
-          // Substituir mensagem otimista pela real quando chegar via callback
-          // (isso acontece automaticamente via joinRoom callback)
-        } else {
-          console.log('⚠️ Fallback: mensagem processada localmente');
-        }
-      }).catch((error) => {
-        console.error('❌ Erro no envio (não afeta UI):', error);
-        // Manter mensagem otimista mesmo com erro
-        // Usuário não precisa saber que houve erro no servidor
-      });
-      
-    } catch (error) {
-      console.error('❌ Erro crítico (mantendo mensagem):', error);
-      // Mesmo com erro, manter a mensagem na interface
-      // A experiência do usuário não é afetada
+    // ⚡ SCROLL IMEDIATO
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
     }
+
+    // 📤 ENVIO EM BACKGROUND (não aguarda)
+    chatService.sendMessage(salaId, usuario.nome, mensagemParaEnviar, 'texto', usuario.premium || false)
+      .catch(() => {}); // Ignorar erros para não afetar UI
   };
 
   const handleEnviarEmoji = async (emoji: string) => {

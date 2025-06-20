@@ -265,16 +265,7 @@ const InicioPage: React.FC = () => {
       
       <div className="inicio-container">
         <div className="main-content">
-          {/* Logo da empresa */}
-          <div className="logo-section">
-            <div className="logo-container">
-              <img 
-                src="/logo-nova-coracao-rosa.svg" 
-                alt="Logo 100 Matchs" 
-                className="main-logo"
-              />
-            </div>
-          </div>
+          {/* Logo da empresa - removido conforme solicitação */}
           
           {/* Container dos formulários lado a lado */}
           <div className="entrada-forms-container">

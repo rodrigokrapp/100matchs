@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { testSupabaseConnection } from './lib/supabase';
+import { historyCleanup } from './lib/chatService';
 
 // Páginas
 import InicioPage from './pages/InicioPage';
@@ -18,6 +19,19 @@ import LoginPremiumPage from './pages/LoginPremiumPage';
 import './App.css';
 
 function App() {
+  // 🧹 Inicializar sistema de limpeza automática
+  useEffect(() => {
+    console.log('🚀 Iniciando aplicação 100 Matchs');
+    
+    // Iniciar limpeza automática de histórico
+    historyCleanup.startAutoCleanup();
+    
+    // Cleanup ao desmontar
+    return () => {
+      historyCleanup.stopAutoCleanup();
+    };
+  }, []);
+
   return (
     <Router>
       <div className="App">

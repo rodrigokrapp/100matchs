@@ -455,3 +455,146 @@ class ChatService {
 }
 
 export const chatService = new ChatService();
+
+// 🧹 SISTEMA DE LIMPEZA AUTOMÁTICA
+class HistoryCleanupService {
+  private cleanupInterval: NodeJS.Timeout | null = null;
+  private isRunning = false;
+
+  // Iniciar limpeza automática a cada 5 minutos
+  startAutoCleanup() {
+    if (this.isRunning) return;
+    
+    this.isRunning = true;
+    console.log('🧹 Sistema de limpeza automática iniciado (5 em 5 minutos)');
+    
+    // Executar primeira limpeza imediatamente
+    this.performCleanup();
+    
+    // Configurar limpeza automática a cada 5 minutos
+    this.cleanupInterval = setInterval(() => {
+      this.performCleanup();
+    }, 5 * 60 * 1000); // 5 minutos
+  }
+
+  // Parar limpeza automática
+  stopAutoCleanup() {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
+    this.isRunning = false;
+    console.log('🧹 Sistema de limpeza automática parado');
+  }
+
+  // Executar limpeza completa
+  private async performCleanup() {
+    try {
+      console.log('🧹 Iniciando limpeza automática...');
+      
+      // 1. Limpar localStorage
+      this.cleanupLocalStorage();
+      
+      // 2. Limpar Supabase (se disponível)
+      await this.cleanupSupabase();
+      
+      console.log('✅ Limpeza automática concluída');
+    } catch (error) {
+      console.error('❌ Erro na limpeza automática:', error);
+    }
+  }
+
+  // Limpar dados do localStorage
+  private cleanupLocalStorage() {
+    try {
+      const agora = Date.now();
+      const CINCO_MINUTOS = 5 * 60 * 1000;
+      
+      // Limpar mensagens antigas
+      const chaves = Object.keys(localStorage);
+      chaves.forEach(chave => {
+        if (chave.startsWith('chat_') || chave.startsWith('mensagens_')) {
+          try {
+            const dados = JSON.parse(localStorage.getItem(chave) || '[]');
+            if (Array.isArray(dados)) {
+              const mensagensFiltradas = dados.filter((msg: any) => {
+                const timestamp = new Date(msg.created_at || msg.timestamp).getTime();
+                return (agora - timestamp) < CINCO_MINUTOS;
+              });
+              
+              if (mensagensFiltradas.length !== dados.length) {
+                localStorage.setItem(chave, JSON.stringify(mensagensFiltradas));
+                console.log(`🧹 Limpeza localStorage: ${dados.length - mensagensFiltradas.length} mensagens removidas de ${chave}`);
+              }
+            }
+          } catch (error) {
+            // Se houver erro, remover completamente
+            localStorage.removeItem(chave);
+          }
+        }
+      });
+
+      // Limpar imagens temporárias (URLs blob antigas)
+      chaves.forEach(chave => {
+        if (chave.includes('temp_image') || chave.includes('blob_')) {
+          localStorage.removeItem(chave);
+        }
+      });
+
+      console.log('✅ localStorage limpo');
+    } catch (error) {
+      console.error('❌ Erro ao limpar localStorage:', error);
+    }
+  }
+
+  // Limpar dados do Supabase
+  private async cleanupSupabase() {
+    try {
+      // Importar supabase apenas quando necessário
+      const { supabase } = await import('./supabase');
+      
+      const agora = new Date();
+      const cincoMinutosAtras = new Date(agora.getTime() - (5 * 60 * 1000));
+      
+      // Limpar mensagens antigas
+      const { error: deleteError } = await supabase
+        .from('mensagens')
+        .delete()
+        .lt('created_at', cincoMinutosAtras.toISOString());
+
+      if (deleteError) {
+        console.warn('⚠️ Erro ao limpar mensagens do Supabase:', deleteError);
+      } else {
+        console.log('✅ Mensagens antigas removidas do Supabase');
+      }
+
+      // Limpar dados de sessão antigos
+      const { error: sessionError } = await supabase
+        .from('usuarios_online')
+        .delete()
+        .lt('last_seen', cincoMinutosAtras.toISOString());
+
+      if (sessionError) {
+        console.warn('⚠️ Erro ao limpar sessões do Supabase:', sessionError);
+      }
+
+    } catch (error) {
+      console.warn('⚠️ Supabase não disponível para limpeza:', error);
+    }
+  }
+
+  // Limpar dados específicos de uma sala
+  cleanupRoom(roomId: string) {
+    try {
+      localStorage.removeItem(`chat_${roomId}`);
+      localStorage.removeItem(`mensagens_${roomId}`);
+      localStorage.removeItem(`usuarios_${roomId}`);
+      console.log(`🧹 Dados da sala ${roomId} limpos`);
+    } catch (error) {
+      console.error('❌ Erro ao limpar dados da sala:', error);
+    }
+  }
+}
+
+// Instância global do serviço de limpeza
+export const historyCleanup = new HistoryCleanupService();
