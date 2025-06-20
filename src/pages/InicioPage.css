@@ -69,9 +69,11 @@
 }
 
 .hero-banner-image {
-  max-width: 100%;
+  width: 100%;
+  max-width: 1200px;
   height: auto;
-  max-height: 400px;
+  display: block;
+  object-fit: contain;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
