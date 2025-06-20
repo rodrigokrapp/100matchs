@@ -1,0 +1,6119 @@
+/* CadastroPremiumPage.css - Design Moderno e Ousado */
+.cadastro-premium-page {
+  min-height: 100vh;
+  background: #663399;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 2rem 0;
+}
+
+.cadastro-premium-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+
+.cadastro-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cadastro-card {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  border-radius: 25px;
+  padding: 3rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.cadastro-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #f59e0b, #f97316, #ef4444);
+}
+
+.cadastro-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.premium-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.cadastro-header h1 {
+  font-size: 2.5rem;
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cadastro-header p {
+  color: #1e3a8a;
+  font-size: 1.1rem;
+}
+
+.benefits-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(249, 115, 22, 0.1));
+  border-radius: 12px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.benefits-section h3 {
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1e3a8a;
+  font-weight: 500;
+}
+
+.benefit-icon {
+  font-size: 1.2rem;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+}
+
+.input-group label {
+  display: block;
+  color: #1e3a8a;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.input-group .input {
+  width: 100%;
+}
+
+.input-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.actions .btn {
+  flex: 1;
+}
+
+.login-link {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(30, 58, 138, 0.1);
+}
+
+.login-link p {
+  color: #1e3a8a;
+  margin: 0;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.link-button:hover {
+  color: #1e40af;
+}
+
+.btn-cadastrar {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, #FFD700, #FF6D00);
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+  border: 3px solid transparent;
+}
+
+.btn-cadastrar:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(255, 215, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-cadastrar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+}
+
+.success-card {
+  background: rgba(0, 230, 118, 0.2);
+  border: 2px solid #00E676;
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: #00E676;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 20px rgba(0, 230, 118, 0.7));
+}
+
+.success-title {
+  color: #00E676;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.success-message {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.redirect-info {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.redirect-info h4 {
+  color: #FFD700;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.redirect-info p {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.countdown {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #FF1744;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.btn-ir-salas {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, #00E676, #00BCD4);
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 10px 30px rgba(0, 230, 118, 0.5);
+  border: 3px solid transparent;
+}
+
+.btn-ir-salas:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(0, 230, 118, 0.7);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-voltar {
+  background: linear-gradient(135deg, #00E676, #00BCD4);
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 8px 25px rgba(0, 230, 118, 0.4);
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 2rem;
+  border: 3px solid transparent;
+}
+
+.btn-voltar:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0, 230, 118, 0.6);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsivo - OTIMIZADO PARA MOBILE */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .cadastro-premium-page {
+    padding: 0.25rem 0;
+  }
+  
+  .cadastro-container {
+    padding: 0.25rem;
+  }
+  
+  .cadastro-card {
+    padding: 1.2rem 0.8rem;
+    margin: 0.25rem;
+    border-radius: 18px;
+  }
+  
+  .cadastro-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.6rem;
+    line-height: 1.1;
+  }
+  
+  .cadastro-header p {
+    font-size: 0.9rem;
+  }
+  
+  .premium-badge {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+  
+  .benefits-section {
+    padding: 1rem 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .benefit-item {
+    font-size: 0.85rem;
+    gap: 0.6rem;
+  }
+  
+  .benefit-icon {
+    font-size: 1.1rem;
+    min-width: 20px;
+  }
+  
+  .input-group {
+    margin-bottom: 1.1rem;
+  }
+  
+  .input-group label {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .input {
+    padding: 12px 10px;
+    font-size: 16px; /* Evita zoom no iOS */
+    border-radius: 10px;
+  }
+  
+  .terms-checkbox {
+    margin: 1rem 0;
+  }
+  
+  .terms-checkbox span {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+  
+  .actions {
+    gap: 0.8rem;
+    margin-top: 1.2rem;
+  }
+  
+  .btn {
+    padding: 14px;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
+  
+  .btn-cadastrar {
+    padding: 16px;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .login-link {
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
+  }
+  
+  .login-link p {
+    font-size: 0.85rem;
+  }
+  
+  .link-button {
+    font-size: 0.85rem;
+  }
+}
+
+/* OTIMIZAÇÃO EXTRA PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+  .cadastro-card {
+    padding: 1rem 0.6rem !important;
+    margin: 0.25rem !important;
+  }
+  
+  .cadastro-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .benefits-section {
+    padding: 0.8rem 0.6rem !important;
+  }
+  
+  .input {
+    padding: 10px 8px !important;
+  }
+  
+  .btn {
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 14px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÕES EXTRAS PARA MOBILE - LAYOUT APRIMORADO */
+@media (max-width: 768px) {
+  .cadastro-premium-page {
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .cadastro-container {
+    width: 100% !important;
+    padding: 0.5rem !important;
+  }
+  
+  .cadastro-card {
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .cadastro-header h1 {
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .cadastro-header p {
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .premium-badge {
+    margin-bottom: 1.2rem !important;
+  }
+  
+  .benefits-section {
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
+  }
+  
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .benefit-item {
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
+  }
+  
+  .input-group {
+    margin-bottom: 1.3rem !important;
+  }
+  
+  .input-group label {
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .input {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .terms-checkbox {
+    margin: 1.2rem 0 !important;
+  }
+  
+  .terms-checkbox span {
+    line-height: 1.5 !important;
+  }
+  
+  .actions {
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  
+  .btn {
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+  }
+}
+
+/* 📱 OTIMIZAÇÃO PARA TELAS MUITO PEQUENAS */
+@media (max-width: 360px) {
+ 

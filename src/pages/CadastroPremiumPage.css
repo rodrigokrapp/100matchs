@@ -316,87 +316,109 @@
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Responsivo */
+/* Responsivo - OTIMIZADO PARA MOBILE */
 @media (max-width: 768px) {
   .cadastro-premium-page {
-    padding: 1rem 0;
-    min-height: 100vh;
+    align-items: flex-start !important;
+    padding: 0.5rem 0 !important;
   }
   
   .cadastro-container {
-    padding: 0.5rem;
-    max-width: 100%;
+    width: 100% !important;
+    padding: 0.5rem !important;
   }
   
   .cadastro-card {
-    padding: 1.5rem;
-    margin: 0 0.5rem;
-    border-radius: 20px;
+    margin: 0.5rem !important;
+    padding: 1.5rem 1rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
   }
   
   .cadastro-header h1 {
-    font-size: 1.8rem;
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;
   }
   
   .cadastro-header p {
-    font-size: 1rem;
+    line-height: 1.4 !important;
+    margin-bottom: 1rem !important;
   }
   
   .premium-badge {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.8rem;
+    margin-bottom: 1.2rem !important;
   }
   
   .benefits-section {
-    padding: 1rem;
-    margin-bottom: 1.5rem;
+    padding: 1.2rem !important;
+    border-radius: 15px !important;
   }
   
-  .benefits-grid {
-    grid-template-columns: 1fr;
-    gap: 0.8rem;
+  .benefits-section h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
   }
   
   .benefit-item {
-    font-size: 0.9rem;
+    padding: 0.5rem 0 !important;
+    justify-content: flex-start !important;
+  }
+  
+  .benefit-icon {
+    min-width: 24px !important;
   }
   
   .input-group {
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.3rem !important;
   }
   
   .input-group label {
-    font-size: 0.9rem;
+    margin-bottom: 0.6rem !important;
+    font-weight: 600 !important;
   }
   
   .input {
-    padding: 12px;
-    font-size: 16px; /* Evita zoom no iOS */
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   .terms-checkbox {
-    margin: 1rem 0;
+    margin: 1.2rem 0 !important;
   }
   
   .terms-checkbox span {
-    font-size: 0.85rem;
-    line-height: 1.4;
+    line-height: 1.5 !important;
   }
   
   .actions {
-    flex-direction: column;
-    gap: 0.8rem;
+    margin-top: 1.5rem !important;
+    gap: 1rem !important;
   }
   
   .btn {
-    padding: 14px;
-    font-size: 1rem;
+    padding: 16px !important;
+    font-size: 1.1rem !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .btn-cadastrar {
+    padding: 18px !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  .login-link {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
   }
 }
 
 @media (max-width: 480px) {
   .cadastro-premium-page {
-    padding: 0.5rem 0;
+    padding: 0.25rem 0;
   }
   
   .cadastro-container {
@@ -404,13 +426,18 @@
   }
   
   .cadastro-card {
-    padding: 1.2rem;
-    margin: 0 0.25rem;
-    border-radius: 15px;
+    padding: 1.2rem 0.8rem;
+    margin: 0.25rem;
+    border-radius: 18px;
+  }
+  
+  .cadastro-header {
+    margin-bottom: 1.5rem;
   }
   
   .cadastro-header h1 {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+    line-height: 1.1;
   }
   
   .cadastro-header p {
@@ -423,45 +450,81 @@
   }
   
   .benefits-section {
-    padding: 0.8rem;
+    padding: 1rem 0.8rem;
     margin-bottom: 1.2rem;
   }
   
   .benefits-section h3 {
     font-size: 1rem;
+    margin-bottom: 0.8rem;
   }
   
   .benefit-item {
     font-size: 0.85rem;
+    gap: 0.6rem;
   }
   
   .benefit-icon {
-    font-size: 1rem;
-  }
-  
-  .input-group {
-    margin-bottom: 1rem;
-  }
-  
-  .input-group label {
-    font-size: 0.85rem;
-  }
-  
-  .input {
-    padding: 10px;
-    font-size: 16px; /* Evita zoom no iOS */
-  }
-  
-  .terms-checkbox span {
-    font-size: 0.8rem;
-  }
-  
-  .btn {
-    padding: 12px;
-    font-size: 0.9rem;
-  }
-  
-  .login-link p {
-    font-size: 0.85rem;
-  }
-} 
+
+ 
+ / *   =Ψρά  O T I M I Z A Η Υ E S   M O B I L E   E S P E C Ν F I C A S   * / 
+ @ m e d i a   ( m a x - w i d t h :   7 6 8 p x )   { 
+     . c a d a s t r o - p r e m i u m - p a g e   { 
+         a l i g n - i t e m s :   f l e x - s t a r t   ! i m p o r t a n t ; 
+         p a d d i n g :   0 . 5 r e m   0   ! i m p o r t a n t ; 
+     } 
+     
+     . c a d a s t r o - c o n t a i n e r   { 
+         w i d t h :   1 0 0 %   ! i m p o r t a n t ; 
+         p a d d i n g :   0 . 5 r e m   ! i m p o r t a n t ; 
+     } 
+     
+     . c a d a s t r o - c a r d   { 
+         m a r g i n :   0 . 5 r e m   ! i m p o r t a n t ; 
+         p a d d i n g :   1 . 5 r e m   1 r e m   ! i m p o r t a n t ; 
+         b o x - s h a d o w :   0   1 0 p x   2 5 p x   r g b a ( 0 ,   0 ,   0 ,   0 . 2 )   ! i m p o r t a n t ; 
+     } 
+     
+     . i n p u t   { 
+         p a d d i n g :   1 4 p x   1 2 p x   ! i m p o r t a n t ; 
+         b o r d e r - r a d i u s :   1 2 p x   ! i m p o r t a n t ; 
+         w i d t h :   1 0 0 %   ! i m p o r t a n t ; 
+         b o x - s i z i n g :   b o r d e r - b o x   ! i m p o r t a n t ; 
+     } 
+     
+     . b t n   { 
+         p a d d i n g :   1 6 p x   ! i m p o r t a n t ; 
+         f o n t - s i z e :   1 . 1 r e m   ! i m p o r t a n t ; 
+         b o r d e r - r a d i u s :   1 5 p x   ! i m p o r t a n t ; 
+         w i d t h :   1 0 0 %   ! i m p o r t a n t ; 
+         b o x - s i z i n g :   b o r d e r - b o x   ! i m p o r t a n t ; 
+     } 
+     
+     . b t n - c a d a s t r a r   { 
+         p a d d i n g :   1 8 p x   ! i m p o r t a n t ; 
+         f o n t - s i z e :   1 . 2 r e m   ! i m p o r t a n t ; 
+     } 
+ } 
+ 
+ / *   =Ψρά  T E L A S   M U I T O   P E Q U E N A S   * / 
+ @ m e d i a   ( m a x - w i d t h :   3 6 0 p x )   { 
+     . c a d a s t r o - c a r d   { 
+         p a d d i n g :   1 r e m   0 . 6 r e m   ! i m p o r t a n t ; 
+         m a r g i n :   0 . 2 5 r e m   ! i m p o r t a n t ; 
+     } 
+     
+     . c a d a s t r o - h e a d e r   h 1   { 
+         f o n t - s i z e :   1 . 4 r e m   ! i m p o r t a n t ; 
+     } 
+     
+     . i n p u t   { 
+         p a d d i n g :   1 2 p x   1 0 p x   ! i m p o r t a n t ; 
+     } 
+     
+     . b t n   { 
+         p a d d i n g :   1 4 p x   ! i m p o r t a n t ; 
+         f o n t - s i z e :   1 r e m   ! i m p o r t a n t ; 
+     } 
+ } 
+  
+ 
