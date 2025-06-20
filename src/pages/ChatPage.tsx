@@ -63,6 +63,9 @@ const ChatPage: React.FC = () => {
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [userToBlock, setUserToBlock] = useState<string>('');
 
+  // Estado para forçar re-render da lista de usuários
+  const [forceUpdate, setForceUpdate] = useState(0);
+
   const nomeSala = location.state?.nomeSala || 'Chat';
 
   // Verificar permissões de mídia
@@ -1138,6 +1141,7 @@ const ChatPage: React.FC = () => {
         console.log('📸 Perfil atualizado:', event.detail);
         // Forçar re-render da lista de usuários
         setUsuariosOnlineList(prev => [...prev]);
+        setForceUpdate(prev => prev + 1);
       };
 
       window.addEventListener('profile_updated', handleProfileUpdate as EventListener);
@@ -1278,14 +1282,29 @@ const ChatPage: React.FC = () => {
 
       console.log('💾 Salvando dados:', dadosParaSalvar);
 
-      // Salvar no localStorage
+      // Salvar no localStorage com múltiplas chaves para compatibilidade
       localStorage.setItem(`perfil_${usuario.nome}`, JSON.stringify(dadosParaSalvar));
       localStorage.setItem(`usuario_${usuario.nome}`, JSON.stringify(dadosParaSalvar));
+      localStorage.setItem(`user_${usuario.nome}`, JSON.stringify(dadosParaSalvar));
+      localStorage.setItem(`profile_${usuario.nome}`, JSON.stringify(dadosParaSalvar));
       
-      console.log('✅ DADOS SALVOS NO LOCALSTORAGE');
+      console.log('✅ DADOS SALVOS NO LOCALSTORAGE COM MÚLTIPLAS CHAVES');
+
+      // Broadcast para outros usuários
+      window.dispatchEvent(new CustomEvent('profile_updated', {
+        detail: {
+          nome: usuario.nome,
+          fotos: dadosParaSalvar.fotos,
+          descricao: dadosParaSalvar.descricao,
+          idade: dadosParaSalvar.idade
+        }
+      }));
 
       // Fechar modal
       setShowEditPerfilModal(false);
+      
+      // Forçar atualização da interface
+      setForceUpdate(prev => prev + 1);
       
       // Mostrar sucesso
       alert('✅ Perfil salvo com sucesso!');
@@ -1367,17 +1386,48 @@ const ChatPage: React.FC = () => {
 
   // Função para obter foto do usuário
   const getUserPhoto = (nomeUsuario: string): string | null => {
+    console.log('🔍 Buscando foto para usuário:', nomeUsuario);
+    
     if (nomeUsuario === usuario?.nome) {
-      return editingProfile.fotos && editingProfile.fotos.length > 0 ? editingProfile.fotos[0] : null;
+      const foto = editingProfile.fotos && editingProfile.fotos.length > 0 ? editingProfile.fotos[0] : null;
+      console.log('👤 Foto do usuário atual:', foto ? 'Encontrada' : 'Não encontrada');
+      return foto;
     }
     
-    // Buscar foto de outros usuários no localStorage
-    const dadosSalvos = localStorage.getItem(`usuario_${nomeUsuario}`) || localStorage.getItem(`perfil_${nomeUsuario}`);
-    if (dadosSalvos) {
-      const dados = JSON.parse(dadosSalvos);
-      return dados.fotos && dados.fotos.length > 0 ? dados.fotos[0] : null;
+    // Buscar foto de outros usuários no localStorage com múltiplas chaves
+    const possiveisChaves = [
+      `usuario_${nomeUsuario}`,
+      `perfil_${nomeUsuario}`,
+      `user_${nomeUsuario}`,
+      `profile_${nomeUsuario}`
+    ];
+    
+    for (const chave of possiveisChaves) {
+      const dadosSalvos = localStorage.getItem(chave);
+      if (dadosSalvos) {
+        try {
+          const dados = JSON.parse(dadosSalvos);
+          console.log(`📁 Dados encontrados em ${chave}:`, dados);
+          
+          if (dados.fotos && dados.fotos.length > 0) {
+            console.log('📸 Foto encontrada para', nomeUsuario, ':', dados.fotos[0].substring(0, 50) + '...');
+            return dados.fotos[0];
+          }
+        } catch (error) {
+          console.warn('⚠️ Erro ao parsear dados de', chave, ':', error);
+        }
+      }
     }
     
+    // Buscar nas mensagens se o usuário enviou alguma foto
+    const mensagensDoUsuario = mensagens.filter(msg => msg.user_name === nomeUsuario && msg.message_type === 'imagem');
+    if (mensagensDoUsuario.length > 0) {
+      const fotoMensagem = mensagensDoUsuario[mensagensDoUsuario.length - 1].content;
+      console.log('💬 Foto encontrada nas mensagens para', nomeUsuario);
+      return fotoMensagem;
+    }
+    
+    console.log('❌ Nenhuma foto encontrada para', nomeUsuario);
     return null;
   };
 
@@ -1774,6 +1824,7 @@ const ChatPage: React.FC = () => {
             {usuariosOnlineList.map((nomeUsuario) => {
               const isCurrentUser = nomeUsuario === usuario?.nome;
               const userPhoto = getUserPhoto(nomeUsuario);
+              console.log('🔄 Renderizando usuário:', nomeUsuario, 'Foto:', userPhoto ? 'Sim' : 'Não', 'ForceUpdate:', forceUpdate);
               return (
                 <div 
                   key={nomeUsuario}
