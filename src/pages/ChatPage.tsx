@@ -297,6 +297,38 @@ const ChatPage: React.FC = () => {
     try {
       console.log('🚀 Inicializando chat para sala:', salaId);
       
+      // CARREGAR PERFIL DO USUÁRIO ATUAL PRIMEIRO
+      if (usuario?.nome) {
+        console.log('👤 Carregando perfil do usuário atual:', usuario.nome);
+        const possiveisChaves = [
+          `perfil_${usuario.nome}`,
+          `usuario_${usuario.nome}`,
+          `user_${usuario.nome}`,
+          `profile_${usuario.nome}`
+        ];
+        
+        for (const chave of possiveisChaves) {
+          const dadosSalvos = localStorage.getItem(chave);
+          if (dadosSalvos) {
+            try {
+              const dados = JSON.parse(dadosSalvos);
+              if (dados.fotos && dados.fotos.length > 0) {
+                setEditingProfile(prev => ({
+                  ...prev,
+                  fotos: dados.fotos,
+                  descricao: dados.descricao || prev.descricao,
+                  idade: dados.idade || prev.idade
+                }));
+                console.log('✅ Perfil do usuário carregado:', dados);
+                break;
+              }
+            } catch (error) {
+              console.warn('⚠️ Erro ao carregar perfil de', chave);
+            }
+          }
+        }
+      }
+      
       // Testar conexão específica do chat
       const connectionTest = await testChatConnection(salaId);
       console.log('🧪 Resultado do teste de conexão:', connectionTest);
@@ -1029,7 +1061,7 @@ const ChatPage: React.FC = () => {
     
     try {
       // Obter stream primeiro
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           width: { ideal: 1920, min: 1280 },
           height: { ideal: 1080, min: 720 },
@@ -1441,43 +1473,54 @@ const ChatPage: React.FC = () => {
     alert(`Usuário ${nomeUsuario} foi desbloqueado.`);
   };
 
-  // Função para obter foto do usuário
+  // Função para obter foto do usuário OTIMIZADA
   const getUserPhoto = (nomeUsuario: string): string | null => {
     console.log('🔍 Buscando foto para usuário:', nomeUsuario);
     
+    // Se for o usuário atual, buscar no estado do perfil editado primeiro
     if (nomeUsuario === usuario?.nome) {
-      const foto = editingProfile.fotos && editingProfile.fotos.length > 0 ? editingProfile.fotos[0] : null;
-      console.log('👤 Foto do usuário atual:', foto ? 'Encontrada' : 'Não encontrada');
-      return foto;
+      if (editingProfile.fotos && editingProfile.fotos.length > 0) {
+        console.log('👤 Foto do usuário atual encontrada no estado:', editingProfile.fotos[0].substring(0, 50) + '...');
+        return editingProfile.fotos[0];
+      }
     }
     
-    // Buscar foto de outros usuários no localStorage com múltiplas chaves
+    // Buscar foto no localStorage com múltiplas chaves (ordem otimizada)
     const possiveisChaves = [
-      `usuario_${nomeUsuario}`,
       `perfil_${nomeUsuario}`,
+      `usuario_${nomeUsuario}`, 
       `user_${nomeUsuario}`,
       `profile_${nomeUsuario}`
     ];
     
     for (const chave of possiveisChaves) {
-      const dadosSalvos = localStorage.getItem(chave);
-      if (dadosSalvos) {
-        try {
+      try {
+        const dadosSalvos = localStorage.getItem(chave);
+        if (dadosSalvos) {
           const dados = JSON.parse(dadosSalvos);
-          console.log(`📁 Dados encontrados em ${chave}:`, dados);
+          console.log(`📁 Verificando ${chave} para ${nomeUsuario}:`, dados);
           
-          if (dados.fotos && dados.fotos.length > 0) {
-            console.log('📸 Foto encontrada para', nomeUsuario, ':', dados.fotos[0].substring(0, 50) + '...');
-            return dados.fotos[0];
+          if (dados.fotos && Array.isArray(dados.fotos) && dados.fotos.length > 0) {
+            const foto = dados.fotos[0];
+            if (foto && foto.startsWith('data:image/')) {
+              console.log('📸 Foto encontrada para', nomeUsuario, 'em', chave);
+              return foto;
+            }
           }
-        } catch (error) {
-          console.warn('⚠️ Erro ao parsear dados de', chave, ':', error);
         }
+      } catch (error) {
+        console.warn('⚠️ Erro ao parsear dados de', chave, ':', error);
       }
     }
     
-    // Buscar nas mensagens se o usuário enviou alguma foto
-    const mensagensDoUsuario = mensagens.filter(msg => msg.user_name === nomeUsuario && msg.message_type === 'imagem');
+    // Buscar nas mensagens como fallback
+    const mensagensDoUsuario = mensagens.filter(msg => 
+      msg.user_name === nomeUsuario && 
+      msg.message_type === 'imagem' && 
+      msg.content && 
+      msg.content.startsWith('data:image/')
+    );
+    
     if (mensagensDoUsuario.length > 0) {
       const fotoMensagem = mensagensDoUsuario[mensagensDoUsuario.length - 1].content;
       console.log('💬 Foto encontrada nas mensagens para', nomeUsuario);
@@ -1560,10 +1603,10 @@ const ChatPage: React.FC = () => {
                             <FiUser className="default-user-icon" />
                           )}
                         </div>
-                        <span className="sender">
-                          {msg.user_name}
-                          {msg.is_premium && <FiStar className="premium-icon" />}
-                        </span>
+                      <span className="sender">
+                        {msg.user_name}
+                        {msg.is_premium && <FiStar className="premium-icon" />}
+                      </span>
                       </div>
                       <span className="time">{formatTime(msg.created_at)}</span>
                       {msg.is_temporary && (
