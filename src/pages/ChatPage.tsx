@@ -318,7 +318,7 @@ const ChatPage: React.FC = () => {
       setIsConnected(connected);
       
       // SISTEMA REAL DE USUÁRIOS - sem números robóticos
-      await setupRealUserCount(salaId);
+      atualizarUsuariosOnline();
       
       // Limpar mensagens expiradas periodicamente
       const cleanupInterval = setInterval(async () => {
@@ -340,6 +340,7 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
+    atualizarUsuariosOnline();
   }, [mensagens]);
 
   const scrollToBottom = () => {
@@ -1257,6 +1258,28 @@ const ChatPage: React.FC = () => {
 
   // Funções para edição do próprio perfil
   const handleEditProfile = () => {
+    // Carregar dados atuais do usuário
+    if (usuario?.nome) {
+      const dadosSalvos = localStorage.getItem(`perfil_${usuario.nome}`) || 
+                         localStorage.getItem(`usuario_${usuario.nome}`) ||
+                         localStorage.getItem(`user_${usuario.nome}`) ||
+                         localStorage.getItem(`profile_${usuario.nome}`);
+      
+      if (dadosSalvos) {
+        try {
+          const dados = JSON.parse(dadosSalvos);
+          setEditingProfile({
+            fotos: dados.fotos || [],
+            descricao: dados.descricao || '',
+            idade: dados.idade || 25,
+            localizacao: dados.localizacao || 'Brasil',
+            profissao: dados.profissao || 'Usuário'
+          });
+        } catch (error) {
+          console.error('Erro ao carregar dados do perfil:', error);
+        }
+      }
+    }
     setShowEditPerfilModal(true);
   };
 
