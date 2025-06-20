@@ -1697,11 +1697,11 @@ const ChatPage: React.FC = () => {
                   >
                     <div className="message-header">
                       <div className="user-info" onClick={() => handleUsuarioClick(msg.user_name)}>
-                        <FiUser className="default-user-icon" />
-                        <span className="sender">
-                          {msg.user_name}
-                          {msg.is_premium && <FiStar className="premium-icon" />}
-                        </span>
+                            <FiUser className="default-user-icon" />
+                      <span className="sender">
+                        {msg.user_name}
+                        {msg.is_premium && <FiStar className="premium-icon" />}
+                      </span>
                       </div>
                       <span className="time">{formatTime(msg.created_at)}</span>
                       {msg.is_temporary && (
