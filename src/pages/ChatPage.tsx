@@ -232,6 +232,18 @@ const ChatPage: React.FC = () => {
       }
     };
 
+    // Listener para atualização de mini fotos
+    const handleMiniPhotoUpdate = (event: CustomEvent) => {
+      console.log('📸 Mini foto atualizada:', event.detail);
+      setForceUpdate(prev => prev + 1);
+    };
+
+    // Listener para forçar atualização do chat
+    const handleForceChatUpdate = (event: CustomEvent) => {
+      console.log('🔄 Forçando atualização do chat');
+      setForceUpdate(prev => prev + 1);
+    };
+
     // POLLING de segurança - verifica mensagens a cada 3 segundos
     const messagePolling = setInterval(() => {
       if (salaId) {
@@ -264,6 +276,8 @@ const ChatPage: React.FC = () => {
     window.addEventListener('local-message', handleLocalMessage);
     window.addEventListener('chatMessageSent' as any, handleChatMessageSent);
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('mini_photo_updated' as any, handleMiniPhotoUpdate);
+    window.addEventListener('force_chat_update' as any, handleForceChatUpdate);
 
     // Cleanup ao sair da página
     return () => {
@@ -272,6 +286,8 @@ const ChatPage: React.FC = () => {
       window.removeEventListener('local-message', handleLocalMessage);
       window.removeEventListener('chatMessageSent' as any, handleChatMessageSent);
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('mini_photo_updated' as any, handleMiniPhotoUpdate);
+      window.removeEventListener('force_chat_update' as any, handleForceChatUpdate);
     };
   }, [navigate, salaId]);
 
@@ -372,6 +388,26 @@ const ChatPage: React.FC = () => {
     const mensagemParaEnviar = mensagem.trim();
     setMensagem('');
 
+    // 🚀 OTIMIZAÇÃO: Mostrar mensagem imediatamente (otimistic update)
+    const mensagemOtimista: ChatMessage = {
+      id: `temp_${Date.now()}`,
+      room_id: salaId,
+      user_name: usuario.nome,
+      content: mensagemParaEnviar,
+      message_type: 'texto',
+      is_premium: usuario.premium || false,
+      is_temporary: false,
+      created_at: new Date().toISOString()
+    };
+
+    // Adicionar mensagem imediatamente à interface
+    setMensagens(prev => [...prev, mensagemOtimista]);
+
+    // Scroll imediato
+    setTimeout(() => {
+      scrollToBottom();
+    }, 50);
+
     try {
       console.log('📤 Enviando mensagem:', mensagemParaEnviar);
       
@@ -385,18 +421,16 @@ const ChatPage: React.FC = () => {
 
       if (sucesso) {
         console.log('✅ Mensagem enviada com sucesso');
+        // Remover mensagem otimista e deixar a real aparecer
+        setMensagens(prev => prev.filter(msg => msg.id !== mensagemOtimista.id));
       } else {
         console.log('⚠️ Mensagem processada via fallback');
       }
       
-      // Scroll para o final após enviar
-      setTimeout(() => {
-        scrollToBottom();
-      }, 100);
-      
     } catch (error) {
       console.error('❌ Erro ao enviar mensagem:', error);
-      // Restaurar mensagem em caso de erro
+      // Em caso de erro, remover mensagem otimista e restaurar no input
+      setMensagens(prev => prev.filter(msg => msg.id !== mensagemOtimista.id));
       setMensagem(mensagemParaEnviar);
     }
   };
@@ -1510,7 +1544,7 @@ const ChatPage: React.FC = () => {
 
                 return (
                   <div 
-                    key={msg.id} 
+                    key={`${msg.id}_${forceUpdate}`}
                     className={`message ${isOwn ? 'own-message' : 'other-message'} ${msg.is_temporary ? 'temporary-message' : ''}`}
                   >
                     <div className="message-header">

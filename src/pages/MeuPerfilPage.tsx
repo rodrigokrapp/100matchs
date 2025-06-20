@@ -118,6 +118,32 @@ const MeuPerfilPage: React.FC = () => {
         }
       }));
 
+      // Broadcast específico para atualizar mini fotos no chat
+      window.dispatchEvent(new CustomEvent('mini_photo_updated', {
+        detail: {
+          userName: nome,
+          photo: fotos.length > 0 ? fotos[0] : null
+        }
+      }));
+
+      // Forçar atualização global
+      window.dispatchEvent(new CustomEvent('force_chat_update', {
+        detail: { timestamp: Date.now() }
+      }));
+
+      // Broadcast específico para atualizar mini fotos no chat
+      window.dispatchEvent(new CustomEvent('mini_photo_updated', {
+        detail: {
+          userName: nome,
+          photo: fotos.length > 0 ? fotos[0] : null
+        }
+      }));
+
+      // Forçar atualização global
+      window.dispatchEvent(new CustomEvent('force_chat_update', {
+        detail: { timestamp: Date.now() }
+      }));
+
       alert('Perfil salvo com sucesso!');
       navigate('/salas');
     } catch (error) {
