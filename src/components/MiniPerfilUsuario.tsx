@@ -160,10 +160,10 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
 
               <div className="modal-content">
                 <div className="no-photo-section">
-                  <div className="upload-photo-hint">
-                    <FiUser size={60} />
+                    <div className="upload-photo-hint">
+                      <FiUser size={60} />
                     <p>👤 Usuário sem fotos</p>
-                  </div>
+                    </div>
                 </div>
 
                 <div className="profile-info">
@@ -177,7 +177,7 @@ const MiniPerfilUsuario: React.FC<MiniPerfilUsuarioProps> = ({
 
                   <div className="bio-section">
                     <h4>Sobre mim</h4>
-                    <p>{userBio}</p>
+                      <p>{userBio}</p>
                   </div>
                 </div>
 

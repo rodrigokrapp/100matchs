@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   FiSend, FiImage, FiMic, FiSmile, FiArrowLeft, 
   FiUsers, FiStar, FiClock, FiCheck, FiEye, FiPlay, FiPause,
-  FiMicOff, FiCamera, FiFolder, FiUser, FiX, FiHeart, FiMapPin
+  FiMicOff, FiCamera, FiFolder, FiUser, FiX, FiHeart, FiMapPin, FiUserX, FiEdit, FiSave
 } from 'react-icons/fi';
 import { MdGif } from 'react-icons/md';
 import { chatService, ChatMessage } from '../lib/chatService';
@@ -46,6 +46,22 @@ const ChatPage: React.FC = () => {
   const [showPerfilModal, setShowPerfilModal] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [usuariosReaisOnline, setUsuariosReaisOnline] = useState<{[key: string]: number}>({});
+
+  // Estados para edição do próprio perfil
+  const [showEditPerfilModal, setShowEditPerfilModal] = useState(false);
+  const [editingProfile, setEditingProfile] = useState({
+    fotos: [] as string[],
+    descricao: '',
+    idade: 25,
+    localizacao: 'Brasil',
+    profissao: 'Usuário'
+  });
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  // Estados para sistema de bloqueio
+  const [usuariosBloqueados, setUsuariosBloqueados] = useState<string[]>([]);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [userToBlock, setUserToBlock] = useState<string>('');
 
   const nomeSala = location.state?.nomeSala || 'Chat';
 
@@ -1100,6 +1116,24 @@ const ChatPage: React.FC = () => {
     }
   }, [usuario]);
 
+  // Carregar dados salvos do perfil e lista de bloqueados
+  useEffect(() => {
+    if (usuario?.nome) {
+      // Carregar dados do perfil
+      const perfilSalvo = localStorage.getItem(`perfil_${usuario.nome}`);
+      if (perfilSalvo) {
+        const dados = JSON.parse(perfilSalvo);
+        setEditingProfile(dados);
+      }
+
+      // Carregar lista de usuários bloqueados
+      const bloqueadosSalvos = localStorage.getItem(`bloqueados_${usuario.nome}`);
+      if (bloqueadosSalvos) {
+        setUsuariosBloqueados(JSON.parse(bloqueadosSalvos));
+      }
+    }
+  }, [usuario]);
+
   // Função para carregar dados do usuário selecionado
   const carregarDadosUsuario = async (nomeUsuario: string) => {
     try {
@@ -1191,6 +1225,14 @@ const ChatPage: React.FC = () => {
   // Função para abrir modal de perfil
   const handleUsuarioClick = async (nomeUsuario: string) => {
     console.log('🖱️ Clique no usuário:', nomeUsuario);
+    
+    // Se for o próprio usuário, abrir modal de edição
+    if (nomeUsuario === usuario?.nome) {
+      handleEditProfile();
+      return;
+    }
+    
+    // Para outros usuários, abrir modal de visualização
     const dadosUsuario = await carregarDadosUsuario(nomeUsuario);
     setUsuarioSelecionado(dadosUsuario);
     setCurrentPhotoIndex(dadosUsuario.fotoPrincipal || 0);
@@ -1216,6 +1258,113 @@ const ChatPage: React.FC = () => {
       setCurrentPhotoIndex((prev) => (prev - 1 + usuarioSelecionado.fotos.length) % usuarioSelecionado.fotos.length);
     }
   };
+
+  // Funções para edição do próprio perfil
+  const handleEditProfile = () => {
+    setShowEditPerfilModal(true);
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      // Salvar no localStorage
+      localStorage.setItem(`perfil_${usuario.nome}`, JSON.stringify(editingProfile));
+      
+      // Salvar no Supabase
+      const { error } = await supabase
+        .from('perfis')
+        .upsert({
+          nome: usuario.nome,
+          fotos: editingProfile.fotos,
+          descricao: editingProfile.descricao,
+          idade: editingProfile.idade,
+          localizacao: editingProfile.localizacao,
+          profissao: editingProfile.profissao,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Erro ao salvar no Supabase:', error);
+      }
+
+      setShowEditPerfilModal(false);
+      alert('Perfil atualizado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar perfil:', error);
+      alert('Erro ao salvar perfil. Tente novamente.');
+    }
+  };
+
+  const handleUploadPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Verificar se é imagem
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor, selecione apenas imagens.');
+      return;
+    }
+
+    // Verificar tamanho (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Imagem muito grande. Máximo 5MB.');
+      return;
+    }
+
+    setUploadingPhoto(true);
+
+    try {
+      // Converter para base64 para armazenamento local
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        setEditingProfile(prev => ({
+          ...prev,
+          fotos: [...prev.fotos, base64]
+        }));
+        setUploadingPhoto(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error);
+      alert('Erro ao fazer upload da foto.');
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setEditingProfile(prev => ({
+      ...prev,
+      fotos: prev.fotos.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Funções para sistema de bloqueio
+  const handleBlockUser = (nomeUsuario: string) => {
+    setUserToBlock(nomeUsuario);
+    setShowBlockModal(true);
+  };
+
+  const confirmBlockUser = () => {
+    const novosBloqueados = [...usuariosBloqueados, userToBlock];
+    setUsuariosBloqueados(novosBloqueados);
+    localStorage.setItem(`bloqueados_${usuario.nome}`, JSON.stringify(novosBloqueados));
+    
+    setShowBlockModal(false);
+    setShowPerfilModal(false);
+    alert(`Usuário ${userToBlock} foi bloqueado.`);
+  };
+
+  const handleUnblockUser = (nomeUsuario: string) => {
+    const novosBloqueados = usuariosBloqueados.filter(nome => nome !== nomeUsuario);
+    setUsuariosBloqueados(novosBloqueados);
+    localStorage.setItem(`bloqueados_${usuario.nome}`, JSON.stringify(novosBloqueados));
+    alert(`Usuário ${nomeUsuario} foi desbloqueado.`);
+  };
+
+  // Filtrar mensagens de usuários bloqueados
+  const mensagensFiltradas = mensagens.filter(msg => 
+    !usuariosBloqueados.includes(msg.user_name)
+  );
 
   if (!usuario) {
     return <div className="loading">Carregando...</div>;
@@ -1257,7 +1406,7 @@ const ChatPage: React.FC = () => {
             </div>
           ) : (
             <div className="messages-list">
-              {mensagens.map((msg) => {
+              {mensagensFiltradas.map((msg) => {
                 const isExpired = isMessageExpired(msg);
                 const isOwn = msg.user_name === usuario?.nome;
                 
@@ -1612,7 +1761,15 @@ const ChatPage: React.FC = () => {
                   title={isCurrentUser ? 'Meu perfil' : `Ver perfil de ${nomeUsuario}`}
                 >
                   <div className="usuario-horizontal-foto">
-                    <FiUser className="icone-usuario-horizontal" />
+                    {isCurrentUser && editingProfile.fotos && editingProfile.fotos.length > 0 ? (
+                      <img 
+                        src={editingProfile.fotos[0]} 
+                        alt={usuario?.nome}
+                        className="user-profile-photo"
+                      />
+                    ) : (
+                      <FiUser className="icone-usuario-horizontal" />
+                    )}
                     <div className="status-horizontal-online"></div>
                     {isCurrentUser && <div className="current-user-badge">EU</div>}
                   </div>
@@ -1783,6 +1940,156 @@ const ChatPage: React.FC = () => {
                 <button className="action-button chat">
                   <FiUser />
                   <span>Conversar</span>
+                </button>
+                <button 
+                  className="action-button block" 
+                  onClick={() => handleBlockUser(usuarioSelecionado.nome)}
+                >
+                  <FiUserX />
+                  <span>Bloquear</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Edição do Próprio Perfil */}
+      {showEditPerfilModal && (
+        <div className="modal-overlay" onClick={() => setShowEditPerfilModal(false)}>
+          <div className="modal-content-edit" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title">
+                <FiEdit />
+                <span>Editar Meu Perfil</span>
+              </div>
+              <button className="close-button" onClick={() => setShowEditPerfilModal(false)}>
+                <FiX />
+              </button>
+            </div>
+
+            <div className="modal-content">
+              <div className="edit-section">
+                <h4>📸 Minhas Fotos</h4>
+                <div className="photos-grid">
+                  {editingProfile.fotos.map((foto, index) => (
+                    <div key={index} className="photo-item">
+                      <img src={foto} alt={`Foto ${index + 1}`} />
+                      <button 
+                        className="remove-photo"
+                        onClick={() => handleRemovePhoto(index)}
+                      >
+                        <FiX />
+                      </button>
+                    </div>
+                  ))}
+                  
+                  <div className="add-photo">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleUploadPhoto}
+                      style={{ display: 'none' }}
+                      id="photo-upload"
+                    />
+                    <label htmlFor="photo-upload" className="upload-button">
+                      {uploadingPhoto ? (
+                        <div className="loading-spinner">⏳</div>
+                      ) : (
+                        <>
+                          <FiCamera />
+                          <span>Adicionar Foto</span>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="edit-section">
+                <h4>✍️ Descrição</h4>
+                <textarea
+                  value={editingProfile.descricao}
+                  onChange={(e) => setEditingProfile(prev => ({ ...prev, descricao: e.target.value }))}
+                  placeholder="Conte um pouco sobre você..."
+                  maxLength={500}
+                  rows={4}
+                />
+                <small>{editingProfile.descricao.length}/500 caracteres</small>
+              </div>
+
+              <div className="edit-section">
+                <h4>📋 Informações</h4>
+                <div className="info-fields">
+                  <div className="field">
+                    <label>Idade:</label>
+                    <input
+                      type="number"
+                      value={editingProfile.idade}
+                      onChange={(e) => setEditingProfile(prev => ({ ...prev, idade: parseInt(e.target.value) || 25 }))}
+                      min="18"
+                      max="99"
+                    />
+                  </div>
+                  
+                  <div className="field">
+                    <label>Localização:</label>
+                    <input
+                      type="text"
+                      value={editingProfile.localizacao}
+                      onChange={(e) => setEditingProfile(prev => ({ ...prev, localizacao: e.target.value }))}
+                      placeholder="Sua cidade"
+                    />
+                  </div>
+                  
+                  <div className="field">
+                    <label>Profissão:</label>
+                    <input
+                      type="text"
+                      value={editingProfile.profissao}
+                      onChange={(e) => setEditingProfile(prev => ({ ...prev, profissao: e.target.value }))}
+                      placeholder="Sua profissão"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <button className="cancel-button" onClick={() => setShowEditPerfilModal(false)}>
+                  Cancelar
+                </button>
+                <button className="save-button" onClick={handleSaveProfile}>
+                  <FiSave />
+                  Salvar Perfil
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Confirmação de Bloqueio */}
+      {showBlockModal && (
+        <div className="modal-overlay" onClick={() => setShowBlockModal(false)}>
+          <div className="modal-content-small" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title">
+                <FiUserX />
+                <span>Bloquear Usuário</span>
+              </div>
+            </div>
+
+            <div className="modal-content">
+              <p>Tem certeza que deseja bloquear <strong>{userToBlock}</strong>?</p>
+              <p><small>Você não verá mais as mensagens deste usuário no chat.</small></p>
+
+              <div className="modal-actions">
+                <button className="cancel-button" onClick={() => setShowBlockModal(false)}>
+                  Cancelar
+                </button>
+                <button className="block-button" onClick={confirmBlockUser}>
+                  <FiUserX />
+                  Bloquear
                 </button>
               </div>
             </div>

@@ -360,7 +360,7 @@ class ChatService {
         const { error } = await supabase
           .from('chat_messages')
           .insert([message]);
-        
+
         if (!error) {
           console.log('✅ Mensagem salva no banco de dados');
         } else {
