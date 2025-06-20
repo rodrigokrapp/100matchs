@@ -266,8 +266,8 @@ const InicioPage: React.FC = () => {
       {/* Foto de capa no topo */}
       <div className="hero-banner-section">
         <img 
-          src="/banner-converse-sem-match-novo.jpg" 
-          alt="100 Matchs - Converse sem Match" 
+          src="/hero-banner.jpg" 
+          alt="100 Matchs - Capa do Site" 
           className="hero-banner-image"
         />
       </div>
