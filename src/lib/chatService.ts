@@ -449,8 +449,78 @@ class ChatService {
   }
 
   async updateOnlineUsers(roomId: string, count: number) {
-    // Simplified for now
-    console.log(`👥 Usuários online na sala ${roomId}: ${count}`);
+    try {
+      // Atualizar contador local
+      console.log(`📊 Atualizando usuários online para sala ${roomId}: ${count}`);
+    } catch (error) {
+      console.error('❌ Erro ao atualizar usuários online:', error);
+    }
+  }
+
+  // ✅ NOVA FUNÇÃO: Gerenciar cache de fotos dos usuários
+  setUserPhoto(userName: string, photoUrl: string) {
+    try {
+      const userKey = `user_photo_${userName}`;
+      localStorage.setItem(userKey, JSON.stringify({
+        nome: userName,
+        foto: photoUrl,
+        timestamp: new Date().toISOString()
+      }));
+      console.log('📸 Foto do usuário salva no cache:', userName);
+    } catch (error) {
+      console.error('❌ Erro ao salvar foto do usuário:', error);
+    }
+  }
+  
+  getUserPhoto(userName: string): string | null {
+    try {
+      console.log('🔍 Buscando foto específica para usuário:', userName);
+      
+      // Buscar apenas dados salvos do usuário específico, sem caches genéricos
+      const possibleKeys = [
+        `perfil_${userName}`,
+        `usuario_${userName}`,
+        `user_${userName}`,
+        `profile_${userName}`,
+        `user_photo_${userName}`
+      ];
+      
+      for (const key of possibleKeys) {
+        const data = localStorage.getItem(key);
+        if (data) {
+          try {
+            const parsed = JSON.parse(data);
+            // Verificar se o nome corresponde exatamente para evitar mistura de fotos
+            if (parsed.nome === userName) {
+              console.log(`📁 Dados encontrados para ${userName} em ${key}:`, parsed);
+              
+              // Priorizar array de fotos
+              if (parsed.fotos && Array.isArray(parsed.fotos) && parsed.fotos.length > 0) {
+                const validPhoto = parsed.fotos.find((foto: string) => foto && foto.startsWith('data:image/'));
+                if (validPhoto) {
+                  console.log('✅ Foto encontrada no array de fotos para:', userName);
+                  return validPhoto;
+                }
+              }
+              
+              // Foto única
+              if (parsed.foto && parsed.foto.startsWith('data:image/')) {
+                console.log('✅ Foto única encontrada para:', userName);
+                return parsed.foto;
+              }
+            }
+          } catch (e) {
+            console.warn('⚠️ Erro ao parsear dados de', key, ':', e);
+          }
+        }
+      }
+      
+      console.log('❌ Nenhuma foto específica encontrada para:', userName);
+      return null;
+    } catch (error) {
+      console.error('❌ Erro ao buscar foto do usuário:', error);
+      return null;
+    }
   }
 }
 

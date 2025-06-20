@@ -38,6 +38,52 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
       try {
         console.log('🔍 Buscando perfil para:', nomeUsuario);
         
+        // ✅ CORREÇÃO: Buscar dados específicos do usuário no localStorage primeiro
+        const possiveisChaves = [
+          `perfil_${nomeUsuario}`,
+          `usuario_${nomeUsuario}`, 
+          `user_${nomeUsuario}`,
+          `profile_${nomeUsuario}`
+        ];
+        
+        // Tentar buscar no localStorage primeiro
+        for (const chave of possiveisChaves) {
+          try {
+            const dadosSalvos = localStorage.getItem(chave);
+            if (dadosSalvos) {
+              const dados = JSON.parse(dadosSalvos);
+              console.log(`📁 Verificando ${chave} para ${nomeUsuario}:`, dados);
+              
+              if (dados.nome === nomeUsuario) {
+                if (dados.fotos && Array.isArray(dados.fotos) && dados.fotos.length > 0) {
+                  const fotosValidas = dados.fotos.filter((foto: string) => foto && foto.startsWith('data:image/'));
+                  if (fotosValidas.length > 0) {
+                    console.log('✅ Fotos encontradas no localStorage para:', nomeUsuario);
+                    setUserPhotos(fotosValidas);
+                    setUserBio(dados.descricao || 'Usuário da plataforma 100matchs.');
+                    setMainPhotoIndex(dados.foto_principal || 0);
+                    setLoading(false);
+                    return;
+                  }
+                }
+                
+                // Verificar se tem foto única
+                if (dados.foto && dados.foto.startsWith('data:image/')) {
+                  console.log('✅ Foto única encontrada no localStorage para:', nomeUsuario);
+                  setUserPhotos([dados.foto]);
+                  setUserBio(dados.descricao || 'Usuário da plataforma 100matchs.');
+                  setMainPhotoIndex(0);
+                  setLoading(false);
+                  return;
+                }
+              }
+            }
+          } catch (error) {
+            console.warn('⚠️ Erro ao parsear dados de', chave, ':', error);
+          }
+        }
+        
+        // Se não encontrou no localStorage, buscar no Supabase
         let { data: exactData } = await supabase
           .from('perfis')
           .select('*')
@@ -45,7 +91,7 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
           .maybeSingle();
         
         if (exactData) {
-          console.log('✅ Perfil encontrado:', exactData);
+          console.log('✅ Perfil encontrado no Supabase:', exactData);
           const fotosValidas = exactData.fotos ? exactData.fotos.filter((foto: string) => foto !== '') : [];
           setUserPhotos(fotosValidas);
           setUserBio(exactData.descricao || 'Usuário da plataforma 100matchs.');
