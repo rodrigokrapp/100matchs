@@ -3,14 +3,13 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   FiSend, FiImage, FiMic, FiSmile, FiArrowLeft, 
   FiUsers, FiStar, FiClock, FiCheck, FiEye, FiPlay, FiPause,
-  FiMicOff, FiCamera, FiFolder
+  FiMicOff, FiCamera, FiFolder, FiUser, FiX, FiHeart, FiMapPin
 } from 'react-icons/fi';
 import { MdGif } from 'react-icons/md';
 import { chatService, ChatMessage } from '../lib/chatService';
 import MediaService, { EMOJI_CATEGORIES } from '../lib/mediaService';
-import { testChatConnection } from '../lib/supabase';
+import { testChatConnection, supabase } from '../lib/supabase';
 import Header from '../components/Header';
-import { MiniPerfilUsuarioWrapper } from '../components/MiniPerfilUsuario';
 import './ChatPage.css';
 
 const ChatPage: React.FC = () => {
@@ -40,6 +39,12 @@ const ChatPage: React.FC = () => {
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const audioPreviewRef = useRef<HTMLAudioElement>(null);
   const [showUserSim, setShowUserSim] = useState(false);
+  
+  // Estados para lista lateral de usuários
+  const [usuariosOnlineList, setUsuariosOnlineList] = useState<string[]>([]);
+  const [usuarioSelecionado, setUsuarioSelecionado] = useState<any>(null);
+  const [showPerfilModal, setShowPerfilModal] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   const nomeSala = location.state?.nomeSala || 'Chat';
 
@@ -954,129 +959,139 @@ const ChatPage: React.FC = () => {
   };
 
   const getUserInterests = (userName: string): string[] => {
-    const userInterestsData: { [key: string]: string[] } = {
-      'rodrigo': ['Tecnologia', 'Programação', 'Inovação', 'Startups'],
-      'joana': ['Design', 'Arte', 'UX/UI', 'Criatividade'],
-      'carlos': ['Sustentabilidade', 'Natureza', 'Trilhas', 'Engenharia']
-    };
-    
-    return userInterestsData[userName.toLowerCase()] || ['Conversas', 'Amizades'];
+    const interests = ['Conversas', 'Amizades', 'Música', 'Filmes', 'Viagens', 'Esportes', 'Arte', 'Culinária'];
+    return interests.slice(0, Math.floor(Math.random() * 4) + 2);
   };
 
   const handleStartGifRecording = async () => {
+    if (!isPremiumUser()) {
+      alert('🔒 Recurso Premium! Faça upgrade para gravar vídeos.');
+      return;
+    }
+    
     try {
+      // Usar gravação de vídeo normal como GIF
+      const stream = await MediaService.startVideoRecording();
       setIsRecording(true);
       setRecordingType('video');
       setRecordingTime(0);
       
-      // Obter stream da câmera primeiro
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: true, 
-        audio: false 
-      });
-      
-      if (videoPreviewRef.current) {
-        videoPreviewRef.current.srcObject = stream;
-        videoPreviewRef.current.play();
-      }
-      
-      // Iniciar gravação com o stream
-      MediaService.startVideoRecording(stream);
-      
-      // Timer para 5 segundos
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingTime(prev => {
-          if (prev >= 4) { // 5 segundos (0-4)
-            handleStopGifRecording();
-            return 0;
-          }
-          return prev + 1;
-        });
+        setRecordingTime(prev => prev + 1);
       }, 1000);
       
+      console.log('🎬 Gravação iniciada');
     } catch (error) {
-      console.error('Erro ao iniciar gravação de GIF:', error);
-      alert('Erro ao acessar a câmera. Verifique as permissões.');
-      setIsRecording(false);
-      setRecordingType(null);
+      console.error('Erro ao iniciar gravação:', error);
+      alert('Erro ao acessar câmera');
     }
   };
 
   const handleStopGifRecording = async () => {
     try {
+      const videoBlob = await MediaService.stopRecording();
+      setIsRecording(false);
+      setRecordingType(null);
+      setRecordingTime(0);
+      
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
         recordingIntervalRef.current = null;
       }
       
-      // Parar gravação
-      MediaService.stopRecording();
-      
-      // Aguardar um pouco e obter o blob
-      setTimeout(async () => {
-        const videoBlob = await MediaService.getLastRecordedBlob();
-        
-        if (videoBlob && usuario) {
-          // Enviar automaticamente o GIF
-          const videoUrl = URL.createObjectURL(videoBlob);
-          
-          await chatService.sendMessage(
-            salaId || 'default',
-            usuario.nome,
-            videoUrl,
-            'video',
-            true // temporário
-          );
-          
-          // Limpar URL após 30 segundos
-          setTimeout(() => {
-            URL.revokeObjectURL(videoUrl);
-          }, 30000);
-        }
-        
-        setIsRecording(false);
-        setRecordingType(null);
-        setRecordingTime(0);
-        setShowMediaOptions(false);
-      }, 500);
-      
+      if (videoBlob) {
+        const videoUrl = URL.createObjectURL(videoBlob);
+        setPreviewMedia({
+          type: 'video',
+          url: videoUrl,
+          blob: videoBlob
+        });
+        setIsPreviewMode(true);
+        console.log('✅ Vídeo gravado com sucesso');
+      }
     } catch (error) {
-      console.error('Erro ao parar gravação de GIF:', error);
-      setIsRecording(false);
-      setRecordingType(null);
-      setRecordingTime(0);
+      console.error('Erro ao parar gravação:', error);
+      alert('Erro ao finalizar gravação');
     }
   };
 
-  // MELHORADA: Função para manusear vídeos temporários com auto-exclusão
-  const handleTemporaryVideoClick = async (messageId: string, videoElement: HTMLVideoElement) => {
-    if (usuario?.nome) {
-      // Marcar que este usuário específico visualizou a mensagem
-      const currentTime = Date.now();
-      setViewedMessages(prev => {
-        const newMap = new Map(prev);
-        newMap.set(messageId, currentTime);
-        return newMap;
-      });
+  // Função para atualizar lista de usuários online
+  const atualizarUsuariosOnline = () => {
+    const usuariosUnicos = Array.from(new Set(mensagens.map(msg => msg.user_name)));
+    setUsuariosOnlineList(usuariosUnicos.filter(nome => nome !== usuario?.nome));
+  };
+
+  // Atualizar lista quando mensagens mudarem
+  useEffect(() => {
+    atualizarUsuariosOnline();
+  }, [mensagens, usuario]);
+
+  // Função para carregar dados do usuário selecionado
+  const carregarDadosUsuario = async (nomeUsuario: string) => {
+    try {
+      console.log('🔍 Carregando dados do usuário:', nomeUsuario);
       
-      await chatService.markTemporaryMessageViewed(messageId, usuario.nome);
-      
-      // Auto play o vídeo
-      videoElement.play();
-      
-      // Configurar exclusão automática após 10 segundos
-      setTimeout(() => {
-        const container = videoElement.closest('.video-container') as HTMLElement;
-        if (container) {
-          container.style.transition = 'all 0.5s ease';
-          container.style.opacity = '0';
-          container.style.transform = 'scale(0.95)';
-          
-          setTimeout(() => {
-            container.style.display = 'none';
-          }, 500);
-        }
-      }, 10000); // 10 segundos
+      let { data: perfilData } = await supabase
+        .from('perfis')
+        .select('*')
+        .eq('nome', nomeUsuario)
+        .maybeSingle();
+
+      const dadosUsuario = {
+        nome: nomeUsuario,
+        isPremium: Math.random() > 0.5, // Simulação
+        fotos: perfilData?.fotos?.filter((foto: string) => foto !== '') || [],
+        descricao: perfilData?.descricao || 'Usuário da plataforma 100matchs.',
+        idade: perfilData?.idade || Math.floor(Math.random() * 20) + 20,
+        localizacao: perfilData?.localizacao || 'Brasil',
+        profissao: perfilData?.profissao || 'Usuário',
+        interesses: perfilData?.interesses || ['Conversas', 'Amizades'],
+        fotoPrincipal: perfilData?.foto_principal || 0
+      };
+
+      return dadosUsuario;
+    } catch (error) {
+      console.error('Erro ao carregar usuário:', error);
+      return {
+        nome: nomeUsuario,
+        isPremium: false,
+        fotos: [],
+        descricao: 'Usuário da plataforma 100matchs.',
+        idade: 25,
+        localizacao: 'Brasil',
+        profissao: 'Usuário',
+        interesses: ['Conversas', 'Amizades'],
+        fotoPrincipal: 0
+      };
+    }
+  };
+
+  // Função para abrir modal de perfil
+  const handleUsuarioClick = async (nomeUsuario: string) => {
+    console.log('🖱️ Clique no usuário:', nomeUsuario);
+    const dadosUsuario = await carregarDadosUsuario(nomeUsuario);
+    setUsuarioSelecionado(dadosUsuario);
+    setCurrentPhotoIndex(dadosUsuario.fotoPrincipal || 0);
+    setShowPerfilModal(true);
+  };
+
+  // Função para fechar modal
+  const handleClosePerfilModal = () => {
+    setShowPerfilModal(false);
+    setUsuarioSelecionado(null);
+    setCurrentPhotoIndex(0);
+  };
+
+  // Navegação de fotos no modal
+  const nextPhoto = () => {
+    if (usuarioSelecionado && usuarioSelecionado.fotos && usuarioSelecionado.fotos.length > 1) {
+      setCurrentPhotoIndex((prev) => (prev + 1) % usuarioSelecionado.fotos.length);
+    }
+  };
+
+  const prevPhoto = () => {
+    if (usuarioSelecionado && usuarioSelecionado.fotos && usuarioSelecionado.fotos.length > 1) {
+      setCurrentPhotoIndex((prev) => (prev - 1 + usuarioSelecionado.fotos.length) % usuarioSelecionado.fotos.length);
     }
   };
 
@@ -1137,16 +1152,6 @@ const ChatPage: React.FC = () => {
                       <span className="sender">
                         {msg.user_name}
                         {msg.is_premium && <FiStar className="premium-icon" />}
-                        <MiniPerfilUsuarioWrapper 
-                          nomeUsuario={msg.user_name}
-                          isUserPremium={msg.is_premium || false}
-                          isViewerPremium={isPremiumUser()}
-                          isOwnProfile={msg.user_name.toLowerCase() === usuario?.nome?.toLowerCase()}
-                          userAge={getUserAge(msg.user_name)}
-                          userLocation={getUserLocation(msg.user_name)}
-                          userProfession={getUserProfession(msg.user_name)}
-                          userInterests={getUserInterests(msg.user_name)}
-                        />
                       </span>
                       <span className="time">{formatTime(msg.created_at)}</span>
                       {msg.is_temporary && (
@@ -1528,6 +1533,138 @@ const ChatPage: React.FC = () => {
           </button>
         </div>
       </div>
+      
+      {/* Lista Lateral de Usuários */}
+      <div className="lista-usuarios-lateral">
+        <div className="lista-header">
+          <FiUsers />
+          <span>Usuários Online ({usuariosOnlineList.length})</span>
+        </div>
+        
+        <div className="lista-usuarios">
+          {usuariosOnlineList.map((nomeUsuario) => (
+            <div 
+              key={nomeUsuario}
+              className="usuario-item"
+              onClick={() => handleUsuarioClick(nomeUsuario)}
+              title={`Ver perfil de ${nomeUsuario}`}
+            >
+              <div className="usuario-foto">
+                <FiUser className="icone-usuario-default" />
+                <div className="status-online"></div>
+              </div>
+              
+              <div className="usuario-info">
+                <span className="nome-usuario">{nomeUsuario}</span>
+                <span className="idade-usuario">Online</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Modal do Perfil */}
+      {showPerfilModal && usuarioSelecionado && (
+        <div className="modal-perfil-overlay" onClick={handleClosePerfilModal}>
+          <div className="modal-perfil" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title">
+                <FiUser />
+                <span>Perfil de {usuarioSelecionado.nome}</span>
+                {usuarioSelecionado.isPremium && <FiStar className="premium-badge" />}
+              </div>
+              <button className="close-button" onClick={handleClosePerfilModal}>
+                <FiX />
+              </button>
+            </div>
+
+            <div className="modal-content">
+              {usuarioSelecionado.fotos && usuarioSelecionado.fotos.length > 0 ? (
+                <div className="photos-section">
+                  <div className="photo-container">
+                    <img 
+                      src={usuarioSelecionado.fotos[currentPhotoIndex]} 
+                      alt={`Foto ${currentPhotoIndex + 1} de ${usuarioSelecionado.nome}`}
+                      className="main-photo"
+                    />
+                    
+                    {usuarioSelecionado.fotos.length > 1 && (
+                      <>
+                        <button className="photo-nav prev" onClick={prevPhoto}>‹</button>
+                        <button className="photo-nav next" onClick={nextPhoto}>›</button>
+                      </>
+                    )}
+                    
+                    <div className="photo-counter">
+                      {currentPhotoIndex + 1} de {usuarioSelecionado.fotos.length}
+                    </div>
+                  </div>
+
+                  {usuarioSelecionado.fotos.length > 1 && (
+                    <div className="photo-thumbnails">
+                      {usuarioSelecionado.fotos.map((foto: string, index: number) => (
+                        <img
+                          key={index}
+                          src={foto}
+                          alt={`Miniatura ${index + 1}`}
+                          className={`thumbnail ${index === currentPhotoIndex ? 'active' : ''}`}
+                          onClick={() => setCurrentPhotoIndex(index)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="no-photos-section">
+                  <FiUser size={80} />
+                  <p>👤 Usuário sem fotos</p>
+                </div>
+              )}
+
+              <div className="profile-info">
+                <div className="basic-info">
+                  <h3>{usuarioSelecionado.nome}, {usuarioSelecionado.idade}</h3>
+                  <div className="location">
+                    <FiMapPin />
+                    <span>{usuarioSelecionado.localizacao}</span>
+                  </div>
+                  <div className="profession">
+                    <FiUser />
+                    <span>{usuarioSelecionado.profissao}</span>
+                  </div>
+                </div>
+
+                <div className="bio-section">
+                  <h4>Sobre mim</h4>
+                  <p>{usuarioSelecionado.descricao}</p>
+                </div>
+
+                <div className="interests-section">
+                  <h4>Interesses</h4>
+                  <div className="interests-tags">
+                    {usuarioSelecionado.interesses?.map((interesse: string, index: number) => (
+                      <span key={index} className="interest-tag">
+                        {interesse}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <button className="action-button like">
+                  <FiHeart />
+                  <span>Curtir</span>
+                </button>
+                <button className="action-button chat">
+                  <FiUser />
+                  <span>Conversar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
