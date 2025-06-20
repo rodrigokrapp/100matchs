@@ -124,6 +124,10 @@ const SalasPage: React.FC = () => {
     navigate('/criarsala');
   };
 
+  const handleSalasCriadas = () => {
+    navigate('/salascriadas');
+  };
+
   const salasFiltradas = salasCapitais.filter(sala => 
     sala.nome.toLowerCase().includes(busca.toLowerCase())
   );
@@ -161,6 +165,9 @@ const SalasPage: React.FC = () => {
               />
               <button onClick={handleCriarSala} className="btn btn-primary criar-sala-btn">
                 🚀 Criar Salas
+              </button>
+              <button onClick={handleSalasCriadas} className="btn btn-secondary criar-sala-btn">
+                📋 Salas Criadas
               </button>
             </div>
           </div>
