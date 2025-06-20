@@ -970,8 +970,24 @@ const ChatPage: React.FC = () => {
     }
     
     try {
-      // Usar gravação de vídeo normal como GIF
-      const stream = await MediaService.startVideoRecording();
+      // Obter stream primeiro
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { 
+          width: { ideal: 1920, min: 1280 },
+          height: { ideal: 1080, min: 720 },
+          facingMode: 'user',
+          frameRate: { ideal: 30, min: 24 }
+        },
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 48000
+        }
+      });
+      
+      // Iniciar gravação com o stream
+      MediaService.startVideoRecording(stream);
       setIsRecording(true);
       setRecordingType('video');
       setRecordingTime(0);
@@ -989,7 +1005,15 @@ const ChatPage: React.FC = () => {
 
   const handleStopGifRecording = async () => {
     try {
-      const videoBlob = await MediaService.stopRecording();
+      // Parar gravação
+      MediaService.stopRecording();
+      
+      // Aguardar um pouco para garantir que a gravação parou
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Obter o blob gravado
+      const videoBlob = await MediaService.getLastRecordedBlob();
+      
       setIsRecording(false);
       setRecordingType(null);
       setRecordingTime(0);
