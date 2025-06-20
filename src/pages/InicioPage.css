@@ -1198,3 +1198,128 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   letter-spacing: 2px;
 }
+
+/* Estilos para upload de foto */
+.foto-upload-section {
+  margin: 15px 0;
+}
+
+.foto-upload-label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+}
+
+.foto-upload-button {
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.foto-upload-button:hover {
+  border-color: #ff69b4;
+  background: rgba(255, 105, 180, 0.1);
+  transform: translateY(-2px);
+}
+
+.foto-upload-button.premium {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.foto-upload-button.premium:hover {
+  border-color: #ffb300;
+  background: rgba(255, 179, 0, 0.15);
+}
+
+.foto-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.foto-placeholder span {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.foto-placeholder small {
+  font-size: 12px;
+  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.foto-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.foto-preview img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.foto-preview span {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* Responsivo para mobile */
+@media (max-width: 768px) {
+  .foto-upload-button {
+    min-height: 100px;
+    padding: 15px;
+  }
+  
+  .foto-preview img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .foto-placeholder span {
+    font-size: 14px;
+  }
+  
+  .foto-placeholder small {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .foto-upload-button {
+    min-height: 80px;
+    padding: 10px;
+  }
+  
+  .foto-preview img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .foto-placeholder span {
+    font-size: 13px;
+  }
+  
+  .foto-placeholder small {
+    font-size: 10px;
+  }
+}

@@ -7,15 +7,97 @@ const InicioPage: React.FC = () => {
   const navigate = useNavigate();
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
+  const [fotoChat, setFotoChat] = useState<string>('');
   const [nomePremium, setNomePremium] = useState('');
   const [emailPremium, setEmailPremium] = useState('');
   const [senhaPremium, setSenhaPremium] = useState('');
+  const [fotoPremium, setFotoPremium] = useState<string>('');
   const [aceitarTermos, setAceitarTermos] = useState(false);
   const [aceitarTermosPremium, setAceitarTermosPremium] = useState(false);
+
+  // Função para comprimir imagem
+  const compressImage = (file: File, maxWidth: number = 300, quality: number = 0.2): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calcular novas dimensões mantendo proporção
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxWidth) {
+            width = (width * maxWidth) / height;
+            height = maxWidth;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Desenhar imagem redimensionada
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Converter para base64 com qualidade reduzida
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // Upload de foto para chat gratuito
+  const handleFotoChatUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor, selecione apenas imagens.');
+      return;
+    }
+
+    try {
+      const compressedBase64 = await compressImage(file, 250, 0.15);
+      setFotoChat(compressedBase64);
+    } catch (error) {
+      console.error('Erro ao processar imagem:', error);
+      alert('Erro ao processar imagem. Tente novamente.');
+    }
+  };
+
+  // Upload de foto para premium
+  const handleFotoPremiumUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor, selecione apenas imagens.');
+      return;
+    }
+
+    try {
+      const compressedBase64 = await compressImage(file, 250, 0.15);
+      setFotoPremium(compressedBase64);
+    } catch (error) {
+      console.error('Erro ao processar imagem:', error);
+      alert('Erro ao processar imagem. Tente novamente.');
+    }
+  };
 
   const handleEntrarChat = () => {
     if (!nome.trim()) {
       alert('Por favor, digite seu nome');
+      return;
+    }
+
+    if (!fotoChat) {
+      alert('Por favor, adicione uma foto para seu perfil');
       return;
     }
 
@@ -24,24 +106,43 @@ const InicioPage: React.FC = () => {
       return;
     }
 
-    // Salvar usuário de chat gratuito com tempo de sessão
+    // Salvar usuário de chat gratuito com tempo de sessão e foto
     const usuarioChat = {
       nome: nome.trim(),
       email: email.trim() || `${nome.trim().toLowerCase().replace(/\s+/g, '')}@chat.com`,
       premium: false,
       tipo: 'chat',
+      foto: fotoChat,
       limiteTempo: 15 * 60 * 1000, // 15 minutos em milissegundos
       inicioSessao: new Date().getTime()
     };
 
     localStorage.setItem('usuarioChat', JSON.stringify(usuarioChat));
     localStorage.setItem(`acesso_${usuarioChat.email}`, 'true');
+    
+    // Salvar foto no perfil também
+    const perfilData = {
+      nome: usuarioChat.nome,
+      fotos: [fotoChat],
+      descricao: '',
+      idade: 25,
+      updated_at: new Date().toISOString()
+    };
+    
+    localStorage.setItem(`perfil_${usuarioChat.nome}`, JSON.stringify(perfilData));
+    localStorage.setItem(`usuario_${usuarioChat.nome}`, JSON.stringify(perfilData));
+
     navigate('/salas');
   };
 
   const handleEntrarPremium = () => {
     if (!nomePremium.trim() || !emailPremium.trim() || !senhaPremium.trim()) {
       alert('Por favor, preencha nome, email e senha');
+      return;
+    }
+
+    if (!fotoPremium) {
+      alert('Por favor, adicione uma foto para seu perfil');
       return;
     }
 
@@ -61,14 +162,28 @@ const InicioPage: React.FC = () => {
       return;
     }
 
-    // Login bem-sucedido
+    // Login bem-sucedido com foto
     const usuarioLogado = {
       ...usuarioPremium,
       premium: true,
-      tipo: 'premium'
+      tipo: 'premium',
+      foto: fotoPremium
     };
 
     localStorage.setItem('usuarioPremium', JSON.stringify(usuarioLogado));
+    
+    // Salvar/atualizar foto no perfil
+    const perfilData = {
+      nome: usuarioLogado.nome,
+      fotos: [fotoPremium],
+      descricao: usuarioLogado.descricao || '',
+      idade: usuarioLogado.idade || 25,
+      updated_at: new Date().toISOString()
+    };
+    
+    localStorage.setItem(`perfil_${usuarioLogado.nome}`, JSON.stringify(perfilData));
+    localStorage.setItem(`usuario_${usuarioLogado.nome}`, JSON.stringify(perfilData));
+
     navigate('/salas');
   };
 
@@ -112,6 +227,32 @@ const InicioPage: React.FC = () => {
                   onChange={(e) => setNome(e.target.value)}
                   className="input"
                 />
+                
+                {/* Campo de upload de foto para chat */}
+                <div className="foto-upload-section">
+                  <label className="foto-upload-label">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFotoChatUpload}
+                      style={{ display: 'none' }}
+                    />
+                    <div className="foto-upload-button">
+                      {fotoChat ? (
+                        <div className="foto-preview">
+                          <img src={fotoChat} alt="Sua foto" />
+                          <span>📷 Trocar foto</span>
+                        </div>
+                      ) : (
+                        <div className="foto-placeholder">
+                          <span>📷 Adicionar sua foto</span>
+                          <small>Obrigatório para entrar no chat</small>
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                </div>
+                
                 <div className="terms-checkbox">
                   <label>
                     <input
@@ -155,6 +296,32 @@ const InicioPage: React.FC = () => {
                   onChange={(e) => setSenhaPremium(e.target.value)}
                   className="input"
                 />
+                
+                {/* Campo de upload de foto para premium */}
+                <div className="foto-upload-section">
+                  <label className="foto-upload-label">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFotoPremiumUpload}
+                      style={{ display: 'none' }}
+                    />
+                    <div className="foto-upload-button premium">
+                      {fotoPremium ? (
+                        <div className="foto-preview">
+                          <img src={fotoPremium} alt="Sua foto" />
+                          <span>📷 Trocar foto</span>
+                        </div>
+                      ) : (
+                        <div className="foto-placeholder">
+                          <span>📷 Adicionar sua foto</span>
+                          <small>Obrigatório para login premium</small>
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                </div>
+                
                 <div className="terms-checkbox">
                   <label>
                     <input
