@@ -1131,95 +1131,86 @@ const ChatPage: React.FC = () => {
       if (bloqueadosSalvos) {
         setUsuariosBloqueados(JSON.parse(bloqueadosSalvos));
       }
+
+      // Listener para atualizações de perfil de outros usuários
+      const handleProfileUpdate = (event: CustomEvent) => {
+        console.log('📸 Perfil atualizado:', event.detail);
+        // Forçar re-render da lista de usuários
+        setUsuariosOnlineList(prev => [...prev]);
+      };
+
+      window.addEventListener('profile_updated', handleProfileUpdate as EventListener);
+
+      // Cleanup function
+      const cleanup = () => {
+        window.removeEventListener('profile_updated', handleProfileUpdate as EventListener);
+      };
+
+      return cleanup;
     }
   }, [usuario]);
 
   // Função para carregar dados do usuário selecionado
   const carregarDadosUsuario = async (nomeUsuario: string) => {
+    console.log('🔍 Carregando dados do usuário:', nomeUsuario);
+    
     try {
-      console.log('🔍 Carregando dados do usuário:', nomeUsuario);
-      
-      // Se for o próprio usuário, carregar dados reais
-      if (nomeUsuario === usuario?.nome) {
-        // Buscar dados do perfil do usuário logado
-        let perfilData = null;
-        
-        try {
-          const { data } = await supabase
-            .from('perfis')
-            .select('*')
-            .eq('nome', nomeUsuario)
-            .maybeSingle();
-          perfilData = data;
-        } catch (error) {
-          console.log('Perfil não encontrado no Supabase, usando dados locais');
-        }
-
-        const dadosUsuarioAtual = {
-          nome: usuario.nome,
-          isPremium: usuario.tipo === 'premium' || usuario.premium || false,
-          fotos: perfilData?.fotos?.filter((foto: string) => foto !== '') || [],
-          descricao: perfilData?.descricao || 'Meu perfil na plataforma 100matchs.',
-          idade: perfilData?.idade || 25,
-          localizacao: perfilData?.localizacao || 'Brasil',
-          profissao: perfilData?.profissao || 'Usuário Premium',
-          interesses: perfilData?.interesses || ['Conversas', 'Amizades', 'Relacionamentos'],
-          fotoPrincipal: perfilData?.foto_principal || 0
-        };
-
-        return dadosUsuarioAtual;
-      }
-      
-      // Para outros usuários, buscar no Supabase
-      let { data: perfilData } = await supabase
-        .from('perfis')
-        .select('*')
-        .eq('nome', nomeUsuario)
-        .maybeSingle();
-
-      const dadosUsuario = {
-        nome: nomeUsuario,
-        isPremium: Math.random() > 0.5, // Simulação para outros usuários
-        fotos: perfilData?.fotos?.filter((foto: string) => foto !== '') || [],
-        descricao: perfilData?.descricao || 'Usuário da plataforma 100matchs.',
-        idade: perfilData?.idade || Math.floor(Math.random() * 20) + 20,
-        localizacao: perfilData?.localizacao || 'Brasil',
-        profissao: perfilData?.profissao || 'Usuário',
-        interesses: perfilData?.interesses || ['Conversas', 'Amizades'],
-        fotoPrincipal: perfilData?.foto_principal || 0
-      };
-
-      return dadosUsuario;
-    } catch (error) {
-      console.error('Erro ao carregar usuário:', error);
-      
-      // Fallback - se for o usuário atual, usar dados dele
-      if (nomeUsuario === usuario?.nome) {
+      // Primeiro tentar carregar do localStorage (dados mais recentes)
+      const dadosSalvos = localStorage.getItem(`usuario_${nomeUsuario}`) || localStorage.getItem(`perfil_${nomeUsuario}`);
+      if (dadosSalvos) {
+        const dados = JSON.parse(dadosSalvos);
+        console.log('📁 Dados encontrados no localStorage:', dados);
         return {
-          nome: usuario.nome,
-          isPremium: usuario.tipo === 'premium' || usuario.premium || false,
-          fotos: [],
-          descricao: 'Meu perfil na plataforma 100matchs.',
-          idade: 25,
-          localizacao: 'Brasil',
-          profissao: 'Usuário Premium',
-          interesses: ['Conversas', 'Amizades', 'Relacionamentos'],
+          nome: nomeUsuario,
+          fotos: dados.fotos || [],
+          descricao: dados.descricao || `Olá! Eu sou ${nomeUsuario}. Seja bem-vindo ao meu perfil! 😊`,
+          idade: dados.idade || getUserAge(nomeUsuario),
+          localizacao: dados.localizacao || getUserLocation(nomeUsuario),
+          profissao: dados.profissao || getUserProfession(nomeUsuario),
+          interesses: getUserInterests(nomeUsuario),
+          isPremium: Math.random() > 0.7,
           fotoPrincipal: 0
         };
       }
-      
-      return {
-        nome: nomeUsuario,
-        isPremium: false,
-        fotos: [],
-        descricao: 'Usuário da plataforma 100matchs.',
-        idade: 25,
-        localizacao: 'Brasil',
-        profissao: 'Usuário',
-        interesses: ['Conversas', 'Amizades'],
-        fotoPrincipal: 0
-      };
+
+      // Se não encontrar no localStorage, tentar no Supabase
+      const { data, error } = await supabase
+        .from('perfis')
+        .select('*')
+        .eq('nome', nomeUsuario)
+        .single();
+
+      if (data && !error) {
+        console.log('☁️ Dados encontrados no Supabase:', data);
+        return {
+          nome: nomeUsuario,
+          fotos: data.fotos || [],
+          descricao: data.descricao || `Olá! Eu sou ${nomeUsuario}. Seja bem-vindo ao meu perfil! 😊`,
+          idade: data.idade || getUserAge(nomeUsuario),
+          localizacao: data.localizacao || getUserLocation(nomeUsuario),
+          profissao: data.profissao || getUserProfession(nomeUsuario),
+          interesses: getUserInterests(nomeUsuario),
+          isPremium: Math.random() > 0.7,
+          fotoPrincipal: 0
+        };
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados do usuário:', error);
     }
+
+    // Fallback para dados padrão
+    console.log('🎭 Usando dados padrão para:', nomeUsuario);
+    return {
+      nome: nomeUsuario,
+      fotos: [],
+      descricao: `Olá! Eu sou ${nomeUsuario}. Seja bem-vindo ao meu perfil! 😊`,
+      idade: getUserAge(nomeUsuario),
+      localizacao: getUserLocation(nomeUsuario),
+      profissao: getUserProfession(nomeUsuario),
+      interesses: getUserInterests(nomeUsuario),
+      isPremium: Math.random() > 0.7,
+      fotoPrincipal: 0
+    };
   };
 
   // Função para abrir modal de perfil
@@ -1277,8 +1268,8 @@ const ChatPage: React.FC = () => {
           fotos: editingProfile.fotos,
           descricao: editingProfile.descricao,
           idade: editingProfile.idade,
-          localizacao: editingProfile.localizacao,
-          profissao: editingProfile.profissao,
+          localizacao: editingProfile.localizacao || 'Brasil',
+          profissao: editingProfile.profissao || 'Usuário',
           updated_at: new Date().toISOString()
         });
 
@@ -1286,11 +1277,36 @@ const ChatPage: React.FC = () => {
         console.error('Erro ao salvar no Supabase:', error);
       }
 
+      // Broadcast para outros usuários sobre a atualização via localStorage
+      window.dispatchEvent(new CustomEvent('profile_updated', {
+        detail: {
+          nome: usuario.nome,
+          fotos: editingProfile.fotos,
+          descricao: editingProfile.descricao,
+          idade: editingProfile.idade
+        }
+      }));
+
+      // Atualizar localStorage para outros usuários verem
+      localStorage.setItem(`usuario_${usuario.nome}`, JSON.stringify({
+        nome: usuario.nome,
+        fotos: editingProfile.fotos,
+        descricao: editingProfile.descricao,
+        idade: editingProfile.idade,
+        localizacao: editingProfile.localizacao || 'Brasil',
+        profissao: editingProfile.profissao || 'Usuário',
+        updated_at: new Date().toISOString()
+      }));
+
       setShowEditPerfilModal(false);
-      alert('Perfil atualizado com sucesso!');
+      alert('✅ Perfil atualizado com sucesso!');
+      
+      // Forçar re-render da lista de usuários
+      setUsuariosOnlineList(prev => [...prev]);
+      
     } catch (error) {
       console.error('Erro ao salvar perfil:', error);
-      alert('Erro ao salvar perfil. Tente novamente.');
+      alert('❌ Erro ao salvar perfil. Tente novamente.');
     }
   };
 
@@ -1359,6 +1375,22 @@ const ChatPage: React.FC = () => {
     setUsuariosBloqueados(novosBloqueados);
     localStorage.setItem(`bloqueados_${usuario.nome}`, JSON.stringify(novosBloqueados));
     alert(`Usuário ${nomeUsuario} foi desbloqueado.`);
+  };
+
+  // Função para obter foto do usuário
+  const getUserPhoto = (nomeUsuario: string): string | null => {
+    if (nomeUsuario === usuario?.nome) {
+      return editingProfile.fotos && editingProfile.fotos.length > 0 ? editingProfile.fotos[0] : null;
+    }
+    
+    // Buscar foto de outros usuários no localStorage
+    const dadosSalvos = localStorage.getItem(`usuario_${nomeUsuario}`) || localStorage.getItem(`perfil_${nomeUsuario}`);
+    if (dadosSalvos) {
+      const dados = JSON.parse(dadosSalvos);
+      return dados.fotos && dados.fotos.length > 0 ? dados.fotos[0] : null;
+    }
+    
+    return null;
   };
 
   // Filtrar mensagens de usuários bloqueados
@@ -1753,6 +1785,7 @@ const ChatPage: React.FC = () => {
           <div className="usuarios-horizontal-scroll">
             {usuariosOnlineList.map((nomeUsuario) => {
               const isCurrentUser = nomeUsuario === usuario?.nome;
+              const userPhoto = getUserPhoto(nomeUsuario);
               return (
                 <div 
                   key={nomeUsuario}
@@ -1761,10 +1794,10 @@ const ChatPage: React.FC = () => {
                   title={isCurrentUser ? 'Meu perfil' : `Ver perfil de ${nomeUsuario}`}
                 >
                   <div className="usuario-horizontal-foto">
-                    {isCurrentUser && editingProfile.fotos && editingProfile.fotos.length > 0 ? (
+                    {userPhoto ? (
                       <img 
-                        src={editingProfile.fotos[0]} 
-                        alt={usuario?.nome}
+                        src={userPhoto} 
+                        alt={nomeUsuario}
                         className="user-profile-photo"
                       />
                     ) : (
@@ -2029,26 +2062,6 @@ const ChatPage: React.FC = () => {
                       onChange={(e) => setEditingProfile(prev => ({ ...prev, idade: parseInt(e.target.value) || 25 }))}
                       min="18"
                       max="99"
-                    />
-                  </div>
-                  
-                  <div className="field">
-                    <label>Localização:</label>
-                    <input
-                      type="text"
-                      value={editingProfile.localizacao}
-                      onChange={(e) => setEditingProfile(prev => ({ ...prev, localizacao: e.target.value }))}
-                      placeholder="Sua cidade"
-                    />
-                  </div>
-                  
-                  <div className="field">
-                    <label>Profissão:</label>
-                    <input
-                      type="text"
-                      value={editingProfile.profissao}
-                      onChange={(e) => setEditingProfile(prev => ({ ...prev, profissao: e.target.value }))}
-                      placeholder="Sua profissão"
                     />
                   </div>
                 </div>
