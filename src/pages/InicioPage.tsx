@@ -216,16 +216,6 @@ const InicioPage: React.FC = () => {
               <h3>Ver Toda Descrição</h3>
               <p>Leia a descrição completa dos perfis (Premium)</p>
             </div>
-            <div className="feature-card card">
-              <div className="feature-icon">🖼️</div>
-              <h3>Ter Fotos no Perfil</h3>
-              <p>Adicione suas fotos ao seu perfil (Premium)</p>
-            </div>
-            <div className="feature-card card">
-              <div className="feature-icon">✍️</div>
-              <h3>Ter Descrição</h3>
-              <p>Escreva sua descrição personalizada (Premium)</p>
-            </div>
           </div>
         </div>
       </div>
