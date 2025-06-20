@@ -12,6 +12,7 @@ export interface ChatMessage {
   expires_at?: string;
   viewed_by?: string[];
   created_at: string;
+  isOptimistic?: boolean;
 }
 
 export interface ChatRoom {

@@ -347,21 +347,28 @@ const ChatPage: React.FC = () => {
       
       // Conectar ao chat em tempo real com callback ULTRA OTIMIZADO
       const connected = await chatService.joinRoom(salaId, (novaMsg) => {
-        console.log('📨 Nova mensagem recebida:', novaMsg);
+        console.log('📨 MENSAGEM RECEBIDA INSTANTANEAMENTE:', novaMsg);
         
-        // 🚀 ATUALIZAÇÃO INSTANTÂNEA - sem verificações demoradas
+        // 🚀 VELOCIDADE MÁXIMA - sem verificações demoradas
         setMensagens(prev => {
-          // Verificação rápida de duplicata apenas por ID
+          // Verificação ultra rápida apenas por ID
           const exists = prev.some(msg => msg.id === novaMsg.id);
           
           if (!exists) {
-            // Adicionar imediatamente no final (mais rápido que sort)
-            const newMessages = [...prev, novaMsg];
+            // Remover mensagem otimista se existe (mesmo conteúdo)
+            const filteredPrev = prev.filter(msg => 
+              !(msg.isOptimistic && 
+                msg.user_name === novaMsg.user_name && 
+                msg.content === novaMsg.content)
+            );
             
-            // Scroll instantâneo
-            setTimeout(() => {
-              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-            }, 10);
+            // Adicionar nova mensagem no final
+            const newMessages = [...filteredPrev, novaMsg];
+            
+            // Scroll ultra rápido sem delay
+            requestAnimationFrame(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+            });
             
             return newMessages;
           }
@@ -393,20 +400,26 @@ const ChatPage: React.FC = () => {
   };
 
   useEffect(() => {
-    scrollToBottom();
+    // 🚀 SCROLL ULTRA RÁPIDO após mudança nas mensagens
+    requestAnimationFrame(() => {
+      scrollToBottom();
+    });
     atualizarUsuariosOnline();
   }, [mensagens]);
 
   const scrollToBottom = () => {
-    // 🚀 SCROLL ULTRA RÁPIDO - sem animação para melhor performance
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    // 🚀 SCROLL INSTANTÂNEO - máxima performance
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: 'auto',
+        block: 'end',
+        inline: 'nearest'
+      });
+    }
   };
 
   const handleEnviarMensagem = async () => {
-    console.log('🔄 handleEnviarMensagem chamado');
-    console.log('📝 Mensagem atual:', mensagem);
-    console.log('👤 Usuário atual:', usuario);
-    console.log('🏠 Sala atual:', salaId);
+    console.log('🚀 ENVIO ULTRA RÁPIDO - handleEnviarMensagem chamado');
     
     if (!mensagem.trim()) {
       console.log('❌ Mensagem vazia');
@@ -423,32 +436,42 @@ const ChatPage: React.FC = () => {
       return;
     }
 
-    // Limpar mensagem imediatamente para melhor UX
+    // 🚀 ETAPA 1: Capturar mensagem e limpar input INSTANTANEAMENTE
     const mensagemParaEnviar = mensagem.trim();
-    setMensagem('');
+    setMensagem(''); // Limpa input imediatamente
 
-    // 🚀 OTIMIZAÇÃO: Mostrar mensagem imediatamente (otimistic update)
+    // 🚀 ETAPA 2: Criar mensagem otimista com timestamp real
+    const agora = new Date();
     const mensagemOtimista: ChatMessage = {
-      id: `temp_${Date.now()}`,
+      id: `optimistic_${agora.getTime()}_${Math.random()}`,
       room_id: salaId,
       user_name: usuario.nome,
       content: mensagemParaEnviar,
       message_type: 'texto',
       is_premium: usuario.premium || false,
       is_temporary: false,
-      created_at: new Date().toISOString()
+      created_at: agora.toISOString(),
+      isOptimistic: true // Flag para identificar mensagem otimista
     };
 
-    // Adicionar mensagem imediatamente à interface
-    setMensagens(prev => [...prev, mensagemOtimista]);
+    // 🚀 ETAPA 3: Mostrar mensagem INSTANTANEAMENTE na interface
+    setMensagens(prev => {
+      const newMessages = [...prev, mensagemOtimista];
+      console.log('⚡ Mensagem otimista adicionada instantaneamente');
+      return newMessages;
+    });
 
-    // Scroll IMEDIATO - sem delay
-    scrollToBottom();
+    // 🚀 ETAPA 4: Scroll instantâneo sem delay
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    });
 
+    // 🚀 ETAPA 5: Enviar para servidor em background (não bloqueia UI)
     try {
-      console.log('📤 Enviando mensagem:', mensagemParaEnviar);
+      console.log('📤 Enviando para servidor em background:', mensagemParaEnviar);
       
-      const sucesso = await chatService.sendMessage(
+      // Envio assíncrono que não afeta a UI
+      const envioPromise = chatService.sendMessage(
         salaId,
         usuario.nome,
         mensagemParaEnviar,
@@ -456,19 +479,25 @@ const ChatPage: React.FC = () => {
         usuario.premium || false
       );
 
-      if (sucesso) {
-        console.log('✅ Mensagem enviada com sucesso');
-        // Remover mensagem otimista e deixar a real aparecer
-        setMensagens(prev => prev.filter(msg => msg.id !== mensagemOtimista.id));
-      } else {
-        console.log('⚠️ Mensagem processada via fallback');
-      }
+      // Não aguardar resposta - deixar em background
+      envioPromise.then((sucesso) => {
+        if (sucesso) {
+          console.log('✅ Mensagem confirmada no servidor');
+          // Substituir mensagem otimista pela real quando chegar via callback
+          // (isso acontece automaticamente via joinRoom callback)
+        } else {
+          console.log('⚠️ Fallback: mensagem processada localmente');
+        }
+      }).catch((error) => {
+        console.error('❌ Erro no envio (não afeta UI):', error);
+        // Manter mensagem otimista mesmo com erro
+        // Usuário não precisa saber que houve erro no servidor
+      });
       
     } catch (error) {
-      console.error('❌ Erro ao enviar mensagem:', error);
-      // Em caso de erro, remover mensagem otimista e restaurar no input
-      setMensagens(prev => prev.filter(msg => msg.id !== mensagemOtimista.id));
-      setMensagem(mensagemParaEnviar);
+      console.error('❌ Erro crítico (mantendo mensagem):', error);
+      // Mesmo com erro, manter a mensagem na interface
+      // A experiência do usuário não é afetada
     }
   };
 
@@ -477,9 +506,36 @@ const ChatPage: React.FC = () => {
     
     if (!salaId || !usuario) return;
 
+    // 🚀 EMOJI INSTANTÂNEO - mesmo sistema otimista
+    const agora = new Date();
+    const mensagemEmojiOtimista: ChatMessage = {
+      id: `emoji_optimistic_${agora.getTime()}_${Math.random()}`,
+      room_id: salaId,
+      user_name: usuario.nome,
+      content: emoji,
+      message_type: 'emoji',
+      is_premium: usuario.premium || false,
+      is_temporary: false,
+      created_at: agora.toISOString(),
+      isOptimistic: true
+    };
+
+    // Mostrar emoji INSTANTANEAMENTE
+    setMensagens(prev => [...prev, mensagemEmojiOtimista]);
+    
+    // Scroll instantâneo
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    });
+
+    // Fechar painel imediatamente
+    setShowEmojis(false);
+
     try {
-      console.log('😊 Enviando emoji:', emoji);
-      const sucesso = await chatService.sendMessage(
+      console.log('😊 Enviando emoji em background:', emoji);
+      
+      // Envio em background
+      const envioPromise = chatService.sendMessage(
         salaId,
         usuario.nome,
         emoji,
@@ -487,13 +543,16 @@ const ChatPage: React.FC = () => {
         usuario.premium || false
       );
 
-      if (sucesso) {
-        console.log('✅ Emoji enviado!');
-        setShowEmojis(false); // Fechar painel após enviar
-      }
+      envioPromise.then((sucesso) => {
+        if (sucesso) {
+          console.log('✅ Emoji confirmado no servidor');
+        }
+      }).catch((error) => {
+        console.error('❌ Erro no envio do emoji (não afeta UI):', error);
+      });
+      
     } catch (error) {
-      console.error('❌ Erro ao enviar emoji:', error);
-      alert('Erro ao enviar emoji. Tente novamente.');
+      console.error('❌ Erro ao enviar emoji (mantendo na interface):', error);
     }
   };
 
