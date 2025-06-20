@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiMapPin, FiUsers, FiLogOut, FiStar } from 'react-icons/fi';
 import Header from '../components/Header';
+import { supabase } from '../lib/supabase';
 import './SalasPage.css';
 
 interface Sala {
@@ -79,27 +80,77 @@ const SalasPage: React.FC = () => {
 
     setSalasCapitais(capitais);
 
-    // Carregar salas personalizadas do localStorage
-    const carregarSalasPersonalizadas = () => {
-      const salasPersonalizadasSalvas = localStorage.getItem('salas-personalizadas');
-      console.log('📂 Carregando salas personalizadas:', salasPersonalizadasSalvas);
+    // Carregar salas personalizadas do Supabase e localStorage
+    const carregarSalasPersonalizadas = async () => {
+      console.log('📂 Carregando salas personalizadas do Supabase...');
       
-      if (salasPersonalizadasSalvas) {
-        const salas = JSON.parse(salasPersonalizadasSalvas);
-        // Filtrar salas que não expiraram (24 horas)
-        const salasValidas = salas.filter((sala: any) => {
-          const agora = new Date().getTime();
-          const criacao = new Date(sala.criada_em).getTime();
-          const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
-          console.log(`⏰ Sala "${sala.nome}" criada há ${diferencaHoras.toFixed(1)} horas`);
-          return diferencaHoras < 24;
-        });
+      try {
+        // ✅ CARREGAR DO SUPABASE PRIMEIRO (SALAS COMPARTILHADAS)
+        const { data: salasSupabase, error: supabaseError } = await supabase
+          .from('salas_personalizadas')
+          .select('*')
+          .order('criada_em', { ascending: false });
+
+        let salasValidas: Sala[] = [];
+        const agora = new Date().getTime();
+
+        if (supabaseError) {
+          console.warn('⚠️ Erro ao carregar do Supabase, usando localStorage:', supabaseError);
+          
+          // Fallback: carregar do localStorage
+          const salasPersonalizadasSalvas = localStorage.getItem('salas-personalizadas');
+          if (salasPersonalizadasSalvas) {
+            const salas = JSON.parse(salasPersonalizadasSalvas);
+            salasValidas = salas.filter((sala: any) => {
+              const criacao = new Date(sala.criada_em).getTime();
+              const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
+              return diferencaHoras < 24;
+            });
+          }
+        } else {
+          console.log('✅ Salas carregadas do Supabase:', salasSupabase?.length || 0);
+          
+          // Filtrar salas que não expiraram (24 horas)
+          salasValidas = (salasSupabase || [])
+            .filter((sala: any) => {
+              const criacao = new Date(sala.criada_em).getTime();
+              const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
+              console.log(`⏰ Sala "${sala.nome}" criada há ${diferencaHoras.toFixed(1)} horas`);
+              return diferencaHoras < 24;
+            })
+            .map((sala: any) => ({
+              id: sala.id,
+              nome: sala.nome,
+              tipo: 'personalizada' as const,
+              usuarios: sala.usuarios_online || 0,
+              criada_em: sala.criada_em
+            }));
+
+          // Remover salas expiradas do Supabase
+          const salasExpiradas = (salasSupabase || []).filter((sala: any) => {
+            const criacao = new Date(sala.criada_em).getTime();
+            const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
+            return diferencaHoras >= 24;
+          });
+
+          if (salasExpiradas.length > 0) {
+            console.log('🗑️ Removendo salas expiradas do Supabase:', salasExpiradas.length);
+            const idsExpirados = salasExpiradas.map((sala: any) => sala.id);
+            await supabase
+              .from('salas_personalizadas')
+              .delete()
+              .in('id', idsExpirados);
+          }
+        }
         
-        console.log('✅ Salas personalizadas válidas:', salasValidas);
+        console.log('✅ Salas personalizadas válidas:', salasValidas.length);
         setSalasPersonalizadas(salasValidas);
+        
+        // Atualizar localStorage com dados do Supabase
         localStorage.setItem('salas-personalizadas', JSON.stringify(salasValidas));
-      } else {
-        console.log('📭 Nenhuma sala personalizada encontrada');
+        
+      } catch (error) {
+        console.error('❌ Erro ao carregar salas personalizadas:', error);
         setSalasPersonalizadas([]);
       }
     };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import { supabase } from '../lib/supabase';
 import './CriarSalaPage.css';
 
 const CriarSalaPage: React.FC = () => {
@@ -10,7 +11,7 @@ const CriarSalaPage: React.FC = () => {
   const [cidade, setCidade] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleCriarSala = () => {
+  const handleCriarSala = async () => {
     if (!nome.trim() || !bairro.trim() || !cidade.trim()) {
       alert('Por favor, preencha todos os campos');
       return;
@@ -38,18 +39,43 @@ const CriarSalaPage: React.FC = () => {
         criador: usuario.nome || 'Usuário'
       };
 
-      // Salvar no localStorage
-      const salasExistentes = JSON.parse(localStorage.getItem('salas-personalizadas') || '[]');
-      salasExistentes.push(novaSala);
-      localStorage.setItem('salas-personalizadas', JSON.stringify(salasExistentes));
+      console.log('🏠 Criando nova sala:', novaSala);
 
-      console.log('🏠 Nova sala criada:', novaSala);
-      console.log('📂 Salas no localStorage:', salasExistentes);
+      // ✅ SALVAR NO SUPABASE PARA TODOS OS USUÁRIOS VEREM
+      const { data: salaSupabase, error: supabaseError } = await supabase
+        .from('salas_personalizadas')
+        .insert([{
+          id: novaSala.id,
+          nome: novaSala.nome,
+          bairro: novaSala.bairro,
+          cidade: novaSala.cidade,
+          criador: novaSala.criador,
+          criada_em: novaSala.criada_em,
+          usuarios_online: 0
+        }])
+        .select()
+        .single();
 
-      alert('Sala criada com sucesso!');
+      if (supabaseError) {
+        console.warn('⚠️ Erro ao salvar no Supabase, salvando apenas localmente:', supabaseError);
+        
+        // Fallback: salvar no localStorage
+        const salasExistentes = JSON.parse(localStorage.getItem('salas-personalizadas') || '[]');
+        salasExistentes.push(novaSala);
+        localStorage.setItem('salas-personalizadas', JSON.stringify(salasExistentes));
+      } else {
+        console.log('✅ Sala salva no Supabase com sucesso:', salaSupabase);
+        
+        // Também salvar no localStorage para backup
+        const salasExistentes = JSON.parse(localStorage.getItem('salas-personalizadas') || '[]');
+        salasExistentes.push(novaSala);
+        localStorage.setItem('salas-personalizadas', JSON.stringify(salasExistentes));
+      }
+
+      alert('Sala criada com sucesso! Agora todos os usuários podem vê-la.');
       navigate('/salas');
     } catch (error) {
-      console.error('Erro ao criar sala:', error);
+      console.error('❌ Erro ao criar sala:', error);
       alert('Erro ao criar sala. Tente novamente.');
     } finally {
       setLoading(false);
