@@ -62,7 +62,79 @@ const MeuPerfilPage: React.FC = () => {
     }
   };
 
-  const handleFotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Função para comprimir imagem
+  const compressImage = (file: File, maxWidth: number = 300, quality: number = 0.2): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calcular novas dimensões mantendo proporção
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxWidth) {
+            width = (width * maxWidth) / height;
+            height = maxWidth;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Desenhar imagem redimensionada
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Converter para base64 com qualidade reduzida
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // Função para limpar dados antigos do localStorage
+  const cleanOldData = () => {
+    try {
+      const keys = Object.keys(localStorage);
+      const currentUser = nome;
+      
+      // Remover dados de outros usuários antigos
+      const userKeys = keys.filter(key => 
+        (key.startsWith('perfil_') || 
+         key.startsWith('usuario_') || 
+         key.startsWith('user_') || 
+         key.startsWith('profile_')) && 
+        !key.includes(currentUser)
+      );
+      
+      // Se há muitos usuários, remover os mais antigos
+      if (userKeys.length > 10) {
+        const keysToRemove = userKeys.slice(0, userKeys.length - 5);
+        keysToRemove.forEach(key => {
+          localStorage.removeItem(key);
+          console.log('🗑️ Removido:', key);
+        });
+      }
+
+      // Limpar mensagens antigas também
+      const chatKeys = keys.filter(key => key.startsWith('chat_'));
+      if (chatKeys.length > 5) {
+        const oldChatKeys = chatKeys.slice(0, chatKeys.length - 3);
+        oldChatKeys.forEach(key => localStorage.removeItem(key));
+      }
+    } catch (error) {
+      console.error('❌ Erro ao limpar dados antigos:', error);
+    }
+  };
+
+  const handleFotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('📱 Upload iniciado no mobile/desktop');
     const files = Array.from(e.target.files || []);
     console.log('📁 Arquivos selecionados:', files.length);
@@ -72,44 +144,41 @@ const MeuPerfilPage: React.FC = () => {
       return;
     }
 
-    // Converter para base64 com melhor tratamento para mobile
-    files.forEach((file, index) => {
-      console.log(`📸 Processando foto ${index + 1}:`, file.name, file.size);
+    // Processar cada arquivo
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      console.log(`📸 Processando foto ${i + 1}:`, file.name, file.size);
       
       // Verificar se é imagem
       if (!file.type.startsWith('image/')) {
         alert('Por favor, selecione apenas imagens.');
-        return;
+        continue;
       }
 
-      // Verificar tamanho (máximo 10MB para mobile)
-      if (file.size > 10 * 1024 * 1024) {
-        alert('Imagem muito grande. Máximo 10MB.');
-        return;
-      }
-
-      const reader = new FileReader();
-      
-      reader.onload = (event) => {
-        console.log('✅ Foto convertida para base64');
-        const base64 = event.target?.result as string;
+      try {
+        // Comprimir imagem com qualidade muito baixa para evitar quota
+        console.log('🔄 Comprimindo imagem...');
+        const compressedBase64 = await compressImage(file, 250, 0.15);
+        
+        // Verificar tamanho após compressão
+        const sizeAfterCompression = compressedBase64.length * 0.75;
+        console.log('📏 Tamanho após compressão:', Math.round(sizeAfterCompression / 1024), 'KB');
         
         setFotos(prev => {
-          const novasFotos = [...prev, base64];
+          const novasFotos = [...prev, compressedBase64];
           console.log('📷 Total de fotos agora:', novasFotos.length);
           return novasFotos;
         });
-      };
-
-      reader.onerror = (error) => {
+        
+        console.log('✅ Foto comprimida e adicionada com sucesso');
+        
+      } catch (error) {
         console.error('❌ Erro ao processar imagem:', error);
         alert('Erro ao processar imagem. Tente novamente.');
-      };
+      }
+    }
 
-      reader.readAsDataURL(file);
-    });
-
-    // Limpar input para permitir selecionar a mesma foto novamente
+    // Limpar input
     e.target.value = '';
   };
 
@@ -137,6 +206,10 @@ const MeuPerfilPage: React.FC = () => {
     setLoading(true);
 
     try {
+      // LIMPAR DADOS ANTIGOS PRIMEIRO para evitar quota exceeded
+      console.log('🧹 Limpando dados antigos...');
+      cleanOldData();
+
       // Dados para salvar
       const perfilData = {
         nome: nome,
@@ -147,38 +220,53 @@ const MeuPerfilPage: React.FC = () => {
       };
 
       console.log('💾 Dados preparados para salvar:', perfilData);
+      
+      // Verificar tamanho dos dados
+      const dataSize = JSON.stringify(perfilData).length;
+      console.log('📏 Tamanho dos dados:', Math.round(dataSize / 1024), 'KB');
 
-      // Salvar no localStorage com múltiplas chaves para compatibilidade
+      // Salvar no localStorage com tratamento de erro de quota
       try {
+        // Remover dados antigos do usuário atual primeiro
+        localStorage.removeItem(`perfil_${nome}`);
+        localStorage.removeItem(`usuario_${nome}`);
+        localStorage.removeItem(`user_${nome}`);
+        localStorage.removeItem(`profile_${nome}`);
+        
+        // Salvar novos dados
         localStorage.setItem(`perfil_${nome}`, JSON.stringify(perfilData));
         console.log('✅ Salvo em perfil_' + nome);
         
         localStorage.setItem(`usuario_${nome}`, JSON.stringify(perfilData));
         console.log('✅ Salvo em usuario_' + nome);
         
-        localStorage.setItem(`user_${nome}`, JSON.stringify(perfilData));
-        console.log('✅ Salvo em user_' + nome);
-        
-        localStorage.setItem(`profile_${nome}`, JSON.stringify(perfilData));
-        console.log('✅ Salvo em profile_' + nome);
-        
-      } catch (storageError) {
+      } catch (storageError: any) {
         console.error('❌ ERRO no localStorage:', storageError);
-        throw storageError;
+        
+        if (storageError.name === 'QuotaExceededError' || storageError.code === 22) {
+          // Limpar mais dados e tentar novamente
+          console.log('🧹 Quota excedida, limpando TUDO...');
+          
+          // Limpar todos os dados desnecessários
+          const keys = Object.keys(localStorage);
+          const essentialKeys = ['usuarioPremium', 'usuarioChat', 'visitante'];
+          
+          keys.forEach(key => {
+            if (!essentialKeys.includes(key) && !key.includes(nome)) {
+              localStorage.removeItem(key);
+            }
+          });
+          
+          // Tentar salvar apenas o essencial
+          localStorage.setItem(`perfil_${nome}`, JSON.stringify(perfilData));
+          
+          console.log('✅ Salvo após limpeza total');
+        } else {
+          throw storageError;
+        }
       }
 
       console.log('📡 Enviando broadcasts...');
-
-      // Broadcast para outros usuários
-      window.dispatchEvent(new CustomEvent('profile_updated', {
-        detail: {
-          nome: nome,
-          fotos: fotos,
-          descricao: descricao,
-          idade: idade
-        }
-      }));
-      console.log('✅ Broadcast profile_updated enviado');
 
       // Broadcast específico para atualizar mini fotos no chat
       const fotoParaChat = fotos.length > 0 ? fotos[0] : null;
@@ -206,7 +294,7 @@ const MeuPerfilPage: React.FC = () => {
       navigate('/salas');
     } catch (error) {
       console.error('💥 ERRO CRÍTICO ao salvar:', error);
-      alert('❌ Erro ao salvar perfil: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));
+      alert('❌ Erro ao salvar perfil. Tente com uma foto menor.');
     } finally {
       setLoading(false);
     }
