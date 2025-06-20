@@ -160,10 +160,7 @@ const SalasPage: React.FC = () => {
                 className="input search-input"
               />
               <button onClick={handleCriarSala} className="btn btn-primary criar-sala-btn">
-                Criar Sala
-              </button>
-              <button onClick={() => navigate('/salascriadas')} className="btn btn-secondary criar-sala-btn">
-                Salas Criadas
+                🚀 Criar Salas
               </button>
             </div>
           </div>
