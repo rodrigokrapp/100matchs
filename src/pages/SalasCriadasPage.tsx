@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiTrash2, FiUsers, FiClock } from 'react-icons/fi';
 import Header from '../components/Header';
-import { supabase } from '../lib/supabase';
-import { initializeSalasTable } from '../lib/initDatabase';
+import { carregarSalasCompartilhadas, excluirSalaCompartilhada, sincronizarSalas } from '../lib/salasService';
 import './SalasCriadasPage.css';
 
 interface SalaCriada {
@@ -13,12 +12,14 @@ interface SalaCriada {
   cidade: string;
   criada_em: string;
   usuarios: number;
+  fonte?: string;
 }
 
 const SalasCriadasPage: React.FC = () => {
   const navigate = useNavigate();
   const [salasPersonalizadas, setSalasPersonalizadas] = useState<SalaCriada[]>([]);
   const [usuario, setUsuario] = useState<any>(null);
+  const [carregando, setCarregando] = useState(false);
 
   useEffect(() => {
     // Verificar se usuário está logado
@@ -34,137 +35,35 @@ const SalasCriadasPage: React.FC = () => {
       return;
     }
 
-    // Inicializar tabela e carregar salas
-    const init = async () => {
-      await initializeSalasTable();
-      carregarSalasCriadas();
-    };
+    // Carregar salas imediatamente
+    carregarSalas();
     
-    init();
+    // Sincronizar salas na inicialização
+    sincronizarSalas();
     
     // Atualizar salas a cada 30 segundos
     const interval = setInterval(() => {
-      console.log('🔄 Atualizando lista de salas...');
-      carregarSalasCriadas();
+      console.log('🔄 Atualizando lista de salas automaticamente...');
+      carregarSalas();
     }, 30000);
 
     return () => clearInterval(interval);
   }, [navigate]);
 
-  const carregarSalasCriadas = async () => {
-    console.log('📂 Carregando salas do Supabase e localStorage...');
-    
+  const carregarSalas = async () => {
     try {
-      // ✅ CARREGAR DO SUPABASE PRIMEIRO (SALAS COMPARTILHADAS)
-      const { data: salasSupabase, error: supabaseError } = await supabase
-        .from('salas_personalizadas')
-        .select('*')
-        .order('criada_em', { ascending: false });
-
-      let salasValidas: SalaCriada[] = [];
-      const agora = new Date().getTime();
-
-      if (supabaseError) {
-        console.warn('⚠️ Erro ao carregar do Supabase, usando localStorage:', supabaseError);
-        
-        // Fallback: carregar do localStorage
-        const salasPersonalizadasSalvas = localStorage.getItem('salas-personalizadas');
-        if (salasPersonalizadasSalvas) {
-          const salas = JSON.parse(salasPersonalizadasSalvas);
-          salasValidas = salas.filter((sala: SalaCriada) => {
-            const criacao = new Date(sala.criada_em).getTime();
-            const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
-            return diferencaHoras < 24;
-          });
-        }
-      } else {
-        console.log('✅ Salas carregadas do Supabase:', salasSupabase?.length || 0);
-        
-        // Filtrar salas que não expiraram (24 horas) e remover as expiradas
-        salasValidas = (salasSupabase || [])
-          .filter((sala: any) => {
-            const criacao = new Date(sala.criada_em).getTime();
-            const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
-            console.log(`⏰ Sala "${sala.nome}" criada há ${diferencaHoras.toFixed(1)} horas`);
-            return diferencaHoras < 24;
-          })
-          .map((sala: any) => ({
-            id: sala.id,
-            nome: sala.nome,
-            bairro: sala.bairro,
-            cidade: sala.cidade,
-            criada_em: sala.criada_em,
-            usuarios: sala.usuarios_online || 0
-          }));
-
-        // Remover salas expiradas do Supabase
-        const salasExpiradas = (salasSupabase || []).filter((sala: any) => {
-          const criacao = new Date(sala.criada_em).getTime();
-          const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
-          return diferencaHoras >= 24;
-        });
-
-        if (salasExpiradas.length > 0) {
-          console.log('🗑️ Removendo salas expiradas do Supabase:', salasExpiradas.length);
-          const idsExpirados = salasExpiradas.map((sala: any) => sala.id);
-          await supabase
-            .from('salas_personalizadas')
-            .delete()
-            .in('id', idsExpirados);
-        }
-      }
-
-      // Se não há salas válidas, criar salas de exemplo
-      if (salasValidas.length === 0) {
-        console.log('📭 Nenhuma sala encontrada, criando salas de exemplo...');
-        const salasExemplo = [
-          {
-            id: `exemplo-1-${Date.now()}`,
-            nome: 'Chat Geral - Centro, São Paulo',
-            bairro: 'Centro',
-            cidade: 'São Paulo',
-            criada_em: new Date().toISOString(),
-            usuarios: 0
-          },
-          {
-            id: `exemplo-2-${Date.now() + 1}`,
-            nome: 'Galera da Praia - Copacabana, Rio de Janeiro',
-            bairro: 'Copacabana',
-            cidade: 'Rio de Janeiro',
-            criada_em: new Date().toISOString(),
-            usuarios: 0
-          }
-        ];
-        
-        // Tentar salvar no Supabase
-        try {
-          await supabase
-            .from('salas_personalizadas')
-            .insert(salasExemplo.map(sala => ({
-              id: sala.id,
-              nome: sala.nome,
-              bairro: sala.bairro,
-              cidade: sala.cidade,
-              criador: 'Sistema',
-              criada_em: sala.criada_em,
-              usuarios_online: 0
-            })));
-          console.log('✅ Salas de exemplo criadas no Supabase');
-        } catch (error) {
-          console.warn('⚠️ Erro ao criar salas de exemplo no Supabase');
-        }
-        
-        localStorage.setItem('salas-personalizadas', JSON.stringify(salasExemplo));
-        salasValidas = salasExemplo;
-        console.log('🎯 Salas de exemplo criadas para demonstração');
-      }
-
-      console.log('✅ Total de salas válidas:', salasValidas.length);
-      setSalasPersonalizadas(salasValidas);
+      setCarregando(true);
+      console.log('📂 Carregando todas as salas compartilhadas...');
       
+      const salas = await carregarSalasCompartilhadas();
+      console.log('✅ Salas carregadas:', salas.length);
+      
+      setSalasPersonalizadas(salas);
     } catch (error) {
       console.error('❌ Erro ao carregar salas:', error);
       setSalasPersonalizadas([]);
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -185,16 +84,29 @@ const SalasCriadasPage: React.FC = () => {
     navigate(`/chat/${salaId}`, { state: { nomeSala } });
   };
 
-  const handleExcluirSala = (salaId: string) => {
+  const handleExcluirSala = async (salaId: string) => {
     if (confirm('Tem certeza que deseja excluir esta sala?')) {
-      const salasAtualizadas = salasPersonalizadas.filter(sala => sala.id !== salaId);
-      setSalasPersonalizadas(salasAtualizadas);
-      localStorage.setItem('salas-personalizadas', JSON.stringify(salasAtualizadas));
+      console.log('🗑️ Excluindo sala:', salaId);
+      const sucesso = await excluirSalaCompartilhada(salaId);
+      
+      if (sucesso) {
+        // Atualizar lista local
+        setSalasPersonalizadas(prev => prev.filter(sala => sala.id !== salaId));
+        console.log('✅ Sala excluída com sucesso');
+      } else {
+        alert('Erro ao excluir sala. Tente novamente.');
+      }
     }
   };
 
   const handleVoltar = () => {
     navigate('/salas');
+  };
+
+  const handleAtualizarManual = async () => {
+    console.log('🔄 Atualização manual solicitada');
+    await carregarSalas();
+    await sincronizarSalas();
   };
 
   if (!usuario) {
@@ -213,90 +125,110 @@ const SalasCriadasPage: React.FC = () => {
           </button>
           
           <div className="header-content">
-            <h1>🏠 Salas Criadas</h1>
-            <p>Todas as salas personalizadas criadas pelos usuários</p>
-            <small>⏰ Salas ficam ativas por 24 horas após a criação</small>
-            <button 
-              onClick={carregarSalasCriadas}
-              className="btn btn-secondary"
-              style={{ marginTop: '10px' }}
-            >
-              🔄 Atualizar Lista
-            </button>
+            <h1>🏠 Salas Criadas por Todos os Usuários</h1>
+            <p>Todas as salas personalizadas criadas pela comunidade</p>
+            <small>⏰ Salas ficam ativas por exatamente 24 horas após a criação</small>
+            <div style={{ marginTop: '10px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <button 
+                onClick={handleAtualizarManual}
+                className="btn btn-secondary"
+                disabled={carregando}
+              >
+                {carregando ? '⏳ Carregando...' : '🔄 Atualizar Lista'}
+              </button>
+              <button 
+                onClick={() => navigate('/criarsala')}
+                className="btn btn-primary"
+              >
+                ➕ Criar Nova Sala
+              </button>
+            </div>
           </div>
         </div>
 
-        {salasPersonalizadas.length === 0 ? (
+        {carregando && salasPersonalizadas.length === 0 ? (
+          <div className="loading-salas">
+            <div className="spinner"></div>
+            <p>Carregando salas compartilhadas...</p>
+          </div>
+        ) : salasPersonalizadas.length === 0 ? (
           <div className="no-salas">
             <div className="no-salas-card card">
-              <h3>Nenhuma sala criada ainda</h3>
-              <p>Seja o primeiro a criar uma sala personalizada!</p>
+              <h3>📭 Nenhuma sala ativa no momento</h3>
+              <p>Seja o primeiro a criar uma sala personalizada para a comunidade!</p>
+              <p><small>💡 As salas ficam visíveis para todos os usuários por 24 horas</small></p>
               <button 
                 onClick={() => navigate('/criarsala')} 
                 className="btn btn-primary"
               >
-                Criar Primeira Sala
+                🚀 Criar Primeira Sala
               </button>
             </div>
           </div>
         ) : (
           <div className="salas-grid">
             {salasPersonalizadas.map((sala) => (
-              <div key={sala.id} className="sala-criada-card card">
+              <div key={sala.id} className="sala-card card">
                 <div className="sala-header">
                   <h3>{sala.nome}</h3>
-                  <button 
-                    onClick={() => handleExcluirSala(sala.id)}
-                    className="btn-excluir"
-                    title="Excluir sala"
-                  >
-                    <FiTrash2 />
-                  </button>
+                  <div className="sala-fonte">
+                    {sala.fonte === 'supabase' && '☁️'}
+                    {sala.fonte === 'localStorage' && '💾'}
+                    {sala.fonte === 'exemplo' && '🎯'}
+                  </div>
                 </div>
                 
                 <div className="sala-info">
-                  <p className="sala-localizacao">
+                  <div className="sala-location">
                     📍 {sala.bairro}, {sala.cidade}
-                  </p>
+                  </div>
                   
                   <div className="sala-stats">
                     <div className="stat">
                       <FiUsers />
                       <span>{sala.usuarios} online</span>
                     </div>
-                    
                     <div className="stat">
                       <FiClock />
                       <span>{calcularTempoRestante(sala.criada_em)}</span>
                     </div>
                   </div>
                   
-                  <div className="sala-criacao">
+                  <div className="sala-details">
                     <small>
-                      Criada em {new Date(sala.criada_em).toLocaleString('pt-BR')}
+                      Criada em: {new Date(sala.criada_em).toLocaleString('pt-BR')}
                     </small>
                   </div>
                 </div>
                 
-                <button 
-                  onClick={() => handleEntrarSala(sala.id, sala.nome)}
-                  className="btn btn-primary btn-entrar"
-                >
-                  Entrar na Sala
-                </button>
+                <div className="sala-actions">
+                  <button 
+                    onClick={() => handleEntrarSala(sala.id, sala.nome)}
+                    className="btn btn-primary"
+                  >
+                    💬 Entrar na Sala
+                  </button>
+                  <button 
+                    onClick={() => handleExcluirSala(sala.id)}
+                    className="btn btn-danger btn-small"
+                    title="Excluir sala"
+                  >
+                    <FiTrash2 />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
-        
-        <div className="info-section">
+
+        <div className="info-footer">
           <div className="info-card card">
-            <h3>ℹ️ Informações Importantes</h3>
+            <h4>ℹ️ Como funciona</h4>
             <ul>
-              <li>🕐 Salas personalizadas ficam ativas por exatamente 24 horas</li>
-              <li>🗑️ Você pode excluir salas que criou a qualquer momento</li>
-              <li>👥 O número de usuários online é atualizado em tempo real</li>
-              <li>🔄 Esta página é atualizada automaticamente</li>
+              <li><strong>Compartilhamento:</strong> Todas as salas criadas aparecem para todos os usuários</li>
+              <li><strong>Duração:</strong> Cada sala fica ativa por exatamente 24 horas</li>
+              <li><strong>Atualização:</strong> A lista é atualizada automaticamente a cada 30 segundos</li>
+              <li><strong>Sincronização:</strong> Salas são sincronizadas entre dispositivos e usuários</li>
             </ul>
           </div>
         </div>
@@ -305,4 +237,4 @@ const SalasCriadasPage: React.FC = () => {
   );
 };
 
-export default SalasCriadasPage; 
+export default SalasCriadasPage;

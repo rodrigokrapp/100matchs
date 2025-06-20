@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import { supabase } from '../lib/supabase';
+import { salvarSalaCompartilhada } from '../lib/salasService';
 import './CriarSalaPage.css';
 
 const CriarSalaPage: React.FC = () => {
@@ -41,38 +41,22 @@ const CriarSalaPage: React.FC = () => {
 
       console.log('🏠 Criando nova sala:', novaSala);
 
-      // ✅ SALVAR NO SUPABASE PARA TODOS OS USUÁRIOS VEREM
-      const { data: salaSupabase, error: supabaseError } = await supabase
-        .from('salas_personalizadas')
-        .insert([{
-          id: novaSala.id,
-          nome: novaSala.nome,
-          bairro: novaSala.bairro,
-          cidade: novaSala.cidade,
-          criador: novaSala.criador,
-          criada_em: novaSala.criada_em,
-          usuarios_online: 0
-        }])
-        .select()
-        .single();
+      // ✅ USAR NOVO SERVIÇO DE SALAS COMPARTILHADAS
+      const resultado = await salvarSalaCompartilhada({
+        id: novaSala.id,
+        nome: novaSala.nome,
+        bairro: novaSala.bairro,
+        cidade: novaSala.cidade,
+        criador: novaSala.criador
+      });
 
-      if (supabaseError) {
-        console.warn('⚠️ Erro ao salvar no Supabase, salvando apenas localmente:', supabaseError);
-        
-        // Fallback: salvar no localStorage
-        const salasExistentes = JSON.parse(localStorage.getItem('salas-personalizadas') || '[]');
-        salasExistentes.push(novaSala);
-        localStorage.setItem('salas-personalizadas', JSON.stringify(salasExistentes));
+      if (resultado.success) {
+        console.log(`✅ Sala salva com sucesso via ${resultado.fonte}`);
+        alert('🎉 Sala criada com sucesso!\n\nTodos os usuários poderão vê-la por 24 horas na página "Salas Criadas".');
       } else {
-        console.log('✅ Sala salva no Supabase com sucesso:', salaSupabase);
-        
-        // Também salvar no localStorage para backup
-        const salasExistentes = JSON.parse(localStorage.getItem('salas-personalizadas') || '[]');
-        salasExistentes.push(novaSala);
-        localStorage.setItem('salas-personalizadas', JSON.stringify(salasExistentes));
+        console.error('❌ Erro ao salvar sala:', resultado.error);
+        alert('❌ Erro ao criar sala. Tente novamente.');
       }
-
-      alert('Sala criada com sucesso! Agora todos os usuários podem vê-la.');
       navigate('/salas');
     } catch (error) {
       console.error('❌ Erro ao criar sala:', error);
