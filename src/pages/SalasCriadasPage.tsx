@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiTrash2, FiUsers, FiClock } from 'react-icons/fi';
 import Header from '../components/Header';
 import { supabase } from '../lib/supabase';
+import { initializeSalasTable } from '../lib/initDatabase';
 import './SalasCriadasPage.css';
 
 interface SalaCriada {
@@ -33,7 +34,13 @@ const SalasCriadasPage: React.FC = () => {
       return;
     }
 
-    carregarSalasCriadas();
+    // Inicializar tabela e carregar salas
+    const init = async () => {
+      await initializeSalasTable();
+      carregarSalasCriadas();
+    };
+    
+    init();
     
     // Atualizar salas a cada 30 segundos
     const interval = setInterval(() => {
