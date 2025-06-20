@@ -72,6 +72,9 @@ const ChatPage: React.FC = () => {
 
   const nomeSala = location.state?.nomeSala || 'Chat';
 
+  // ✅ CACHE ESPECÍFICO DE FOTOS POR USUÁRIO
+  const [userPhotosCache, setUserPhotosCache] = useState<{[key: string]: string | null}>({});
+
   // Verificar permissões de mídia
   useEffect(() => {
     checkMediaPermissions();
@@ -1540,49 +1543,15 @@ const ChatPage: React.FC = () => {
     alert(`Usuário ${nomeUsuario} foi desbloqueado.`);
   };
 
-  // Função para obter foto do usuário OTIMIZADA
+  // ✅ FUNÇÃO ULTRA OTIMIZADA DE FOTOS POR USUÁRIO
   const getUserPhoto = (nomeUsuario: string): string | null => {
-    console.log('🔍 Buscando foto para usuário:', nomeUsuario);
+    if (!nomeUsuario) return null;
     
-    // Se for o usuário atual, verificar dados reais
-    if (nomeUsuario === usuario?.nome) {
-      // Verificar estado de edição primeiro
-      if (editingProfile.fotos && editingProfile.fotos.length > 0) {
-        console.log('👤 Foto do usuário atual no estado de edição');
-        return editingProfile.fotos[0];
-      }
-      
-      // Verificar dados salvos do usuário logado
-      const usuarioPremium = localStorage.getItem('usuarioPremium');
-      const usuarioChat = localStorage.getItem('usuarioChat');
-      
-      if (usuarioPremium) {
-        try {
-          const dadosPremium = JSON.parse(usuarioPremium);
-          if (dadosPremium.foto) {
-            console.log('✅ Foto do usuário logado encontrada (premium)');
-            return dadosPremium.foto;
-          }
-        } catch (error) {
-          console.warn('⚠️ Erro ao parsear dados premium');
-        }
-      }
-      
-      if (usuarioChat) {
-        try {
-          const dadosChat = JSON.parse(usuarioChat);
-          if (dadosChat.foto) {
-            console.log('✅ Foto do usuário logado encontrada (chat)');
-            return dadosChat.foto;
-          }
-        } catch (error) {
-          console.warn('⚠️ Erro ao parsear dados chat');
-        }
-      }
-    }
+    console.log('🔍 Buscando foto específica para:', nomeUsuario);
     
-    // Buscar fotos específicas do usuário no localStorage
-    const possiveisChaves = [
+    // ⚡ ESTRATÉGIA 1: Buscar APENAS por dados específicos do usuário solicitado
+    // NUNCA misturar com dados do usuário logado atual
+    const chavesPossiveisUsuario = [
       `perfil_${nomeUsuario}`,
       `usuario_${nomeUsuario}`, 
       `user_${nomeUsuario}`,
@@ -1590,49 +1559,81 @@ const ChatPage: React.FC = () => {
       `user_photo_${nomeUsuario}`
     ];
     
-    for (const chave of possiveisChaves) {
+    // Buscar apenas pelos dados salvos específicos do usuário
+    for (const chave of chavesPossiveisUsuario) {
       try {
         const dadosSalvos = localStorage.getItem(chave);
         if (dadosSalvos) {
           const dados = JSON.parse(dadosSalvos);
-          console.log(`📁 Verificando ${chave} para ${nomeUsuario}:`, dados);
           
-          // Verificar se o nome corresponde exatamente
-          if (dados.nome === nomeUsuario) {
+          // ✅ VERIFICAÇÃO RIGOROSA: nome deve corresponder EXATAMENTE
+          if (dados && dados.nome === nomeUsuario) {
+            console.log(`📁 Dados específicos encontrados em ${chave} para ${nomeUsuario}`);
+            
+            // Priorizar array de fotos
             if (dados.fotos && Array.isArray(dados.fotos) && dados.fotos.length > 0) {
-              const foto = dados.fotos[0];
-              if (foto && foto.startsWith('data:image/')) {
-                console.log('📸 Foto específica encontrada para', nomeUsuario);
-                return foto;
+              const fotoValida = dados.fotos.find((foto: string) => foto && foto.startsWith('data:image/'));
+              if (fotoValida) {
+                console.log('✅ Foto do array encontrada para:', nomeUsuario);
+                return fotoValida;
               }
             }
             
+            // Foto única
             if (dados.foto && dados.foto.startsWith('data:image/')) {
-              console.log('📸 Foto direta encontrada para', nomeUsuario);
+              console.log('✅ Foto única encontrada para:', nomeUsuario);
               return dados.foto;
             }
           }
         }
       } catch (error) {
-        console.warn('⚠️ Erro ao parsear dados de', chave, ':', error);
+        console.warn(`⚠️ Erro ao parsear ${chave}:`, error);
       }
     }
     
-    // Buscar nas mensagens de imagem do usuário
-    const mensagensDoUsuario = mensagens.filter((msg: ChatMessage) => 
+    // ⚡ ESTRATÉGIA 2: Se for o próprio usuário logado, verificar também dados de sessão
+    if (nomeUsuario === usuario?.nome) {
+      console.log('👤 Buscando foto do próprio usuário logado:', nomeUsuario);
+      
+      // Estado de edição atual
+      if (editingProfile.fotos && editingProfile.fotos.length > 0) {
+        console.log('✅ Foto no estado de edição para usuário atual');
+        return editingProfile.fotos[0];
+      }
+      
+      // Dados de sessão do usuário
+      const sessaoUsuarios = ['usuarioPremium', 'usuarioChat', 'visitante'];
+      for (const tipoSessao of sessaoUsuarios) {
+        try {
+          const dadosSessao = localStorage.getItem(tipoSessao);
+          if (dadosSessao) {
+            const dados = JSON.parse(dadosSessao);
+            if (dados.nome === nomeUsuario && dados.foto && dados.foto.startsWith('data:image/')) {
+              console.log(`✅ Foto de sessão ${tipoSessao} para usuário atual`);
+              return dados.foto;
+            }
+          }
+        } catch (error) {
+          console.warn(`⚠️ Erro ao verificar sessão ${tipoSessao}`);
+        }
+      }
+    }
+    
+    // ⚡ ESTRATÉGIA 3: Buscar nas mensagens de imagem específicas do usuário
+    const imagensDoUsuario = mensagens.filter((msg: ChatMessage) => 
       msg.user_name === nomeUsuario && 
       msg.message_type === 'imagem' && 
       msg.content && 
       msg.content.startsWith('data:image/')
     );
     
-    if (mensagensDoUsuario.length > 0) {
-      const fotoMensagem = mensagensDoUsuario[mensagensDoUsuario.length - 1].content;
-      console.log('💬 Foto encontrada nas mensagens para', nomeUsuario);
-      return fotoMensagem;
+    if (imagensDoUsuario.length > 0) {
+      const ultimaFoto = imagensDoUsuario[imagensDoUsuario.length - 1].content;
+      console.log('💬 Foto encontrada nas mensagens de:', nomeUsuario);
+      return ultimaFoto;
     }
     
-    console.log('❌ Nenhuma foto encontrada para', nomeUsuario);
+    console.log('❌ Nenhuma foto específica encontrada para:', nomeUsuario);
     return null;
   };
 
