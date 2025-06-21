@@ -22,34 +22,6 @@
   max-width: 1200px;
 }
 
-.back-button {
-  position: absolute;
-  left: 0;
-  background: transparent;
-  border: none;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  padding: 0;
-}
-
-.back-button:hover {
-  transform: scale(1.1);
-}
-
-.back-button-image {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
 .logo-container {
   display: flex;
   align-items: center;
@@ -72,13 +44,6 @@
 
 .logo:hover {
   transform: rotate(10deg);
-}
-
-.site-title-image {
-  height: 30px;
-  width: auto;
-  object-fit: contain;
-  transition: transform 0.3s ease;
 }
 
 .salas-link {
@@ -127,23 +92,9 @@
     padding: 1rem;
   }
   
-  .site-title-image {
-    height: 25px;
-  }
-  
   .logo {
     width: 35px;
     height: 35px;
-  }
-  
-  .back-button {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .back-button-image {
-    width: 100%;
-    height: 100%;
   }
   
   .salas-link {

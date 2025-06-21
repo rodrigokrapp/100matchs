@@ -307,27 +307,29 @@
 /* Responsivo */
 @media (max-width: 768px) {
   .suporte-page {
-    padding: 20px 10px;
+    padding: 20px 15px;
     min-height: 100vh;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
   }
 
   .suporte-container {
-    padding: 0 15px;
+    padding: 20px 10px;
     width: 100%;
     max-width: 100%;
   }
 
   .suporte-card {
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1rem;
     margin: 0 auto;
     max-width: 100%;
-    border-radius: 20px;
+    border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .suporte-header h1 {
