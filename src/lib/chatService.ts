@@ -340,11 +340,7 @@ class ChatService {
       detail: { message, roomId }
     }));
 
-    localStorage.setItem('lastChatMessage', JSON.stringify({
-      message,
-      roomId,
-      timestamp: Date.now()
-    }));
+    // Removido lastChatMessage para evitar localStorage quota exceeded
 
     // 🚀 ESTRATÉGIA PARALELA: Todas as operações remotas SEM bloquear
     // BroadcastChannel instantâneo
@@ -354,22 +350,15 @@ class ChatService {
       console.log('BroadcastChannel falhou:', e);
     }
 
-    // Operações remotas em background (não bloqueiam)
-    setTimeout(() => {
-      // Broadcast Supabase
-      this.channel?.send({
-        type: 'broadcast',
-        event: 'new_message',
-        payload: message
-      }).catch((e: any) => console.log('Broadcast falhou:', e));
-      
-             // Supabase Database (temporariamente desabilitado para evitar erro TS)
-       // supabase.from('chat_messages').insert([message]).catch((e: any) => {
-       //   console.log('DB falhou:', e);
-       // });
-    }, 0); // Próximo tick, sem delay
+    // ⚡ OPERAÇÕES REMOTAS INSTANTÂNEAS (sem setTimeout para máxima velocidade)
+    // Broadcast Supabase
+    this.channel?.send({
+      type: 'broadcast',
+      event: 'new_message',
+      payload: message
+    }).catch((e: any) => console.log('Broadcast falhou:', e));
 
-    console.log('⚡ Mensagem disparada INSTANTANEAMENTE!');
+    console.log('⚡ Mensagem disparada INSTANTANEAMENTE SEM DELAY!');
     return true;
   }
 
