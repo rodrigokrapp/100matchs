@@ -75,7 +75,11 @@ const HomePage: React.FC = () => {
       overflow: 'hidden',
       borderRadius: '15px',
       marginBottom: '40px',
-      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+      backgroundImage: 'url("/banner-converse-sem-match-novo.jpg")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
     },
 
     heroOverlay: {
@@ -89,7 +93,7 @@ const HomePage: React.FC = () => {
       justifyContent: 'center' as const,
       alignItems: 'center' as const,
       padding: '20px',
-      background: 'linear-gradient(135deg, rgba(102, 51, 153, 0.8), rgba(190, 24, 93, 0.6))',
+      background: 'transparent',
       textAlign: 'center' as const
     },
     heroTitle: {
@@ -181,33 +185,17 @@ const HomePage: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <div style={styles.headerContent}>
-          <h1 className="logo">Plataforma Premium</h1>
-          <nav style={styles.nav}>
-            <Link to="/" style={styles.navLink}>Início</Link>
-            <Link to="/salas" style={styles.navLink}>Salas</Link>
-            <button style={styles.upgradeBtn} onClick={handleUpgrade}>
-              ⭐ Upgrade Premium
-            </button>
-          </nav>
-        </div>
-      </header>
-
       <main>
         <section style={styles.hero}>
-          <div style={{...styles.heroBanner, background: 'linear-gradient(135deg, #663399 0%, #be185d 100%)'}}>
+          <div style={styles.heroBanner}>
             <div style={styles.heroOverlay}>
-              <h1 style={styles.heroTitle}>CONVERSE SEM MATCH!</h1>
-              <p style={styles.heroSubtitle}>
-                Conecte-se com pessoas próximas sem precisar de match. 
-                Conversas espontâneas, encontros reais e conexões verdadeiras.
-              </p>
-              <Link to="/salas" style={styles.ctaButton}>
-                🚀 Começar Agora
-              </Link>
+              {/* Banner apenas com imagem, sem texto */}
             </div>
           </div>
+          
+          <Link to="/inicio" style={styles.ctaButton}>
+            🚀 Começar Agora
+          </Link>
         </section>
 
         <section style={styles.features}>

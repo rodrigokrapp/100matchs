@@ -2055,15 +2055,19 @@ const ChatPage: React.FC = () => {
             </button>
             
             <button 
-              className={`emoji-toggle ${showEmojis ? 'active' : ''}`}
+              className={`emoji-toggle ${showEmojis ? 'active' : ''} ${!isPremiumUser() ? 'premium-blocked' : ''}`}
               onClick={() => {
+                if (!isPremiumUser()) {
+                  if (!checkPremiumAccess('Emoticons e Figurinhas')) return;
+                }
                 console.log('🔥 Emoji button clicked! Current showEmojis:', showEmojis);
                 setShowEmojis(!showEmojis);
                 console.log('🔥 Setting showEmojis to:', !showEmojis);
               }}
-              title="Emojis e Figurinhas"
+              title={isPremiumUser() ? "Emojis e Figurinhas" : "🔒 Emojis - Premium"}
             >
               <FiSmile />
+              {!isPremiumUser() && <span className="premium-lock">🔒</span>}
             </button>
           </div>
           
