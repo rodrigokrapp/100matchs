@@ -77,7 +77,7 @@ const HomePage: React.FC = () => {
       borderRadius: '15px',
       marginBottom: '40px',
       boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
-      backgroundImage: 'url("/capa-segunda.jpg.jpg")',
+      backgroundImage: 'url("/desliza e nada 1.jpg.png")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
