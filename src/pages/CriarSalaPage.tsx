@@ -266,4 +266,4 @@ const CriarSalaPage: React.FC = () => {
   );
 };
 
-export default CriarSalaPage;
+export default CriarSalaPage; 

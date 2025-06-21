@@ -71,15 +71,17 @@ const HomePage: React.FC = () => {
     heroBanner: {
       position: 'relative' as const,
       width: '100%',
-      height: '400px',
+      height: 'auto',
+      minHeight: '400px',
       overflow: 'hidden',
       borderRadius: '15px',
       marginBottom: '40px',
       boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
-      backgroundImage: 'url("/banner-converse-sem-match-novo.jpg")',
+      backgroundImage: 'url("/banner-converse-sem-match.jpg")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
+      backgroundRepeat: 'no-repeat',
+      aspectRatio: '16/9'
     },
 
     heroOverlay: {
