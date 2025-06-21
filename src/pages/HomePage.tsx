@@ -11,14 +11,14 @@ const HomePage: React.FC = () => {
   const styles = {
     container: {
       minHeight: '100vh',
-      background: 'white',
-      color: '#333',
+      background: '#6B46C1',
+      color: 'white',
       fontFamily: 'Inter, sans-serif'
     },
     header: {
-      background: 'rgba(255, 255, 255, 0.95)',
+      background: 'rgba(107, 70, 193, 0.95)',
       padding: '15px 0',
-      boxShadow: '0 2px 20px rgba(0,0,0,0.1)',
+      boxShadow: '0 2px 20px rgba(0,0,0,0.3)',
       backdropFilter: 'blur(10px)',
       position: 'sticky' as const,
       top: 0,
@@ -46,7 +46,7 @@ const HomePage: React.FC = () => {
       alignItems: 'center'
     },
     navLink: {
-      color: '#333',
+      color: 'white',
       textDecoration: 'none',
       fontWeight: 500,
       transition: 'all 0.3s ease'
@@ -135,7 +135,7 @@ const HomePage: React.FC = () => {
     },
     features: {
       padding: '80px 20px',
-      background: 'rgba(248, 249, 250, 0.5)'
+      background: 'rgba(99, 102, 241, 0.3)'
     },
     featuresContainer: {
       maxWidth: '1200px',
@@ -146,7 +146,7 @@ const HomePage: React.FC = () => {
       fontSize: '36px',
       fontWeight: 700,
       marginBottom: '50px',
-      color: '#333'
+      color: 'white'
     },
     featuresGrid: {
       display: 'grid',
@@ -171,7 +171,7 @@ const HomePage: React.FC = () => {
       fontSize: '24px',
       fontWeight: 600,
       marginBottom: '15px',
-      color: '#333'
+      color: '#4C1D95'
     },
     featureDesc: {
       color: '#666',
