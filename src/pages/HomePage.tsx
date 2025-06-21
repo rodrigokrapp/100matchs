@@ -153,12 +153,12 @@ const HomePage: React.FC = () => {
       <header style={styles.header}>
         <div style={styles.headerContent}>
           <Link to="/inicio" style={styles.logoContainer}>
-            <span style={styles.logoText}>100 matchs</span>
             <img 
-              src="/logo - oficial.jpg.jpg" 
+              src="/logo-top.jpg.jpg" 
               alt="100 Matchs Logo" 
               style={styles.logoImage}
             />
+            <span style={styles.logoText}>100matchs</span>
           </Link>
         </div>
       </header>

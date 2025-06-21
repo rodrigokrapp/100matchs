@@ -9,16 +9,23 @@ const Header: React.FC = () => {
     navigate('/inicio');
   };
 
+  const handleBackClick = () => {
+    window.history.back();
+  };
+
   return (
     <header className="header">
-      <div className="header-center">
+      <div className="header-content">
+        <button onClick={handleBackClick} className="back-button">
+          ←
+        </button>
         <div className="logo-container" onClick={handleLogoClick}>
-          <h1 className="site-title">100 matchs</h1>
           <img 
-            src="/logo - oficial.jpg.jpg" 
+            src="/logo-top.jpg.jpg" 
             alt="100 Matchs Logo" 
             className="logo" 
           />
+          <span className="site-title">100matchs</span>
         </div>
       </div>
     </header>
