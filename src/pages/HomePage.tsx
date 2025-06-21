@@ -11,12 +11,12 @@ const HomePage: React.FC = () => {
   const styles = {
     container: {
       minHeight: '100vh',
-      background: '#6B46C1',
+      background: '#7C3AED',
       color: 'white',
       fontFamily: 'Inter, sans-serif'
     },
     header: {
-      background: 'rgba(107, 70, 193, 0.95)',
+      background: 'rgba(124, 58, 237, 0.95)',
       padding: '15px 0',
       boxShadow: '0 2px 20px rgba(0,0,0,0.3)',
       backdropFilter: 'blur(10px)',
@@ -32,13 +32,20 @@ const HomePage: React.FC = () => {
       alignItems: 'center',
       padding: '0 20px'
     },
-    logo: {
+    logoContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px'
+    },
+    logoImage: {
+      height: '40px',
+      width: 'auto',
+      cursor: 'pointer'
+    },
+    logoText: {
       fontSize: '28px',
       fontWeight: 700,
-      background: 'linear-gradient(135deg, #ff6b9d, #4facfe)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text'
+      color: 'white'
     },
     nav: {
       display: 'flex',
@@ -83,7 +90,6 @@ const HomePage: React.FC = () => {
       backgroundRepeat: 'no-repeat',
       aspectRatio: '16/9'
     },
-
     heroOverlay: {
       position: 'absolute' as const,
       top: 0,
@@ -97,27 +103,6 @@ const HomePage: React.FC = () => {
       padding: '20px',
       background: 'transparent',
       textAlign: 'center' as const
-    },
-    heroTitle: {
-      fontSize: '48px',
-      fontWeight: 700,
-      marginBottom: '20px',
-      color: 'white',
-      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)',
-      '@media (max-width: 768px)': {
-        fontSize: '36px'
-      }
-    },
-    heroSubtitle: {
-      fontSize: '20px',
-      color: 'rgba(255, 255, 255, 0.95)',
-      marginBottom: '30px',
-      lineHeight: 1.6,
-      textShadow: '1px 1px 2px rgba(0, 0, 0, 0.7)',
-      maxWidth: '600px',
-      '@media (max-width: 768px)': {
-        fontSize: '18px'
-      }
     },
     ctaButton: {
       background: 'linear-gradient(135deg, #ff6b9d, #ff8fab)',
@@ -133,49 +118,22 @@ const HomePage: React.FC = () => {
       textDecoration: 'none',
       display: 'inline-block'
     },
-    features: {
-      padding: '80px 20px',
-      background: 'rgba(99, 102, 241, 0.3)'
-    },
-    featuresContainer: {
+    imagesSection: {
+      padding: '60px 20px',
       maxWidth: '1200px',
-      margin: '0 auto'
+      margin: '0 auto',
+      textAlign: 'center' as const
     },
-    featuresTitle: {
-      textAlign: 'center' as const,
-      fontSize: '36px',
-      fontWeight: 700,
-      marginBottom: '50px',
-      color: 'white'
+    imageContainer: {
+      marginBottom: '40px'
     },
-    featuresGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-      gap: '30px'
-    },
-    featureCard: {
-      background: 'rgba(255, 255, 255, 0.95)',
-      padding: '30px',
-      borderRadius: '20px',
-      textAlign: 'center' as const,
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
-      transition: 'all 0.3s ease'
-    },
-    featureIcon: {
-      fontSize: '48px',
+    sectionImage: {
+      width: '100%',
+      maxWidth: '600px',
+      height: 'auto',
+      borderRadius: '15px',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
       marginBottom: '20px'
-    },
-    featureTitle: {
-      fontSize: '24px',
-      fontWeight: 600,
-      marginBottom: '15px',
-      color: '#4C1D95'
-    },
-    featureDesc: {
-      color: '#666',
-      lineHeight: 1.6
     },
     footer: {
       background: '#333',
@@ -187,6 +145,27 @@ const HomePage: React.FC = () => {
 
   return (
     <div style={styles.container}>
+      <header style={styles.header}>
+        <div style={styles.headerContent}>
+          <Link to="/inicio" style={styles.logoContainer}>
+            <img 
+              src="/logo - oficial.jpg.jpg" 
+              alt="100 Matchs Logo" 
+              style={styles.logoImage}
+            />
+            <span style={styles.logoText}>100 matchs</span>
+          </Link>
+          <nav style={styles.nav}>
+            <Link to="/inicio" style={styles.navLink}>Início</Link>
+            <Link to="/salas" style={styles.navLink}>Salas</Link>
+            <Link to="/premium" style={styles.navLink}>Premium</Link>
+            <button onClick={handleUpgrade} style={styles.upgradeBtn}>
+              Upgrade ⭐
+            </button>
+          </nav>
+        </div>
+      </header>
+
       <main>
         <section style={styles.hero}>
           <div style={styles.heroBanner}>
@@ -196,42 +175,31 @@ const HomePage: React.FC = () => {
           </div>
           
           <Link to="/inicio" style={styles.ctaButton}>
-            🚀 Começar Agora
+            💬 Conversar free
           </Link>
         </section>
 
-        <section style={styles.features}>
-          <div style={styles.featuresContainer}>
-            <h3>Por que escolher nossa Plataforma Premium?</h3>
-            <div style={styles.featuresGrid}>
-              <div style={styles.featureCard}>
-                <div style={styles.featureIcon}>🎯</div>
-                <h4 style={styles.featureTitle}>Conteúdo Exclusivo</h4>
-                <p style={styles.featureDesc}>
-                  Acesso a materiais premium únicos e de alta qualidade
-                </p>
-              </div>
-              <div style={styles.featureCard}>
-                <div style={styles.featureIcon}>💬</div>
-                <h4 style={styles.featureTitle}>Comunidade Ativa</h4>
-                <p style={styles.featureDesc}>
-                  Conecte-se com membros premium em tempo real
-                </p>
-              </div>
-              <div style={styles.featureCard}>
-                <div style={styles.featureIcon}>🔒</div>
-                <h4 style={styles.featureTitle}>100% Seguro</h4>
-                <p style={styles.featureDesc}>
-                  Ambiente seguro e privado para seus dados
-                </p>
-              </div>
-            </div>
+        <section style={styles.imagesSection}>
+          <div style={styles.imageContainer}>
+            <img 
+              src="/feliz -site.jpg.png" 
+              alt="Feliz Site" 
+              style={styles.sectionImage}
+            />
+          </div>
+          
+          <div style={styles.imageContainer}>
+            <img 
+              src="/garota-feliz.jpg.jpg" 
+              alt="Garota Feliz" 
+              style={styles.sectionImage}
+            />
           </div>
         </section>
       </main>
 
       <footer style={styles.footer}>
-        <p>&copy; 2024 Plataforma Premium. Todos os direitos reservados.</p>
+        <p>&copy; 2024 100 Matchs. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
