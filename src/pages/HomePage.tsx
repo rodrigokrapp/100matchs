@@ -112,16 +112,17 @@ const HomePage: React.FC = () => {
       background: 'linear-gradient(135deg, #ff6b9d, #ff8fab)',
       color: 'white',
       border: 'none',
-      padding: '16px 32px',
-      borderRadius: '30px',
-      fontSize: '18px',
-      fontWeight: 600,
+      padding: '24px 48px',
+      borderRadius: '50px',
+      fontSize: '24px',
+      fontWeight: 700,
       cursor: 'pointer',
       transition: 'all 0.3s ease',
-      boxShadow: '0 6px 20px rgba(255, 107, 157, 0.3)',
+      boxShadow: '0 8px 25px rgba(255, 107, 157, 0.4)',
       textDecoration: 'none',
       display: 'inline-block',
-      animation: 'pulse 2s infinite'
+      animation: 'pulse 2s infinite',
+      margin: '40px 0'
     },
     imagesSection: {
       padding: '60px 20px',
@@ -170,10 +171,6 @@ const HomePage: React.FC = () => {
               {/* Banner apenas com imagem, sem texto */}
             </div>
           </div>
-          
-          <Link to="/inicio" style={styles.ctaButton}>
-            💬 Conversar free
-          </Link>
         </section>
 
         <section style={styles.imagesSection}>
@@ -184,6 +181,10 @@ const HomePage: React.FC = () => {
               style={styles.sectionImage}
             />
           </div>
+          
+          <Link to="/inicio" style={styles.ctaButton}>
+            💬 Conversar free
+          </Link>
           
           <div style={styles.imageContainer}>
             <img 
