@@ -187,6 +187,12 @@ const CriarSalaPage: React.FC = () => {
             >
               {loading ? '🔄 Criando...' : '🚀 Criar Sala'}
             </button>
+            <button 
+              onClick={() => window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank')} 
+              className="btn btn-premium-small"
+            >
+              ⭐ Seja Premium
+            </button>
           </div>
         </div>
 

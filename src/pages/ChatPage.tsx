@@ -942,7 +942,7 @@ const ChatPage: React.FC = () => {
   };
 
   const handleUpgradePremium = () => {
-    navigate('/premium');
+    window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank');
   };
 
   // Sistema real de contagem de usuários - sem robôs

@@ -27,6 +27,8 @@ function App() {
           <Route path="/login-premium" element={<LoginPremiumPage />} />
           <Route path="/meu-perfil-premium" element={<MeuPerfilPremiumPage />} />
           <Route path="/suporte" element={<SuportePage />} />
+          <Route path="/suporte6828" element={<SuportePage />} />
+          <Route path="/cadastropremium6838k" element={<CadastroPremiumPage />} />
         </Routes>
       </div>
     </Router>

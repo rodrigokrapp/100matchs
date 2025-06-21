@@ -9,104 +9,89 @@ const CadastroPremiumPage: React.FC = () => {
     nome: '',
     email: '',
     senha: '',
-    confirmarSenha: '',
-    aceitarTermos: false
+    confirmarSenha: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [erro, setErro] = useState('');
+  const [carregando, setCarregando] = useState(false);
 
-  const validateForm = () => {
-    const newErrors: {[key: string]: string} = {};
-
-    // Validar nome
-    if (!formData.nome.trim()) {
-      newErrors.nome = 'Nome é obrigatório';
-    } else if (formData.nome.trim().length < 2) {
-      newErrors.nome = 'Nome deve ter pelo menos 2 caracteres';
-    }
-
-    // Validar email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email é obrigatório';
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Email inválido';
-    }
-
-    // Validar senha
-    if (!formData.senha) {
-      newErrors.senha = 'Senha é obrigatória';
-    } else if (formData.senha.length < 6) {
-      newErrors.senha = 'Senha deve ter pelo menos 6 caracteres';
-    }
-
-    // Confirmar senha
-    if (formData.senha !== formData.confirmarSenha) {
-      newErrors.confirmarSenha = 'Senhas não coincidem';
-    }
-
-    // Validar termos
-    if (!formData.aceitarTermos) {
-      newErrors.aceitarTermos = 'Você deve aceitar os termos de políticas e privacidade';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setErro('');
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+  const validarFormulario = () => {
+    if (!formData.nome.trim()) {
+      setErro('Nome é obrigatório');
+      return false;
     }
+    if (!formData.email.trim()) {
+      setErro('Email é obrigatório');
+      return false;
+    }
+    if (!formData.email.includes('@')) {
+      setErro('Email inválido');
+      return false;
+    }
+    if (formData.senha.length < 6) {
+      setErro('Senha deve ter pelo menos 6 caracteres');
+      return false;
+    }
+    if (formData.senha !== formData.confirmarSenha) {
+      setErro('Senhas não coincidem');
+      return false;
+    }
+    return true;
   };
 
   const handleCadastrar = async () => {
-    if (!validateForm()) return;
+    if (!validarFormulario()) return;
 
-    setLoading(true);
-
+    setCarregando(true);
+    
     try {
+      // Simular delay de cadastro
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Salvar usuário premium no localStorage
+      const usuariosPremium = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
+      
       // Verificar se email já existe
-      const usuariosExistentes = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
-      const emailExiste = usuariosExistentes.find((user: any) => user.email === formData.email);
-
+      const emailExiste = usuariosPremium.find((u: any) => u.email === formData.email);
       if (emailExiste) {
-        alert('Este email já está cadastrado!');
-        setLoading(false);
+        setErro('Email já cadastrado');
+        setCarregando(false);
         return;
       }
-
-      // Criar usuário premium
+      
       const novoUsuario = {
         id: Date.now().toString(),
-        nome: formData.nome.trim(),
-        email: formData.email.trim(),
-        senha: formData.senha, // Em produção, usar hash
+        nome: formData.nome,
+        email: formData.email,
+        senha: formData.senha,
         premium: true,
         tipo: 'premium',
-        criado_em: new Date().toISOString()
+        dataCadastro: new Date().toISOString(),
+        foto: null
       };
-
-      // Salvar no localStorage
-      usuariosExistentes.push(novoUsuario);
-      localStorage.setItem('usuarios-premium', JSON.stringify(usuariosExistentes));
-
+      
+      usuariosPremium.push(novoUsuario);
+      localStorage.setItem('usuarios-premium', JSON.stringify(usuariosPremium));
+      
       // Fazer login automático
       localStorage.setItem('usuarioPremium', JSON.stringify(novoUsuario));
-
-      alert('Cadastro realizado com sucesso! Bem-vindo ao Premium!');
+      
+      // Redirecionar para salas
       navigate('/salas');
+      
     } catch (error) {
-      console.error('Erro ao cadastrar:', error);
-      alert('Erro ao realizar cadastro. Tente novamente.');
+      setErro('Erro ao cadastrar. Tente novamente.');
     } finally {
-      setLoading(false);
+      setCarregando(false);
     }
-  };
-
-  const handleVoltar = () => {
-    navigate('/suporte6828');
   };
 
   return (
@@ -114,166 +99,99 @@ const CadastroPremiumPage: React.FC = () => {
       <Header />
       
       <div className="cadastro-container">
-        <div className="cadastro-card card">
+        <div className="cadastro-content">
           <div className="cadastro-header">
-            <div className="premium-badge">⭐ PREMIUM</div>
-            <h1>Cadastro Premium</h1>
-            <p>Acesse todas as funcionalidades exclusivas</p>
-            <div className="premium-highlight">
-              <span className="highlight-text">✨ Transforme sua experiência!</span>
-            </div>
+            <h1>🌟 Cadastro Premium</h1>
+            <p>Crie sua conta premium e tenha acesso a todas as funcionalidades!</p>
           </div>
-
-          <div className="benefits-section">
-            <h3>🎯 Benefícios Premium</h3>
-            <div className="benefits-grid">
-              <div className="benefit-item premium-benefit">
-                <span className="benefit-icon">🚀</span>
-                <div className="benefit-content">
-                  <strong>Chat Ilimitado</strong>
-                  <small>Converse sem restrições</small>
-                </div>
-              </div>
-              <div className="benefit-item premium-benefit">
-                <span className="benefit-icon">🏠</span>
-                <div className="benefit-content">
-                  <strong>Criar Salas</strong>
-                  <small>Salas personalizadas</small>
-                </div>
-              </div>
-              <div className="benefit-item premium-benefit">
-                <span className="benefit-icon">📱</span>
-                <div className="benefit-content">
-                  <strong>Sem Limitações</strong>
-                  <small>Uso completo da plataforma</small>
-                </div>
-              </div>
-              <div className="benefit-item premium-benefit">
-                <span className="benefit-icon">⚡</span>
-                <div className="benefit-content">
-                  <strong>Acesso Prioritário</strong>
-                  <small>Recursos exclusivos</small>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <div className="form-header">
-              <h4>📝 Dados para Cadastro</h4>
+          
+          <div className="cadastro-form">
+            <div className="input-group">
+              <label htmlFor="nome">Nome Completo</label>
+              <input
+                type="text"
+                id="nome"
+                name="nome"
+                value={formData.nome}
+                onChange={handleInputChange}
+                placeholder="Digite seu nome completo"
+                className="form-input"
+              />
             </div>
             
             <div className="input-group">
-              <label htmlFor="nome">
-                <span className="label-icon">👤</span>
-                Nome Completo
-              </label>
+              <label htmlFor="email">Email</label>
               <input
-                id="nome"
-                type="text"
-                placeholder="Digite seu nome completo"
-                value={formData.nome}
-                onChange={(e) => handleInputChange('nome', e.target.value)}
-                className={`input premium-input ${errors.nome ? 'input-error' : ''}`}
-              />
-              {errors.nome && <span className="error-message">{errors.nome}</span>}
-            </div>
-
-            <div className="input-group">
-              <label htmlFor="email">
-                <span className="label-icon">📧</span>
-                Email
-              </label>
-              <input
-                id="email"
                 type="email"
-                placeholder="seu@email.com"
+                id="email"
+                name="email"
                 value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`input premium-input ${errors.email ? 'input-error' : ''}`}
+                onChange={handleInputChange}
+                placeholder="Digite seu email"
+                className="form-input"
               />
-              {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
-
+            
             <div className="input-group">
-              <label htmlFor="senha">
-                <span className="label-icon">🔒</span>
-                Senha
-              </label>
+              <label htmlFor="senha">Senha</label>
               <input
+                type="password"
                 id="senha"
-                type="password"
-                placeholder="Mínimo 6 caracteres"
+                name="senha"
                 value={formData.senha}
-                onChange={(e) => handleInputChange('senha', e.target.value)}
-                className={`input premium-input ${errors.senha ? 'input-error' : ''}`}
+                onChange={handleInputChange}
+                placeholder="Digite sua senha (mín. 6 caracteres)"
+                className="form-input"
               />
-              {errors.senha && <span className="error-message">{errors.senha}</span>}
             </div>
-
+            
             <div className="input-group">
-              <label htmlFor="confirmarSenha">
-                <span className="label-icon">🔐</span>
-                Confirmar Senha
-              </label>
+              <label htmlFor="confirmarSenha">Confirmar Senha</label>
               <input
-                id="confirmarSenha"
                 type="password"
-                placeholder="Digite a senha novamente"
+                id="confirmarSenha"
+                name="confirmarSenha"
                 value={formData.confirmarSenha}
-                onChange={(e) => handleInputChange('confirmarSenha', e.target.value)}
-                className={`input premium-input ${errors.confirmarSenha ? 'input-error' : ''}`}
+                onChange={handleInputChange}
+                placeholder="Confirme sua senha"
+                className="form-input"
               />
-              {errors.confirmarSenha && <span className="error-message">{errors.confirmarSenha}</span>}
             </div>
-
-            <div className="terms-checkbox premium-terms">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={formData.aceitarTermos || false}
-                  onChange={(e) => handleInputChange('aceitarTermos', e.target.checked.toString())}
-                />
-                <span className="checkmark"></span>
-                <span>Aceito os termos de políticas e privacidade de imagem, dados básicos e respeito aos usuários do chat</span>
-              </label>
-              {errors.aceitarTermos && <span className="error-message">{errors.aceitarTermos}</span>}
-            </div>
-          </div>
-
-          <div className="actions premium-actions">
-            <button onClick={handleVoltar} className="btn btn-secondary premium-btn-secondary">
-              ← Voltar
-            </button>
+            
+            {erro && <div className="erro-message">{erro}</div>}
+            
             <button 
               onClick={handleCadastrar}
-              className="btn btn-premium premium-btn-main"
-              disabled={loading}
+              disabled={carregando}
+              className="cadastrar-btn"
             >
-              {loading ? (
-                <>
-                  <span className="loading-spinner"></span>
-                  Cadastrando...
-                </>
-              ) : (
-                <>
-                  ⭐ Cadastrar Premium
-                </>
-              )}
+              {carregando ? 'Cadastrando...' : '✨ Cadastrar Premium'}
             </button>
           </div>
-
-          <div className="login-link premium-login-link">
-            <div className="divider">
-              <span>ou</span>
-            </div>
-            <p>Já tem conta Premium? <button onClick={() => navigate('/loginpremium')} className="link-button premium-link">Fazer login →</button></p>
-          </div>
-
-          <div className="premium-footer">
-            <div className="security-info">
-              <span className="security-icon">🔐</span>
-              <small>Seus dados estão seguros e protegidos</small>
+          
+          <div className="beneficios-section">
+            <h3>🎯 Benefícios Premium</h3>
+            <div className="beneficios-list">
+              <div className="beneficio-item">
+                <span className="beneficio-icon">🎤</span>
+                <span>Mensagens de áudio ilimitadas</span>
+              </div>
+              <div className="beneficio-item">
+                <span className="beneficio-icon">📷</span>
+                <span>Envio de imagens e vídeos</span>
+              </div>
+              <div className="beneficio-item">
+                <span className="beneficio-icon">😀</span>
+                <span>Emoticons exclusivos</span>
+              </div>
+              <div className="beneficio-item">
+                <span className="beneficio-icon">🏠</span>
+                <span>Criar salas personalizadas</span>
+              </div>
+              <div className="beneficio-item">
+                <span className="beneficio-icon">⏰</span>
+                <span>Acesso ilimitado 24/7</span>
+              </div>
             </div>
           </div>
         </div>

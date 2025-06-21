@@ -81,7 +81,7 @@ const InicioPage: React.FC = () => {
   };
 
   const handleSupporte = () => {
-    navigate('/suporte');
+    navigate('/suporte6828');
   };
 
   return (

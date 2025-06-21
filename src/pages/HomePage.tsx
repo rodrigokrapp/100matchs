@@ -17,6 +17,21 @@ const pulseAnimation = `
       box-shadow: 0 6px 20px rgba(255, 107, 157, 0.3);
     }
   }
+  
+  @keyframes pulsePremium {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+    }
+  }
 `;
 
 // Injetar CSS no documento
@@ -28,9 +43,7 @@ if (typeof document !== 'undefined') {
 
 const HomePage: React.FC = () => {
   const handleUpgrade = () => {
-    console.log('🔄 Redirecionando para upgrade...');
-    // Remover link específico - será configurado posteriormente
-    alert('Link de pagamento será configurado posteriormente');
+    window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank');
   };
 
   const styles = {
@@ -122,7 +135,23 @@ const HomePage: React.FC = () => {
       textDecoration: 'none',
       display: 'inline-block',
       animation: 'pulse 2s infinite',
-      margin: '40px 0'
+      margin: '20px 0'
+    },
+    premiumButton: {
+      background: 'linear-gradient(135deg, #ffd700, #ffed4e)',
+      color: '#333',
+      border: 'none',
+      padding: '24px 48px',
+      borderRadius: '50px',
+      fontSize: '24px',
+      fontWeight: 700,
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 8px 25px rgba(255, 215, 0, 0.4)',
+      textDecoration: 'none',
+      display: 'inline-block',
+      animation: 'pulsePremium 2s infinite',
+      margin: '20px 0'
     },
     imagesSection: {
       padding: '60px 20px',
@@ -180,11 +209,10 @@ const HomePage: React.FC = () => {
               alt="Feliz Site" 
               style={styles.sectionImage}
             />
+            <Link to="/inicio" style={styles.ctaButton}>
+              💬 Conversar free
+            </Link>
           </div>
-          
-          <Link to="/inicio" style={styles.ctaButton}>
-            💬 Conversar free
-          </Link>
           
           <div style={styles.imageContainer}>
             <img 
@@ -192,6 +220,9 @@ const HomePage: React.FC = () => {
               alt="Garota Feliz" 
               style={styles.sectionImage}
             />
+            <button onClick={handleUpgrade} style={styles.premiumButton}>
+              ⭐ Seja Premium
+            </button>
           </div>
         </section>
       </main>
