@@ -456,13 +456,13 @@ const ChatPage: React.FC = () => {
     // ⚡ ULTRA VELOCIDADE - Zero delays
     if (!mensagem.trim() || !usuario || !salaId) return;
 
-    // ⚡ INSTANTÂNEO: Capturar e limpar
+    // ⚡ INSTANTÂNEO: Capturar e limpar IMEDIATAMENTE
     const msg = mensagem.trim();
-    setMensagem('');
+    setMensagem(''); // Limpar campo PRIMEIRO para resposta instantânea
 
-    // ⚡ INSTANTÂNEO: Criar mensagem otimista
+    // ⚡ INSTANTÂNEO: Criar mensagem otimista (aparece na tela imediatamente)
     const optimisticMsg: ChatMessage = {
-      id: `ultra_${Date.now()}${Math.random()}`,
+      id: `ultra_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       room_id: salaId,
       user_name: usuario.nome,
       content: msg,
@@ -473,27 +473,28 @@ const ChatPage: React.FC = () => {
       isOptimistic: true
     };
 
-    // ⚡ INSTANTÂNEO: Mostrar na tela (método mais rápido)
+    // ⚡ INSTANTÂNEO: Mostrar na tela (método mais rápido possível)
     setMensagens(prev => [...prev, optimisticMsg]);
 
-    // ⚡ INSTANTÂNEO: Scroll automático ultra rápido
+    // ⚡ INSTANTÂNEO: Scroll automático ultra rápido (sem delay)
     requestAnimationFrame(() => {
       if (messagesEndRef.current) {
-        messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+        messagesEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
       }
     });
 
-    // 📤 Background fire-and-forget (sem await, sem catch)
-    chatService.sendMessage(salaId, usuario.nome, msg, 'texto', usuario.premium || false);
+    // 📤 Background: Enviar para outros usuários (fire-and-forget, sem await)
+    chatService.sendMessage(salaId, usuario.nome, msg, 'texto', usuario.premium || false)
+      .catch(error => console.log('Erro ao enviar mensagem:', error));
   };
 
   const handleEnviarEmoji = async (emoji: string) => {
     if (!checkPremiumAccess('Emoticons e Figurinhas')) return;
     if (!salaId || !usuario) return;
 
-    // ⚡ EMOJI ULTRA RÁPIDO
+    // ⚡ EMOJI ULTRA RÁPIDO - Resposta instantânea
     const emojiMsg: ChatMessage = {
-      id: `emoji_ultra_${Date.now()}${Math.random()}`,
+      id: `emoji_ultra_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       room_id: salaId,
       user_name: usuario.nome,
       content: emoji,
@@ -504,19 +505,20 @@ const ChatPage: React.FC = () => {
       isOptimistic: true
     };
 
-    // ⚡ INSTANTÂNEO: Mostrar emoji
+    // ⚡ INSTANTÂNEO: Mostrar emoji imediatamente
     setMensagens(prev => [...prev, emojiMsg]);
+    setShowEmojis(false); // Fechar painel instantaneamente
     
-    // ⚡ INSTANTÂNEO: Scroll e fechar painel
+    // ⚡ INSTANTÂNEO: Scroll automático (sem delay)
     requestAnimationFrame(() => {
       if (messagesEndRef.current) {
-        messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+        messagesEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
       }
     });
-    setShowEmojis(false);
 
-    // 📤 Background fire-and-forget
-    chatService.sendMessage(salaId, usuario.nome, emoji, 'texto', usuario.premium || false);
+    // 📤 Background: Enviar para outros usuários
+    chatService.sendMessage(salaId, usuario.nome, emoji, 'texto', usuario.premium || false)
+      .catch(error => console.log('Erro ao enviar emoji:', error));
   };
 
   // NOVA FUNCIONALIDADE: Capturar vídeo com preview
@@ -2075,9 +2077,16 @@ const ChatPage: React.FC = () => {
             type="text"
             value={mensagem}
             onChange={(e) => setMensagem(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleEnviarMensagem()}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleEnviarMensagem();
+              }
+            }}
             placeholder="Digite sua mensagem..."
             className="message-input"
+            autoComplete="off"
+            autoFocus
           />
           
           <button 

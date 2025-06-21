@@ -310,87 +310,63 @@ class ChatService {
     isTemporary: boolean = false,
     duration: number = 10
   ): Promise<boolean> {
-    try {
-      const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const message: ChatMessage = {
+      id: messageId,
+      room_id: roomId,
+      user_name: userName,
+      content,
+      message_type: messageType,
+      is_premium: isPremium,
+      is_temporary: isTemporary,
+      expires_at: isTemporary ? new Date(Date.now() + duration * 60000).toISOString() : undefined,
+      viewed_by: [],
+      created_at: new Date().toISOString(),
+    };
+
+    console.log('⚡ ENVIO ULTRA RÁPIDO:', message);
+
+    // 🚀 ESTRATÉGIA INSTANTÂNEA: Todas as operações em paralelo (sem await)
+    Promise.all([
+      // Broadcast Supabase
+      this.channel?.send({
+        type: 'broadcast',
+        event: 'new_message',
+        payload: message
+      }).catch((e: any) => console.log('Broadcast falhou:', e)),
       
-      const message: ChatMessage = {
-        id: messageId,
-        room_id: roomId,
-        user_name: userName,
-        content,
-        message_type: messageType,
-        is_premium: isPremium,
-        is_temporary: isTemporary,
-        expires_at: isTemporary ? new Date(Date.now() + duration * 60000).toISOString() : undefined,
-        viewed_by: [],
-        created_at: new Date().toISOString(),
-      };
-
-      console.log('📤 ENVIANDO MENSAGEM - Estratégia múltipla:', message);
-
-      // ESTRATÉGIA 1: Broadcast via Supabase Realtime (mais confiável)
-      if (this.channel) {
+      // BroadcastChannel
+      Promise.resolve().then(() => {
+        this.broadcastChannel?.postMessage(message);
+      }).catch((e: any) => console.log('BroadcastChannel falhou:', e)),
+      
+      // Supabase Database
+      (async () => {
         try {
-          await this.channel.send({
-            type: 'broadcast',
-            event: 'new_message',
-            payload: message
-          });
-          console.log('✅ Mensagem enviada via Supabase Broadcast');
-        } catch (error) {
-          console.error('❌ Erro no broadcast Supabase:', error);
+          await supabase.from('chat_messages').insert([message]);
+        } catch (e: any) {
+          console.log('DB falhou:', e);
         }
-      }
+      })()
+    ]).catch(() => {}); // Ignorar erros para não bloquear
 
-      // ESTRATÉGIA 2: BroadcastChannel (entre abas do mesmo navegador)
-      if (this.broadcastChannel) {
-        try {
-          this.broadcastChannel.postMessage(message);
-          console.log('✅ Mensagem enviada via BroadcastChannel');
-        } catch (error) {
-          console.error('❌ Erro no BroadcastChannel:', error);
-        }
-      }
+    // ⚡ INSTANTÂNEO: localStorage (síncrono)
+    this.addToLocalStorage(roomId, message);
 
-      // ESTRATÉGIA 3: localStorage (persistência e comunicação entre usuários)
-      this.addToLocalStorage(roomId, message);
-      console.log('✅ Mensagem salva no localStorage');
+    // ⚡ INSTANTÂNEO: Eventos customizados (síncronos)
+    window.dispatchEvent(new CustomEvent('chatMessageSent', {
+      detail: { message, roomId }
+    }));
 
-      // ESTRATÉGIA 4: Tentar salvar no Supabase Database (se possível)
-      try {
-        const { error } = await supabase
-          .from('chat_messages')
-          .insert([message]);
+    localStorage.setItem('lastChatMessage', JSON.stringify({
+      message,
+      roomId,
+      timestamp: Date.now()
+    }));
 
-        if (!error) {
-          console.log('✅ Mensagem salva no banco de dados');
-        } else {
-          console.warn('⚠️ Não foi possível salvar no banco:', error.message);
-        }
-      } catch (dbError) {
-        console.warn('⚠️ Banco de dados não disponível, usando apenas localStorage');
-      }
-
-      // ESTRATÉGIA 5: Evento customizado global para garantia máxima
-      window.dispatchEvent(new CustomEvent('chatMessageSent', {
-        detail: { message, roomId }
-      }));
-      console.log('✅ Evento customizado disparado');
-
-      // ESTRATÉGIA 6: Forçar atualização via localStorage (cross-tab)
-      localStorage.setItem('lastChatMessage', JSON.stringify({
-        message,
-        roomId,
-        timestamp: Date.now()
-      }));
-
-      console.log('🚀 Mensagem enviada com TODAS as estratégias!');
-      return true;
-
-    } catch (error) {
-      console.error('❌ ERRO CRÍTICO ao enviar mensagem:', error);
-      return false;
-    }
+    console.log('⚡ Mensagem disparada instantaneamente!');
+    return true;
   }
 
   // Mensagens mock para demonstração
