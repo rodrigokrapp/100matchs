@@ -1,0 +1,12 @@
+INSTRUÇÕES PARA TROCAR A IMAGEM:
+
+1. Salve a imagem "CONVERSE SEM MATCH!" (fundo roxo com 3 pessoas) que você enviou
+2. Renomeie para: banner-converse-sem-match-novo.jpg
+3. Copie para: C:\Users\rodrigo\Downloads\100matchs\public\
+4. Substitua o arquivo existente
+5. Execute: npm run build
+6. Execute: npx netlify deploy --prod --dir dist
+
+OU
+
+Me envie novamente a imagem e eu tentarei outro método. 
