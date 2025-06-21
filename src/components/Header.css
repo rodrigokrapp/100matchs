@@ -2,21 +2,21 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(124, 58, 237, 0.95);
   backdrop-filter: blur(15px);
-  border-bottom: 1px solid rgba(30, 58, 138, 0.1);
+  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
 }
 
-.header-left {
+.header-center {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  justify-content: center;
 }
 
 .logo-container {
@@ -24,6 +24,7 @@
   align-items: center;
   cursor: pointer;
   transition: transform 0.2s ease;
+  gap: 12px;
 }
 
 .logo-container:hover {
@@ -31,9 +32,8 @@
 }
 
 .logo {
-  width: 50px;
-  height: 50px;
-  margin-right: 1rem;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   transition: transform 0.3s ease;
@@ -46,13 +46,9 @@
 .site-title {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #1e3a8a;
+  color: white;
   text-decoration: none;
   margin: 0;
-  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .salas-link {
@@ -101,17 +97,13 @@
     padding: 1rem;
   }
   
-  .header-left {
-    gap: 1rem;
-  }
-  
   .site-title {
     font-size: 1.4rem;
   }
   
   .logo {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
   }
   
   .salas-link {

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import MenuHamburguer from './MenuHamburguer';
 import './Header.css';
 
 const Header: React.FC = () => {
@@ -12,17 +11,16 @@ const Header: React.FC = () => {
 
   return (
     <header className="header">
-      <div className="header-left">
+      <div className="header-center">
         <div className="logo-container" onClick={handleLogoClick}>
+          <h1 className="site-title">100 matchs</h1>
           <img 
-            src="/logo-chat-coracao-rosa.svg" 
+            src="/logo - oficial.jpg.jpg" 
             alt="100 Matchs Logo" 
             className="logo" 
           />
-          <h1 className="site-title">100 Matchs</h1>
         </div>
       </div>
-      <MenuHamburguer />
     </header>
   );
 };

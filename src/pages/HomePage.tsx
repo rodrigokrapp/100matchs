@@ -1,6 +1,31 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+// Adicionar CSS para animação pulse
+const pulseAnimation = `
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 6px 20px rgba(255, 107, 157, 0.3);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(255, 107, 157, 0.5);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 6px 20px rgba(255, 107, 157, 0.3);
+    }
+  }
+`;
+
+// Injetar CSS no documento
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = pulseAnimation;
+  document.head.appendChild(style);
+}
+
 const HomePage: React.FC = () => {
   const handleUpgrade = () => {
     console.log('🔄 Redirecionando para upgrade...');
@@ -28,7 +53,7 @@ const HomePage: React.FC = () => {
       maxWidth: '1200px',
       margin: '0 auto',
       display: 'flex',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       alignItems: 'center',
       padding: '0 20px'
     },
@@ -47,28 +72,7 @@ const HomePage: React.FC = () => {
       fontWeight: 700,
       color: 'white'
     },
-    nav: {
-      display: 'flex',
-      gap: '30px',
-      alignItems: 'center'
-    },
-    navLink: {
-      color: 'white',
-      textDecoration: 'none',
-      fontWeight: 500,
-      transition: 'all 0.3s ease'
-    },
-    upgradeBtn: {
-      background: 'linear-gradient(135deg, #ff6b9d, #ff8fab)',
-      color: 'white',
-      border: 'none',
-      padding: '12px 24px',
-      borderRadius: '25px',
-      fontWeight: 600,
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 4px 15px rgba(255, 107, 157, 0.3)'
-    },
+
     hero: {
       textAlign: 'center' as const,
       padding: '80px 20px',
@@ -116,7 +120,8 @@ const HomePage: React.FC = () => {
       transition: 'all 0.3s ease',
       boxShadow: '0 6px 20px rgba(255, 107, 157, 0.3)',
       textDecoration: 'none',
-      display: 'inline-block'
+      display: 'inline-block',
+      animation: 'pulse 2s infinite'
     },
     imagesSection: {
       padding: '60px 20px',
@@ -148,21 +153,13 @@ const HomePage: React.FC = () => {
       <header style={styles.header}>
         <div style={styles.headerContent}>
           <Link to="/inicio" style={styles.logoContainer}>
+            <span style={styles.logoText}>100 matchs</span>
             <img 
               src="/logo - oficial.jpg.jpg" 
               alt="100 Matchs Logo" 
               style={styles.logoImage}
             />
-            <span style={styles.logoText}>100 matchs</span>
           </Link>
-          <nav style={styles.nav}>
-            <Link to="/inicio" style={styles.navLink}>Início</Link>
-            <Link to="/salas" style={styles.navLink}>Salas</Link>
-            <Link to="/premium" style={styles.navLink}>Premium</Link>
-            <button onClick={handleUpgrade} style={styles.upgradeBtn}>
-              Upgrade ⭐
-            </button>
-          </nav>
         </div>
       </header>
 
