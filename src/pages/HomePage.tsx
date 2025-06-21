@@ -203,26 +203,45 @@ const HomePage: React.FC = () => {
         </section>
 
         <section style={styles.imagesSection}>
+          {/* Banner principal com botão abaixo */}
+          <div style={styles.imageContainer}>
+            <img 
+              src="/desliza e nada 1.jpg.png" 
+              alt="Banner Principal" 
+              style={styles.sectionImage}
+            />
+          </div>
+
+          {/* Botão Conversar free abaixo do banner */}
+          <div style={{textAlign: 'center', margin: '40px 0'}}>
+            <Link to="/inicio" style={styles.ctaButton}>
+              💬 Conversar free
+            </Link>
+          </div>
+          
+          {/* Primeira imagem */}
           <div style={styles.imageContainer}>
             <img 
               src="/feliz -site.jpg.png" 
               alt="Feliz Site" 
               style={styles.sectionImage}
             />
-            <Link to="/inicio" style={styles.ctaButton}>
-              💬 Conversar free
-            </Link>
           </div>
-          
+
+          {/* Botão Seja Premium abaixo da primeira imagem */}
+          <div style={{textAlign: 'center', margin: '40px 0'}}>
+            <button onClick={handleUpgrade} style={styles.premiumButton}>
+              ⭐ Seja Premium
+            </button>
+          </div>
+
+          {/* Segunda imagem */}
           <div style={styles.imageContainer}>
             <img 
               src="/garota-feliz.jpg.jpg" 
               alt="Garota Feliz" 
               style={styles.sectionImage}
             />
-            <button onClick={handleUpgrade} style={styles.premiumButton}>
-              ⭐ Seja Premium
-            </button>
           </div>
         </section>
       </main>
