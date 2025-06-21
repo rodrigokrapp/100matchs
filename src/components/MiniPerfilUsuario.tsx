@@ -38,7 +38,28 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
       try {
         console.log('🔍 Buscando perfil para:', nomeUsuario);
         
-        // ✅ CORREÇÃO: Buscar dados específicos do usuário no localStorage primeiro
+        // ✅ PRIMEIRO: Buscar no Supabase (dados mais atualizados)
+        try {
+          let { data: exactData } = await supabase
+            .from('perfis')
+            .select('*')
+            .eq('nome', nomeUsuario)
+            .maybeSingle();
+          
+          if (exactData) {
+            console.log('✅ Perfil encontrado no Supabase:', exactData);
+            const fotosValidas = exactData.fotos ? exactData.fotos.filter((foto: string) => foto !== '') : [];
+            setUserPhotos(fotosValidas);
+            setUserBio(exactData.descricao || 'Usuário da plataforma 100matchs.');
+            setMainPhotoIndex(exactData.foto_principal || 0);
+            setLoading(false);
+            return;
+          }
+        } catch (supabaseError) {
+          console.warn('⚠️ Erro ao buscar no Supabase:', supabaseError);
+        }
+        
+        // ✅ FALLBACK: Buscar dados específicos do usuário no localStorage
         const possiveisChaves = [
           `perfil_${nomeUsuario}`,
           `usuario_${nomeUsuario}`, 
@@ -46,7 +67,7 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
           `profile_${nomeUsuario}`
         ];
         
-        // Tentar buscar no localStorage primeiro
+        // Tentar buscar no localStorage como fallback
         for (const chave of possiveisChaves) {
           try {
             const dadosSalvos = localStorage.getItem(chave);
@@ -61,7 +82,7 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
                     console.log('✅ Fotos encontradas no localStorage para:', nomeUsuario);
                     setUserPhotos(fotosValidas);
                     setUserBio(dados.descricao || 'Usuário da plataforma 100matchs.');
-                    setMainPhotoIndex(dados.foto_principal || 0);
+                    setMainPhotoIndex(dados.fotoPrincipal || dados.foto_principal || 0);
                     setLoading(false);
                     return;
                   }
@@ -83,24 +104,9 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
           }
         }
         
-        // Se não encontrou no localStorage, buscar no Supabase
-        let { data: exactData } = await supabase
-          .from('perfis')
-          .select('*')
-          .eq('nome', nomeUsuario)
-          .maybeSingle();
-        
-        if (exactData) {
-          console.log('✅ Perfil encontrado no Supabase:', exactData);
-          const fotosValidas = exactData.fotos ? exactData.fotos.filter((foto: string) => foto !== '') : [];
-          setUserPhotos(fotosValidas);
-          setUserBio(exactData.descricao || 'Usuário da plataforma 100matchs.');
-          setMainPhotoIndex(exactData.foto_principal || 0);
-        } else {
-          console.log('❌ Perfil não encontrado');
-          setUserPhotos([]);
-          setUserBio('Usuário da plataforma 100matchs.');
-        }
+        console.log('❌ Perfil não encontrado para:', nomeUsuario);
+        setUserPhotos([]);
+        setUserBio('Usuário da plataforma 100matchs.');
       } catch (error) {
         console.error('❌ Erro na busca:', error);
         setUserPhotos([]);
@@ -110,6 +116,39 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
     };
 
     loadUserData();
+
+    // ✅ LISTENERS para atualização em tempo real
+    const handleProfileUpdate = (event: any) => {
+      console.log('🔄 Evento de atualização de perfil detectado:', event.detail);
+      if (event.detail?.userName === nomeUsuario) {
+        console.log('🔄 Recarregando perfil para:', nomeUsuario);
+        loadUserData(); // Recarregar dados quando perfil for atualizado
+      }
+    };
+
+    const handlePhotoUpdate = (event: any) => {
+      console.log('📸 Evento de atualização de foto detectado:', event.detail);
+      if (event.detail?.userName === nomeUsuario) {
+        console.log('📸 Atualizando foto para:', nomeUsuario);
+        if (event.detail.allPhotos) {
+          setUserPhotos(event.detail.allPhotos.filter((foto: string) => foto !== ''));
+        }
+        // Recarregar dados completos
+        loadUserData();
+      }
+    };
+
+    // ✅ Registrar listeners para eventos de atualização
+    window.addEventListener('perfilUpdated', handleProfileUpdate);
+    window.addEventListener('forceRefreshProfile', handleProfileUpdate);
+    window.addEventListener('mini_photo_updated', handlePhotoUpdate);
+
+    // ✅ Cleanup listeners
+    return () => {
+      window.removeEventListener('perfilUpdated', handleProfileUpdate);
+      window.removeEventListener('forceRefreshProfile', handleProfileUpdate);
+      window.removeEventListener('mini_photo_updated', handlePhotoUpdate);
+    };
   }, [nomeUsuario]);
 
   if (loading) {

@@ -96,8 +96,11 @@ const MeuPerfilPremiumPage: React.FC = () => {
   };
 
   const salvarPerfil = async (perfilAtualizado: PerfilPremium) => {
-    // Salvar no localStorage para uso local
+    // ✅ Salvar no localStorage para uso local (por email)
     localStorage.setItem(`perfil_${perfilAtualizado.email}`, JSON.stringify(perfilAtualizado));
+    
+    // ✅ CORREÇÃO: Salvar TAMBÉM por nome para outros usuários poderem encontrar
+    localStorage.setItem(`perfil_${perfilAtualizado.nome}`, JSON.stringify(perfilAtualizado));
     
     // Salvar no Supabase para que outros usuários possam ver
     try {
@@ -109,44 +112,77 @@ const MeuPerfilPremiumPage: React.FC = () => {
           descricao: perfilAtualizado.descricao,
           fotos: perfilAtualizado.fotos,
           foto_principal: perfilAtualizado.fotoPrincipal,
-          updated_at: new Date().toISOString()
+          is_premium: true,
+          updated_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
         }]);
 
       if (error) {
         console.error('Erro ao salvar perfil no Supabase:', error);
+        // ✅ Fallback: mesmo com erro no Supabase, manter dados locais
+        console.log('⚠️ Mantendo dados apenas no localStorage como fallback');
       } else {
         console.log('✅ Perfil salvo no Supabase com sucesso!');
-        
-        // Disparar evento personalizado para atualização em tempo real
-        window.dispatchEvent(new CustomEvent('perfilUpdated', {
+      }
+
+      // ✅ SEMPRE disparar eventos independente do Supabase
+      console.log('📸 Disparando eventos de atualização de perfil...');
+      
+      // Disparar evento personalizado para atualização em tempo real
+      window.dispatchEvent(new CustomEvent('perfilUpdated', {
+        detail: { 
+          userName: perfilAtualizado.nome,
+          email: perfilAtualizado.email,
+          fotos: perfilAtualizado.fotos,
+          timestamp: Date.now()
+        }
+      }));
+      
+      // Broadcast global para todas as abas/componentes
+      localStorage.setItem('forceProfileRefresh', JSON.stringify({
+        userName: perfilAtualizado.nome,
+        timestamp: Date.now()
+      }));
+      
+      // Disparar evento direto para componentes na mesma aba
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('forceRefreshProfile', {
           detail: { 
             userName: perfilAtualizado.nome,
-            email: perfilAtualizado.email,
+            fotos: perfilAtualizado.fotos,
             timestamp: Date.now()
           }
         }));
-        
-        // Broadcast global para todas as abas/componentes
-        localStorage.setItem('forceProfileRefresh', JSON.stringify({
+      }, 100);
+      
+      // ✅ Novo evento específico para fotos
+      window.dispatchEvent(new CustomEvent('mini_photo_updated', {
+        detail: { 
           userName: perfilAtualizado.nome,
+          photo: perfilAtualizado.fotos[perfilAtualizado.fotoPrincipal] || perfilAtualizado.fotos.find(f => f) || null,
+          allPhotos: perfilAtualizado.fotos,
           timestamp: Date.now()
-        }));
-        
-        // Disparar evento direto para componentes na mesma aba
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('forceRefreshProfile', {
-            detail: { 
-              userName: perfilAtualizado.nome,
-              timestamp: Date.now()
-            }
-          }));
-        }, 100);
-        
-        // Forçar atualização do localStorage (para disparar storage event em outras abas)
-        localStorage.setItem('lastProfileUpdate', Date.now().toString());
-      }
+        }
+      }));
+      
+      // Forçar atualização do localStorage (para disparar storage event em outras abas)
+      localStorage.setItem('lastProfileUpdate', Date.now().toString());
+      
+      console.log('✅ Todos os eventos de atualização disparados!');
+      
     } catch (error) {
       console.error('Erro ao conectar com Supabase:', error);
+      console.log('⚠️ Mantendo dados apenas no localStorage como fallback');
+      
+      // ✅ Mesmo com erro, disparar eventos locais
+      window.dispatchEvent(new CustomEvent('perfilUpdated', {
+        detail: { 
+          userName: perfilAtualizado.nome,
+          email: perfilAtualizado.email,
+          fotos: perfilAtualizado.fotos,
+          timestamp: Date.now()
+        }
+      }));
     }
   };
 
