@@ -194,14 +194,6 @@ const HomePage: React.FC = () => {
       </header>
 
       <main>
-        <section style={styles.hero}>
-          <div style={styles.heroBanner}>
-            <div style={styles.heroOverlay}>
-              {/* Banner apenas com imagem, sem texto */}
-            </div>
-          </div>
-        </section>
-
         <section style={styles.imagesSection}>
           {/* Banner principal com botão abaixo */}
           <div style={styles.imageContainer}>
