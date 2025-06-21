@@ -17,7 +17,11 @@ const Header: React.FC = () => {
     <header className="header">
       <div className="header-content">
         <button onClick={handleBackClick} className="back-button">
-          ←
+          <img 
+            src="/botao-site.jpg.jpg" 
+            alt="Voltar" 
+            className="back-button-image" 
+          />
         </button>
         <div className="logo-container" onClick={handleLogoClick}>
           <img 
@@ -25,7 +29,11 @@ const Header: React.FC = () => {
             alt="100 Matchs Logo" 
             className="logo" 
           />
-          <span className="site-title">100matchs</span>
+          <img 
+            src="/100mt-frase.jpg.jpg" 
+            alt="100 Matchs" 
+            className="site-title-image" 
+          />
         </div>
       </div>
     </header>

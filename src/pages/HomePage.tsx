@@ -188,7 +188,11 @@ const HomePage: React.FC = () => {
               alt="100 Matchs Logo" 
               style={styles.logoImage}
             />
-            <span style={styles.logoText}>100matchs</span>
+            <img 
+              src="/100mt-frase.jpg.jpg" 
+              alt="100 Matchs" 
+              style={{height: '30px', width: 'auto', objectFit: 'contain'}}
+            />
           </Link>
         </div>
       </header>
