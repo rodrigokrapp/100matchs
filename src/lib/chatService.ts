@@ -327,29 +327,10 @@ class ChatService {
 
     console.log('⚡ ENVIO ULTRA RÁPIDO:', message);
 
-    // 🚀 ESTRATÉGIA INSTANTÂNEA: Todas as operações em paralelo (sem await)
-    Promise.all([
-      // Broadcast Supabase
-      this.channel?.send({
-        type: 'broadcast',
-        event: 'new_message',
-        payload: message
-      }).catch((e: any) => console.log('Broadcast falhou:', e)),
-      
-      // BroadcastChannel
-      Promise.resolve().then(() => {
-        this.broadcastChannel?.postMessage(message);
-      }).catch((e: any) => console.log('BroadcastChannel falhou:', e)),
-      
-      // Supabase Database
-      (async () => {
-        try {
-          await supabase.from('chat_messages').insert([message]);
-        } catch (e: any) {
-          console.log('DB falhou:', e);
-        }
-      })()
-    ]).catch(() => {}); // Ignorar erros para não bloquear
+    // ⚡ INSTANTÂNEO: Callback local PRIMEIRO (para aparecer imediatamente)
+    if (this.messageCallback) {
+      this.messageCallback(message);
+    }
 
     // ⚡ INSTANTÂNEO: localStorage (síncrono)
     this.addToLocalStorage(roomId, message);
@@ -365,7 +346,30 @@ class ChatService {
       timestamp: Date.now()
     }));
 
-    console.log('⚡ Mensagem disparada instantaneamente!');
+    // 🚀 ESTRATÉGIA PARALELA: Todas as operações remotas SEM bloquear
+    // BroadcastChannel instantâneo
+    try {
+      this.broadcastChannel?.postMessage(message);
+    } catch (e) {
+      console.log('BroadcastChannel falhou:', e);
+    }
+
+    // Operações remotas em background (não bloqueiam)
+    setTimeout(() => {
+      // Broadcast Supabase
+      this.channel?.send({
+        type: 'broadcast',
+        event: 'new_message',
+        payload: message
+      }).catch((e: any) => console.log('Broadcast falhou:', e));
+      
+      // Supabase Database
+      supabase.from('chat_messages').insert([message]).catch((e: any) => {
+        console.log('DB falhou:', e);
+      });
+    }, 0); // Próximo tick, sem delay
+
+    console.log('⚡ Mensagem disparada INSTANTANEAMENTE!');
     return true;
   }
 
