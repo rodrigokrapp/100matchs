@@ -101,7 +101,7 @@ const HomePage: React.FC = () => {
       borderRadius: '15px',
       marginBottom: '40px',
       boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
-      backgroundImage: 'url("/desliza e nada 1.jpg.png")',
+      backgroundImage: 'url("/desliza-nada 4.jpg.jpg")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
@@ -198,7 +198,7 @@ const HomePage: React.FC = () => {
           {/* Banner principal com botão abaixo */}
           <div style={styles.imageContainer}>
             <img 
-              src="/desliza e nada 1.jpg.png" 
+              src="/desliza-nada 4.jpg.jpg" 
               alt="Banner Principal" 
               style={styles.sectionImage}
             />
