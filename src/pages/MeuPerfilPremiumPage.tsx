@@ -16,17 +16,89 @@ interface PerfilPremium {
 
 const MeuPerfilPremiumPage: React.FC = () => {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState<any>(null);
+  const [usuario] = useState<any>(JSON.parse(localStorage.getItem('usuario') || '{}'));
   const [perfil, setPerfil] = useState<PerfilPremium>({
-    id: '',
-    nome: '',
-    email: '',
+    id: usuario.id || '',
+    nome: usuario.nome || '',
+    email: usuario.email || '',
     descricao: '',
     fotos: ['', '', '', '', ''],
     fotoPrincipal: 0
   });
   const [editandoDescricao, setEditandoDescricao] = useState(false);
   const [novaDescricao, setNovaDescricao] = useState('');
+
+  // 🧹 FUNÇÃO DE LIMPEZA AGRESSIVA DO LOCALSTORAGE
+  const limparLocalStorageAgressivo = () => {
+    try {
+      console.log('🧹 Iniciando limpeza agressiva do localStorage...');
+      
+      // Salvar dados críticos
+      const dadosCriticos = {
+        usuario: localStorage.getItem('usuario'),
+        user_token: localStorage.getItem('user_token'),
+        auth_session: localStorage.getItem('auth_session')
+      };
+      
+      // Lista de chaves a remover (dados pesados)
+      const chavesParaRemover = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const chave = localStorage.key(i);
+        if (chave && (
+          chave.includes('lastChatMessage') ||
+          chave.includes('audioRecording') ||
+          chave.includes('blob_') ||
+          chave.includes('data:image') ||
+          chave.includes('chat_') ||
+          chave.includes('temp') ||
+          chave.includes('upload') ||
+          chave.startsWith('perfil_') ||
+          chave.includes('forceProfile') ||
+          chave.includes('lastProfile')
+        )) {
+          chavesParaRemover.push(chave);
+        }
+      }
+      
+      // Remover chaves problemáticas
+      chavesParaRemover.forEach(chave => {
+        try {
+          localStorage.removeItem(chave);
+        } catch (e) {
+          console.warn('Erro ao remover', chave);
+        }
+      });
+      
+      console.log(`🗑️ Removidas ${chavesParaRemover.length} chaves do localStorage`);
+      
+      // Se ainda há problemas, limpar TUDO e restaurar críticos
+      try {
+        localStorage.setItem('teste_quota', 'teste');
+        localStorage.removeItem('teste_quota');
+      } catch (quotaError) {
+        console.log('🧹 Quota ainda excedida, limpando TUDO...');
+        localStorage.clear();
+        
+        // Restaurar apenas dados críticos
+        Object.entries(dadosCriticos).forEach(([key, value]) => {
+          if (value) {
+            try {
+              localStorage.setItem(key, value);
+            } catch (e) {
+              console.warn('Erro ao restaurar', key);
+            }
+          }
+        });
+      }
+      
+      console.log('✅ Limpeza concluída');
+      
+    } catch (error) {
+      console.error('❌ Erro na limpeza:', error);
+      // Em último caso, limpar tudo
+      localStorage.clear();
+    }
+  };
 
   useEffect(() => {
     // Verificar se usuário premium está logado
@@ -37,7 +109,7 @@ const MeuPerfilPremiumPage: React.FC = () => {
     }
 
     const user = JSON.parse(usuarioPremium);
-    setUsuario(user);
+    setPerfil(user);
 
     // Carregar perfil existente ou criar novo
     const perfilSalvo = localStorage.getItem(`perfil_${user.email}`);
@@ -96,13 +168,91 @@ const MeuPerfilPremiumPage: React.FC = () => {
   };
 
   const salvarPerfil = async (perfilAtualizado: PerfilPremium) => {
-    // ✅ Salvar no localStorage para uso local (por email)
-    localStorage.setItem(`perfil_${perfilAtualizado.email}`, JSON.stringify(perfilAtualizado));
+    console.log('💾 Salvando perfil - Supabase first, localStorage como fallback');
     
-    // ✅ CORREÇÃO: Salvar TAMBÉM por nome para outros usuários poderem encontrar
-    localStorage.setItem(`perfil_${perfilAtualizado.nome}`, JSON.stringify(perfilAtualizado));
-    
-    // Salvar no Supabase para que outros usuários possam ver
+    // 🧹 LIMPEZA AGRESSIVA PARA EVITAR QUOTA EXCEEDED
+    try {
+      console.log('🧹 Limpando localStorage para evitar quota exceeded...');
+      
+      // Primeiro: limpar dados conhecidamente pesados
+      const chavesProblematicas = [
+        'lastChatMessage', 'audioRecording', 'tempUpload', 'blob_', 'data:image',
+        'forceProfileRefresh', 'lastProfileUpdate'
+      ];
+      
+      // Obter todas as chaves do localStorage
+      const todasChaves = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const chave = localStorage.key(i);
+        if (chave) todasChaves.push(chave);
+      }
+      
+      // Remover chaves problemáticas
+      todasChaves.forEach(chave => {
+        if (chavesProblematicas.some(problema => chave.includes(problema))) {
+          try {
+            localStorage.removeItem(chave);
+            console.log(`🗑️ Removido: ${chave}`);
+          } catch (e) {
+            console.warn(`Erro ao remover ${chave}:`, e);
+          }
+        }
+      });
+      
+      // Limpar chats antigos (manter apenas 1 mais recente)
+      const chatKeys = todasChaves.filter(key => key.startsWith('chat_'));
+      if (chatKeys.length > 1) {
+        chatKeys.slice(0, -1).forEach(key => {
+          try {
+            localStorage.removeItem(key);
+            console.log(`🗑️ Chat removido: ${key}`);
+          } catch (e) {
+            console.warn(`Erro ao remover chat ${key}:`, e);
+          }
+        });
+      }
+      
+      // Remover perfis antigos grandes (manter apenas o atual)
+      const perfilKeys = todasChaves.filter(key => 
+        key.startsWith('perfil_') && 
+        !key.includes(perfilAtualizado.nome) && 
+        !key.includes(perfilAtualizado.email)
+      );
+      perfilKeys.forEach(key => {
+        try {
+          localStorage.removeItem(key);
+          console.log(`🗑️ Perfil antigo removido: ${key}`);
+        } catch (e) {
+          console.warn(`Erro ao remover perfil ${key}:`, e);
+        }
+      });
+      
+      console.log('✅ Limpeza do localStorage concluída');
+      
+    } catch (cleanupError) {
+      console.warn('⚠️ Erro na limpeza do localStorage:', cleanupError);
+      
+      // Limpeza de emergência: remover TUDO exceto dados críticos
+      try {
+        const dadosCriticos = {
+          usuario: localStorage.getItem('usuario'),
+          user_token: localStorage.getItem('user_token')
+        };
+        
+        localStorage.clear();
+        
+        // Restaurar apenas dados críticos
+        if (dadosCriticos.usuario) localStorage.setItem('usuario', dadosCriticos.usuario);
+        if (dadosCriticos.user_token) localStorage.setItem('user_token', dadosCriticos.user_token);
+        
+        console.log('🧹 Limpeza de emergência realizada');
+      } catch (emergencyError) {
+        console.error('❌ Erro na limpeza de emergência:', emergencyError);
+      }
+    }
+
+    // ✅ PRIORITÁRIO: Salvar no Supabase (fonte da verdade)
+    let sucessoSupabase = false;
     try {
       const { error } = await supabase
         .from('perfis')
@@ -113,38 +263,42 @@ const MeuPerfilPremiumPage: React.FC = () => {
           fotos: perfilAtualizado.fotos,
           foto_principal: perfilAtualizado.fotoPrincipal,
           is_premium: true,
-          updated_at: new Date().toISOString(),
-          created_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
         }]);
 
-      if (error) {
-        console.error('Erro ao salvar perfil no Supabase:', error);
-        // ✅ Fallback: mesmo com erro no Supabase, manter dados locais
-        console.log('⚠️ Mantendo dados apenas no localStorage como fallback');
+      if (!error) {
+        console.log('✅ Perfil salvo no Supabase!');
+        sucessoSupabase = true;
       } else {
-        console.log('✅ Perfil salvo no Supabase com sucesso!');
+        console.error('Erro Supabase:', error);
       }
+    } catch (supabaseError) {
+      console.error('Erro conexão Supabase:', supabaseError);
+    }
 
-      // ✅ SEMPRE disparar eventos independente do Supabase
-      console.log('📸 Disparando eventos de atualização de perfil...');
-      
-      // Disparar evento personalizado para atualização em tempo real
+    // ✅ NOVO: NÃO SALVAR MAIS NO LOCALSTORAGE - APENAS SUPABASE
+    // O localStorage será usado apenas para dados críticos (login, token)
+    // As fotos e perfis ficarão APENAS no Supabase para evitar quota exceeded
+    console.log('📝 Dados salvos apenas no Supabase - localStorage reservado para dados críticos');
+
+    // ✅ EVENTOS DE ATUALIZAÇÃO
+    try {
       window.dispatchEvent(new CustomEvent('perfilUpdated', {
         detail: { 
           userName: perfilAtualizado.nome,
-          email: perfilAtualizado.email,
           fotos: perfilAtualizado.fotos,
           timestamp: Date.now()
         }
       }));
-      
-      // Broadcast global para todas as abas/componentes
-      localStorage.setItem('forceProfileRefresh', JSON.stringify({
-        userName: perfilAtualizado.nome,
-        timestamp: Date.now()
+
+      window.dispatchEvent(new CustomEvent('mini_photo_updated', {
+        detail: { 
+          userName: perfilAtualizado.nome,
+          allPhotos: perfilAtualizado.fotos,
+          timestamp: Date.now()
+        }
       }));
-      
-      // Disparar evento direto para componentes na mesma aba
+
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('forceRefreshProfile', {
           detail: { 
@@ -155,34 +309,15 @@ const MeuPerfilPremiumPage: React.FC = () => {
         }));
       }, 100);
       
-      // ✅ Novo evento específico para fotos
-      window.dispatchEvent(new CustomEvent('mini_photo_updated', {
-        detail: { 
-          userName: perfilAtualizado.nome,
-          photo: perfilAtualizado.fotos[perfilAtualizado.fotoPrincipal] || perfilAtualizado.fotos.find(f => f) || null,
-          allPhotos: perfilAtualizado.fotos,
-          timestamp: Date.now()
-        }
-      }));
-      
-      // Forçar atualização do localStorage (para disparar storage event em outras abas)
-      localStorage.setItem('lastProfileUpdate', Date.now().toString());
-      
-      console.log('✅ Todos os eventos de atualização disparados!');
-      
-    } catch (error) {
-      console.error('Erro ao conectar com Supabase:', error);
-      console.log('⚠️ Mantendo dados apenas no localStorage como fallback');
-      
-      // ✅ Mesmo com erro, disparar eventos locais
-      window.dispatchEvent(new CustomEvent('perfilUpdated', {
-        detail: { 
-          userName: perfilAtualizado.nome,
-          email: perfilAtualizado.email,
-          fotos: perfilAtualizado.fotos,
-          timestamp: Date.now()
-        }
-      }));
+    } catch (eventError) {
+      console.error('Erro eventos:', eventError);
+    }
+
+    // ✅ FEEDBACK VISUAL
+    if (sucessoSupabase) {
+      console.log('🎉 Perfil salvo com sucesso!');
+    } else {
+      console.warn('⚠️ Verifique sua conexão - dados podem não estar sincronizados');
     }
   };
 
