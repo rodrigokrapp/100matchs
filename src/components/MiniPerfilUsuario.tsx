@@ -36,24 +36,72 @@ export const MiniPerfilUsuarioWrapper: React.FC<{
     const loadUserData = async () => {
       setLoading(true);
       try {
-        console.log('🔍 Buscando perfil para:', nomeUsuario);
+        console.log('🔍 Buscando perfil no Supabase para:', nomeUsuario);
         
-        // ✅ PRIMEIRO: Buscar no Supabase (dados mais atualizados)
+        // ✅ PRIMEIRO: Buscar no Supabase (dados mais atualizados com políticas RLS)
         try {
-          let { data: exactData } = await supabase
+          console.log('🔍 Buscando perfil no Supabase para:', nomeUsuario);
+          
+          // Tentar buscar por nome exato primeiro
+          let { data: exactData, error: exactError } = await supabase
             .from('perfis')
             .select('*')
             .eq('nome', nomeUsuario)
             .maybeSingle();
           
+          if (exactError) {
+            console.warn('⚠️ Erro na query por nome:', exactError);
+          }
+          
+          // Se não encontrar por nome, tentar buscar por email
+          if (!exactData) {
+            console.log('🔍 Tentando buscar por email...');
+            const { data: emailData, error: emailError } = await supabase
+              .from('perfis')
+              .select('*')
+              .eq('email', nomeUsuario)
+              .maybeSingle();
+            
+            if (!emailError && emailData) {
+              exactData = emailData;
+              console.log('✅ Perfil encontrado por email:', emailData);
+            }
+          }
+          
+          // Tentar usar a função personalizada se disponível
+          if (!exactData) {
+            console.log('🔍 Tentando buscar com função personalizada...');
+            const { data: functionData, error: functionError } = await supabase
+              .rpc('get_user_profile', { username: nomeUsuario });
+            
+            if (!functionError && functionData && functionData.length > 0) {
+              exactData = functionData[0];
+              console.log('✅ Perfil encontrado via função:', exactData);
+            }
+          }
+          
           if (exactData) {
-            console.log('✅ Perfil encontrado no Supabase:', exactData);
-            const fotosValidas = exactData.fotos ? exactData.fotos.filter((foto: string) => foto !== '') : [];
-            setUserPhotos(fotosValidas);
-            setUserBio(exactData.descricao || 'Usuário da plataforma 100matchs.');
-            setMainPhotoIndex(exactData.foto_principal || 0);
-            setLoading(false);
-            return;
+            console.log('✅ Dados do perfil carregados:', exactData);
+            
+            // Processar fotos - priorizar array de fotos, depois foto única
+            let fotosParaExibir: string[] = [];
+            
+            if (exactData.fotos && Array.isArray(exactData.fotos) && exactData.fotos.length > 0) {
+              fotosParaExibir = exactData.fotos.filter((foto: string) => foto && foto.trim() !== '');
+              console.log('📸 Fotos encontradas (array):', fotosParaExibir.length);
+            } else if (exactData.foto && exactData.foto.trim() !== '') {
+              fotosParaExibir = [exactData.foto];
+              console.log('📸 Foto única encontrada');
+            }
+            
+            // Se temos fotos, usar as do Supabase
+            if (fotosParaExibir.length > 0) {
+              setUserPhotos(fotosParaExibir);
+              setUserBio(exactData.descricao || 'Usuário da plataforma 100matchs.');
+              setMainPhotoIndex(exactData.foto_principal || 0);
+              setLoading(false);
+              return;
+            }
           }
         } catch (supabaseError) {
           console.warn('⚠️ Erro ao buscar no Supabase:', supabaseError);
