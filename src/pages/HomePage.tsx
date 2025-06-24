@@ -181,29 +181,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      {/* Ícones Flutuantes de Fundo */}
-      <div className="floating-background-icons">
-        <div className="floating-icon">💕</div>
-        <div className="floating-icon">💌</div>
-        <div className="floating-icon">🚲</div>
-        <div className="floating-icon">⚽</div>
-        <div className="floating-icon">🎸</div>
-        <div className="floating-icon">😊</div>
-        <div className="floating-icon">📱</div>
-        <div className="floating-icon">🌙</div>
-        <div className="floating-icon">☀️</div>
-        <div className="floating-icon">🐱</div>
-        <div className="floating-icon">🐶</div>
-        <div className="floating-icon">🔥</div>
-        <div className="floating-icon">🎵</div>
-        <div className="floating-icon">🎹</div>
-        <div className="floating-icon">🎤</div>
-        <div className="floating-icon">💝</div>
-        <div className="floating-icon">💖</div>
-        <div className="floating-icon">🌟</div>
-        <div className="floating-icon">🎺</div>
-        <div className="floating-icon">🎻</div>
-      </div>
       
       <header style={styles.header}>
         <div style={styles.headerContent}>

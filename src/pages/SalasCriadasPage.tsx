@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiTrash2, FiUsers, FiClock } from 'react-icons/fi';
 import Header from '../components/Header';
-import FloatingIcons from '../components/FloatingIcons';
 import { carregarSalasCompartilhadas, excluirSalaCompartilhada, sincronizarSalas } from '../lib/salasService';
 import './SalasCriadasPage.css';
 

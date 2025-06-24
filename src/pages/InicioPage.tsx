@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import FloatingIcons from '../components/FloatingIcons';
 import './InicioPage.css';
 
 const InicioPage: React.FC = () => {
@@ -87,7 +86,6 @@ const InicioPage: React.FC = () => {
 
   return (
     <div className="inicio-page">
-      <FloatingIcons />
       <Header />
       
       <div className="inicio-container">

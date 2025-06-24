@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import FloatingIcons from '../components/FloatingIcons';
 import { salvarSalaCompartilhada, carregarSalasCompartilhadas } from '../lib/salasService';
 import './CriarSalaPage.css';
 
@@ -123,7 +122,6 @@ const CriarSalaPage: React.FC = () => {
 
   return (
     <div className="criar-sala-page">
-      <FloatingIcons />
       <Header />
       
       <div className="criar-sala-container">
