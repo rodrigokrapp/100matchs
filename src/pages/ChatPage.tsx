@@ -10,6 +10,7 @@ import { chatService, ChatMessage } from '../lib/chatService';
 import MediaService, { EMOJI_CATEGORIES } from '../lib/mediaService';
 import { testChatConnection, supabase } from '../lib/supabase';
 import Header from '../components/Header';
+import FloatingIcons from '../components/FloatingIcons';
 import './ChatPage.css';
 
 const ChatPage: React.FC = () => {
@@ -1650,6 +1651,7 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="chat-page">
+      <FloatingIcons />
       <Header />
       
       <div className="chat-container">

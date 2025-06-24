@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import FloatingIcons from '../components/FloatingIcons';
 import './SuportePage.css';
 
 const SuportePage: React.FC = () => {
@@ -25,6 +26,7 @@ const SuportePage: React.FC = () => {
 
   return (
     <div className="suporte-page">
+      <FloatingIcons />
       <Header />
       
       <div className="suporte-container">

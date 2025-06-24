@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiMapPin, FiUsers, FiLogOut, FiStar } from 'react-icons/fi';
 import Header from '../components/Header';
+import FloatingIcons from '../components/FloatingIcons';
 import { carregarSalasCompartilhadas } from '../lib/salasService';
 import './SalasPage.css';
 
@@ -147,6 +148,7 @@ const SalasPage: React.FC = () => {
 
   return (
     <div className="salas-page">
+      <FloatingIcons />
       <Header />
       
       <div className="salas-container">
