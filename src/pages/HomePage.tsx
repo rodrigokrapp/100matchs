@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './HomePage.css';
 
 // Adicionar CSS para animação pulse
 const pulseAnimation = `
@@ -180,6 +181,30 @@ const HomePage: React.FC = () => {
 
   return (
     <div style={styles.container}>
+      {/* Ícones Flutuantes de Fundo */}
+      <div className="floating-background-icons">
+        <div className="floating-icon">💕</div>
+        <div className="floating-icon">💌</div>
+        <div className="floating-icon">🚲</div>
+        <div className="floating-icon">⚽</div>
+        <div className="floating-icon">🎸</div>
+        <div className="floating-icon">😊</div>
+        <div className="floating-icon">📱</div>
+        <div className="floating-icon">🌙</div>
+        <div className="floating-icon">☀️</div>
+        <div className="floating-icon">🐱</div>
+        <div className="floating-icon">🐶</div>
+        <div className="floating-icon">🔥</div>
+        <div className="floating-icon">🎵</div>
+        <div className="floating-icon">🎹</div>
+        <div className="floating-icon">🎤</div>
+        <div className="floating-icon">💝</div>
+        <div className="floating-icon">💖</div>
+        <div className="floating-icon">🌟</div>
+        <div className="floating-icon">🎺</div>
+        <div className="floating-icon">🎻</div>
+      </div>
+      
       <header style={styles.header}>
         <div style={styles.headerContent}>
           <Link to="/inicio" style={styles.logoContainer}>
