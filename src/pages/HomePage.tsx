@@ -194,6 +194,25 @@ const HomePage: React.FC = () => {
 
       <main>
         <section style={styles.imagesSection}>
+          {/* Vídeo do YouTube */}
+          <div style={{marginBottom: '40px', textAlign: 'center'}}>
+            <iframe 
+              width="560" 
+              height="315" 
+              src="https://www.youtube.com/embed/fD7qHX18mAU?si=M0dgkGSChqCkckmf" 
+              title="YouTube video player" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              referrerPolicy="strict-origin-when-cross-origin" 
+              allowFullScreen
+              style={{
+                maxWidth: '100%',
+                borderRadius: '15px',
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+              }}
+            />
+          </div>
+
           {/* Banner principal com botão abaixo */}
           <div style={styles.imageContainer}>
             <img 
