@@ -970,16 +970,33 @@
 
 .message-input {
   flex: 1;
-  border: none;
-  outline: none;
-  background: none;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
   font-size: 16px;
-  color: #333;
-  font-family: inherit;
+  outline: none;
+  backdrop-filter: blur(10px);
+  
+  /* ⚡ OTIMIZAÇÕES DE PERFORMANCE */
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* ⚡ TRANSIÇÕES RÁPIDAS */
+  transition: border-color 0.1s ease;
 }
 
 .message-input::placeholder {
-  color: #9ca3af;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.message-input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+  /* ⚡ SEM TRANSIÇÕES PESADAS NO FOCUS */
 }
 
 .send-button {

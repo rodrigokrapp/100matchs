@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   FiSend, FiImage, FiMic, FiSmile, FiArrowLeft, 
@@ -1756,6 +1756,21 @@ const ChatPage: React.FC = () => {
     !usuariosBloqueados.includes(msg.user_name)
   );
 
+  // ⚡ OTIMIZAÇÃO: Função de mudança de mensagem otimizada
+  const handleMessageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    // Atualização direta sem validações pesadas durante digitação
+    const value = e.target.value;
+    setMensagem(value);
+  }, []);
+
+  // ⚡ ULTRA OTIMIZAÇÃO: Enter otimizado sem dependências pesadas
+  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && mensagem.trim()) {
+      e.preventDefault();
+      handleEnviarMensagem();
+    }
+  }, [mensagem]);
+
   if (!usuario) {
     return <div className="loading">Carregando...</div>;
   }
@@ -2217,13 +2232,8 @@ const ChatPage: React.FC = () => {
           <input
             type="text"
             value={mensagem}
-            onChange={(e) => setMensagem(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleEnviarMensagem();
-              }
-            }}
+            onChange={handleMessageChange}
+            onKeyPress={handleKeyPress}
             placeholder="Digite sua mensagem..."
             className="message-input"
             autoComplete="off"
