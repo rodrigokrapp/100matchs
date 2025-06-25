@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 import Header from '../components/Header';
 import './InicioPage.css';
 
@@ -7,13 +8,119 @@ const InicioPage: React.FC = () => {
   const navigate = useNavigate();
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
-  const [foto, setFoto] = useState('');
+  const [foto, setFoto] = useState<File | null>(null);
+  const [fotoUrl, setFotoUrl] = useState('');
+  const [uploadingFoto, setUploadingFoto] = useState(false);
   const [nomePremium, setNomePremium] = useState('');
   const [emailPremium, setEmailPremium] = useState('');
   const [senhaPremium, setSenhaPremium] = useState('');
-  const [fotoPremium, setFotoPremium] = useState('');
+  const [fotoPremium, setFotoPremium] = useState<File | null>(null);
+  const [fotoUrlPremium, setFotoUrlPremium] = useState('');
+  const [uploadingFotoPremium, setUploadingFotoPremium] = useState(false);
   const [aceitarTermos, setAceitarTermos] = useState(false);
   const [aceitarTermosPremium, setAceitarTermosPremium] = useState(false);
+
+  // Carregar foto salva do usuário premium se existir
+  useEffect(() => {
+    const usuariosPremium = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
+    if (emailPremium) {
+      const usuarioExistente = usuariosPremium.find((u: any) => u.email === emailPremium);
+      if (usuarioExistente && usuarioExistente.fotoUrl) {
+        setFotoUrlPremium(usuarioExistente.fotoUrl);
+      }
+    }
+  }, [emailPremium]);
+
+  // Função para fazer upload da foto
+  const uploadFoto = async (file: File, isChat: boolean = true): Promise<string | null> => {
+    try {
+      const setUploading = isChat ? setUploadingFoto : setUploadingFotoPremium;
+      setUploading(true);
+
+      // Gerar nome único para a foto
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `profile-photos/${fileName}`;
+
+      // Upload para o Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('profile-photos')
+        .upload(filePath, file);
+
+      if (error) {
+        console.error('Erro no upload:', error);
+        alert('Erro ao fazer upload da foto. Tente novamente.');
+        return null;
+      }
+
+      // Obter URL pública da foto
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-photos')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+
+    } catch (error) {
+      console.error('Erro ao processar upload:', error);
+      alert('Erro ao processar foto. Tente novamente.');
+      return null;
+    } finally {
+      const setUploading = isChat ? setUploadingFoto : setUploadingFotoPremium;
+      setUploading(false);
+    }
+  };
+
+  // Função para selecionar foto do chat gratuito
+  const handleSelectFoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validar tipo de arquivo
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecione apenas arquivos de imagem.');
+        return;
+      }
+
+      // Validar tamanho (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('A foto deve ter no máximo 5MB.');
+        return;
+      }
+
+      setFoto(file);
+      
+      // Fazer upload automaticamente
+      const url = await uploadFoto(file, true);
+      if (url) {
+        setFotoUrl(url);
+      }
+    }
+  };
+
+  // Função para selecionar foto premium
+  const handleSelectFotoPremium = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validar tipo de arquivo
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecione apenas arquivos de imagem.');
+        return;
+      }
+
+      // Validar tamanho (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('A foto deve ter no máximo 5MB.');
+        return;
+      }
+
+      setFotoPremium(file);
+      
+      // Fazer upload automaticamente
+      const url = await uploadFoto(file, false);
+      if (url) {
+        setFotoUrlPremium(url);
+      }
+    }
+  };
 
   const handleEntrarChat = () => {
     if (!nome.trim()) {
@@ -55,7 +162,7 @@ const InicioPage: React.FC = () => {
       email: email.trim() || `${nome.trim().toLowerCase().replace(/\s+/g, '')}@chat.com`,
       premium: false,
       tipo: 'chat',
-      foto: foto.trim() || null,
+      foto: fotoUrl || null,
       limiteTempo: 15 * 60 * 1000, // 15 minutos em milissegundos
       inicioSessao: new Date().getTime(),
       usuariosBloqueados: [] // Lista de usuários que este usuário bloqueou
@@ -94,9 +201,19 @@ const InicioPage: React.FC = () => {
       ...usuarioPremium,
       premium: true,
       tipo: 'premium',
-      foto: fotoPremium.trim() || usuarioPremium.foto || null,
+      foto: fotoUrlPremium || usuarioPremium.foto || null,
       usuariosBloqueados: usuarioPremium.usuariosBloqueados || [] // Lista de usuários bloqueados
     };
+
+    // Salvar foto no histórico do usuário premium
+    if (fotoUrlPremium) {
+      const usuariosPremium = JSON.parse(localStorage.getItem('usuarios-premium') || '[]');
+      const index = usuariosPremium.findIndex((u: any) => u.email === emailPremium.trim());
+      if (index !== -1) {
+        usuariosPremium[index].fotoUrl = fotoUrlPremium;
+        localStorage.setItem('usuarios-premium', JSON.stringify(usuariosPremium));
+      }
+    }
 
     localStorage.setItem('usuarioPremium', JSON.stringify(usuarioLogado));
 
@@ -133,14 +250,29 @@ const InicioPage: React.FC = () => {
                   onChange={(e) => setNome(e.target.value)}
                   className="input"
                 />
-                <input
-                  type="url"
-                  placeholder="URL da sua foto (opcional)"
-                  value={foto}
-                  onChange={(e) => setFoto(e.target.value)}
-                  className="input"
-                  style={{ fontSize: '12px' }}
-                />
+                
+                {/* Seleção de Foto para Chat */}
+                <div className="foto-upload-section">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleSelectFoto}
+                    style={{ display: 'none' }}
+                    id="foto-upload-chat"
+                  />
+                  <label htmlFor="foto-upload-chat" className="foto-upload-button">
+                    {uploadingFoto ? (
+                      <span>📤 Carregando foto...</span>
+                    ) : fotoUrl ? (
+                      <div className="foto-preview">
+                        <img src={fotoUrl} alt="Sua foto" className="foto-preview-img" />
+                        <span>📷 Trocar foto</span>
+                      </div>
+                    ) : (
+                      <span>📷 Escolher foto (opcional)</span>
+                    )}
+                  </label>
+                </div>
                 
                 <div className="terms-checkbox">
                   <label>
@@ -185,14 +317,29 @@ const InicioPage: React.FC = () => {
                   onChange={(e) => setSenhaPremium(e.target.value)}
                   className="input"
                 />
-                <input
-                  type="url"
-                  placeholder="URL da sua foto (opcional)"
-                  value={fotoPremium}
-                  onChange={(e) => setFotoPremium(e.target.value)}
-                  className="input"
-                  style={{ fontSize: '12px' }}
-                />
+                
+                {/* Seleção de Foto para Premium */}
+                <div className="foto-upload-section">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleSelectFotoPremium}
+                    style={{ display: 'none' }}
+                    id="foto-upload-premium"
+                  />
+                  <label htmlFor="foto-upload-premium" className="foto-upload-button">
+                    {uploadingFotoPremium ? (
+                      <span>📤 Carregando foto...</span>
+                    ) : fotoUrlPremium ? (
+                      <div className="foto-preview">
+                        <img src={fotoUrlPremium} alt="Sua foto" className="foto-preview-img" />
+                        <span>📷 Trocar foto</span>
+                      </div>
+                    ) : (
+                      <span>📷 Escolher foto (opcional)</span>
+                    )}
+                  </label>
+                </div>
                 
                 <div className="terms-checkbox">
                   <label>
