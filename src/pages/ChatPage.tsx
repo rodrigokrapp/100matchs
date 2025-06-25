@@ -70,6 +70,11 @@ const ChatPage: React.FC = () => {
   // Estado para forçar re-render da lista de usuários
   const [forceUpdate, setForceUpdate] = useState(0);
 
+  // Estados para contagem regressiva
+  const [tempoRestante, setTempoRestante] = useState<number>(0);
+  const [showContagem, setShowContagem] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   const nomeSala = location.state?.nomeSala || 'Chat';
 
   // ✅ CACHE ESPECÍFICO DE FOTOS POR USUÁRIO
@@ -125,6 +130,40 @@ const ChatPage: React.FC = () => {
     */
   };
 
+  // Timer da contagem regressiva
+  useEffect(() => {
+    if (showContagem && tempoRestante > 0) {
+      timerRef.current = setInterval(() => {
+        setTempoRestante(prev => {
+          if (prev <= 1) {
+            // Tempo esgotado - fazer logout e bloquear nome
+            const usuarioChat = localStorage.getItem('usuarioChat');
+            if (usuarioChat) {
+              const userChat = JSON.parse(usuarioChat);
+              const nomeKey = `bloqueio_${userChat.nome.toLowerCase()}`;
+              const agora = new Date().getTime();
+              localStorage.setItem(nomeKey, JSON.stringify({ timestamp: agora }));
+              
+              localStorage.removeItem('usuarioChat');
+              localStorage.removeItem(`acesso_${userChat.email}`);
+            }
+            
+            alert('Seu tempo de acesso de 15 minutos expirou. Este nome ficará bloqueado por 24 horas.');
+            navigate('/inicio');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [showContagem, navigate]);
+
   // Cleanup ao sair da página
   useEffect(() => {
     return () => {
@@ -132,6 +171,9 @@ const ChatPage: React.FC = () => {
       MediaService.stopRecording();
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
+      }
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
       }
       // Limpar URLs temporárias
       tempMediaUrls.forEach(url => MediaService.revokeTempUrl(url));
@@ -147,6 +189,7 @@ const ChatPage: React.FC = () => {
     if (usuarioPremium) {
       const user = JSON.parse(usuarioPremium);
       setUsuario({ ...user, tipo: 'premium' });
+      setShowContagem(false); // Premium não tem contagem regressiva
     } else if (usuarioChat) {
       const userChat = JSON.parse(usuarioChat);
       
@@ -155,14 +198,21 @@ const ChatPage: React.FC = () => {
       const tempoDecorrido = agora - userChat.inicioSessao;
       
       if (tempoDecorrido > userChat.limiteTempo) {
-        // Tempo expirado, fazer logout automático
+        // Tempo expirado, fazer logout automático e bloquear nome por 24h
+        const nomeKey = `bloqueio_${userChat.nome.toLowerCase()}`;
+        localStorage.setItem(nomeKey, JSON.stringify({ timestamp: agora }));
+        
         localStorage.removeItem('usuarioChat');
         localStorage.removeItem(`acesso_${userChat.email}`);
-        alert('Seu tempo de acesso de 15 minutos expirou. Faça login novamente.');
+        alert('Seu tempo de acesso de 15 minutos expirou. Este nome ficará bloqueado por 24 horas.');
         navigate('/inicio');
         return;
       }
       
+      // Calcular tempo restante e iniciar contagem regressiva
+      const tempoRestanteMs = userChat.limiteTempo - tempoDecorrido;
+      setTempoRestante(Math.floor(tempoRestanteMs / 1000));
+      setShowContagem(true);
       setUsuario({ ...userChat, tipo: 'chat' });
     } else if (visitante) {
       const userVisitante = JSON.parse(visitante);
@@ -939,6 +989,12 @@ const ChatPage: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const formatTempoRestante = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const handleVoltar = () => {
     navigate('/salas');
   };
@@ -1545,32 +1601,33 @@ const ChatPage: React.FC = () => {
     alert(`Usuário ${nomeUsuario} foi desbloqueado.`);
   };
 
-  // ✅ FUNÇÃO ULTRA OTIMIZADA DE FOTOS POR USUÁRIO
+  // ✅ FUNÇÃO MELHORADA PARA BUSCAR FOTOS DE TODOS OS USUÁRIOS
   const getUserPhoto = (nomeUsuario: string): string | null => {
     if (!nomeUsuario) return null;
     
-    console.log('🔍 Buscando foto específica para:', nomeUsuario);
+    console.log('🔍 Buscando foto para:', nomeUsuario);
     
-    // ⚡ ESTRATÉGIA 1: Buscar APENAS por dados específicos do usuário solicitado
-    // NUNCA misturar com dados do usuário logado atual
+    // ⚡ ESTRATÉGIA 1: Buscar por dados específicos do usuário solicitado
     const chavesPossiveisUsuario = [
       `perfil_${nomeUsuario}`,
       `usuario_${nomeUsuario}`, 
       `user_${nomeUsuario}`,
       `profile_${nomeUsuario}`,
-      `user_photo_${nomeUsuario}`
+      `user_photo_${nomeUsuario}`,
+      `dados_usuario_${nomeUsuario}`,
+      `foto_perfil_${nomeUsuario}`
     ];
     
-    // Buscar apenas pelos dados salvos específicos do usuário
+    // Buscar pelos dados salvos específicos do usuário
     for (const chave of chavesPossiveisUsuario) {
       try {
         const dadosSalvos = localStorage.getItem(chave);
         if (dadosSalvos) {
           const dados = JSON.parse(dadosSalvos);
           
-          // ✅ VERIFICAÇÃO RIGOROSA: nome deve corresponder EXATAMENTE
-          if (dados && dados.nome === nomeUsuario) {
-            console.log(`📁 Dados específicos encontrados em ${chave} para ${nomeUsuario}`);
+          // Verificar se é o usuário correto
+          if (dados && (dados.nome === nomeUsuario || dados.user_name === nomeUsuario)) {
+            console.log(`📁 Dados encontrados em ${chave} para ${nomeUsuario}`);
             
             // Priorizar array de fotos
             if (dados.fotos && Array.isArray(dados.fotos) && dados.fotos.length > 0) {
@@ -1593,14 +1650,17 @@ const ChatPage: React.FC = () => {
       }
     }
     
-    // ⚡ ESTRATÉGIA 2: Se for o próprio usuário logado, verificar também dados de sessão
+    // ⚡ ESTRATÉGIA 2: Verificar dados de sessão (para usuário atual)
     if (nomeUsuario === usuario?.nome) {
       console.log('👤 Buscando foto do próprio usuário logado:', nomeUsuario);
       
       // Estado de edição atual
       if (editingProfile.fotos && editingProfile.fotos.length > 0) {
-        console.log('✅ Foto no estado de edição para usuário atual');
-        return editingProfile.fotos[0];
+        const fotoValida = editingProfile.fotos.find((foto: string) => foto && foto.startsWith('data:image/'));
+        if (fotoValida) {
+          console.log('✅ Foto no estado de edição');
+          return fotoValida;
+        }
       }
       
       // Dados de sessão do usuário
@@ -1611,7 +1671,7 @@ const ChatPage: React.FC = () => {
           if (dadosSessao) {
             const dados = JSON.parse(dadosSessao);
             if (dados.nome === nomeUsuario && dados.foto && dados.foto.startsWith('data:image/')) {
-              console.log(`✅ Foto de sessão ${tipoSessao} para usuário atual`);
+              console.log(`✅ Foto de sessão ${tipoSessao}`);
               return dados.foto;
             }
           }
@@ -1621,7 +1681,47 @@ const ChatPage: React.FC = () => {
       }
     }
     
-    // ⚡ ESTRATÉGIA 3: Buscar nas mensagens de imagem específicas do usuário
+    // ⚡ ESTRATÉGIA 3: Buscar em todas as chaves do localStorage
+    console.log('🔄 Fazendo busca ampla no localStorage para:', nomeUsuario);
+    const todasAsChaves = Object.keys(localStorage);
+    
+    for (const chave of todasAsChaves) {
+      try {
+        // Pular chaves que não são relevantes
+        if (chave.includes('acesso_') || chave.includes('bloqueio_') || chave.includes('bloqueados_')) {
+          continue;
+        }
+        
+        const dados = localStorage.getItem(chave);
+        if (dados) {
+          const dadosParsed = JSON.parse(dados);
+          
+          // Verificar se contém dados do usuário
+          if (dadosParsed && 
+              (dadosParsed.nome === nomeUsuario || dadosParsed.user_name === nomeUsuario)) {
+            
+            // Verificar fotos
+            if (dadosParsed.fotos && Array.isArray(dadosParsed.fotos) && dadosParsed.fotos.length > 0) {
+              const fotoValida = dadosParsed.fotos.find((foto: string) => foto && foto.startsWith('data:image/'));
+              if (fotoValida) {
+                console.log(`✅ Foto encontrada na busca ampla (${chave}):`, nomeUsuario);
+                return fotoValida;
+              }
+            }
+            
+            if (dadosParsed.foto && dadosParsed.foto.startsWith('data:image/')) {
+              console.log(`✅ Foto única encontrada na busca ampla (${chave}):`, nomeUsuario);
+              return dadosParsed.foto;
+            }
+          }
+        }
+      } catch (error) {
+        // Ignorar erros de parsing
+        continue;
+      }
+    }
+    
+    // ⚡ ESTRATÉGIA 4: Buscar nas mensagens de imagem
     const imagensDoUsuario = mensagens.filter((msg: ChatMessage) => 
       msg.user_name === nomeUsuario && 
       msg.message_type === 'imagem' && 
@@ -1635,7 +1735,7 @@ const ChatPage: React.FC = () => {
       return ultimaFoto;
     }
     
-    console.log('❌ Nenhuma foto específica encontrada para:', nomeUsuario);
+    console.log('❌ Nenhuma foto encontrada para:', nomeUsuario);
     return null;
   };
 
@@ -1665,6 +1765,15 @@ const ChatPage: React.FC = () => {
               <div className={`connection-status ${isConnected ? 'connected' : ''}`}></div>
             </div>
           </div>
+          
+          {/* Contagem regressiva para usuários gratuitos */}
+          {showContagem && (
+            <div className="countdown-timer">
+              <FiClock className="timer-icon" />
+              <span className="timer-text">Tempo restante: {formatTempoRestante(tempoRestante)}</span>
+            </div>
+          )}
+          
           {!usuario?.premium && (
             <button className="upgrade-button" onClick={handleUpgradePremium}>
               <FiStar />
@@ -1699,11 +1808,19 @@ const ChatPage: React.FC = () => {
                   >
                     <div className="message-header">
                       <div className="user-info" onClick={() => handleUsuarioClick(msg.user_name)}>
-                            <FiUser className="default-user-icon" />
-                      <span className="sender">
-                        {msg.user_name}
-                        {msg.is_premium && <FiStar className="premium-icon" />}
-                      </span>
+                        {getUserPhoto(msg.user_name) ? (
+                          <img 
+                            src={getUserPhoto(msg.user_name)!} 
+                            alt={msg.user_name}
+                            className="user-mini-photo"
+                          />
+                        ) : (
+                          <FiUser className="default-user-icon" />
+                        )}
+                        <span className="sender">
+                          {msg.user_name}
+                          {msg.is_premium && <FiStar className="premium-icon" />}
+                        </span>
                       </div>
                       <span className="time">{formatTime(msg.created_at)}</span>
                       {msg.is_temporary && (

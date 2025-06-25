@@ -24,6 +24,29 @@ const InicioPage: React.FC = () => {
       return;
     }
 
+    // Verificar se o nome está bloqueado por 24 horas
+    const nomeKey = `bloqueio_${nome.trim().toLowerCase()}`;
+    const bloqueioData = localStorage.getItem(nomeKey);
+    
+    if (bloqueioData) {
+      const { timestamp } = JSON.parse(bloqueioData);
+      const agora = new Date().getTime();
+      const tempoDecorrido = agora - timestamp;
+      const vinteQuatroHoras = 24 * 60 * 60 * 1000; // 24 horas em milissegundos
+      
+      if (tempoDecorrido < vinteQuatroHoras) {
+        const tempoRestante = vinteQuatroHoras - tempoDecorrido;
+        const horasRestantes = Math.floor(tempoRestante / (60 * 60 * 1000));
+        const minutosRestantes = Math.floor((tempoRestante % (60 * 60 * 1000)) / (60 * 1000));
+        
+        alert(`Este nome está temporariamente bloqueado. Tente novamente em ${horasRestantes}h ${minutosRestantes}min.`);
+        return;
+      } else {
+        // Bloqueio expirou, remover
+        localStorage.removeItem(nomeKey);
+      }
+    }
+
     // Salvar usuário de chat gratuito sem foto
     const usuarioChat = {
       nome: nome.trim(),
