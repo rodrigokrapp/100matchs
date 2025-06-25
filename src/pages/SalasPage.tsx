@@ -163,18 +163,55 @@ const SalasPage: React.FC = () => {
                 onChange={(e) => setBusca(e.target.value)}
                 className="input search-input"
               />
-              <button onClick={handleCriarSala} className="btn btn-primary criar-sala-btn">
-                🚀 Criar Salas
-              </button>
-              <button onClick={handleSalasCriadas} className="btn btn-secondary criar-sala-btn">
-                📋 Salas Criadas
-              </button>
               <button 
                 onClick={() => window.open('https://pay.kiwify.com.br/E2Y9N6m', '_blank')} 
                 className="btn btn-premium-small"
               >
                 ⭐ Seja Premium
               </button>
+            </div>
+            
+            {/* Salas Fixas */}
+            <div className="salas-fixas-section">
+              <div className="salas-fixas-grid">
+                <div className="sala-card card sala-fixa">
+                  <div className="sala-info">
+                    <h3>🔥 Só Pegação</h3>
+                    <p>Para quem busca diversão sem compromisso</p>
+                    <div className="sala-stats">
+                      <span className="usuarios-online">
+                        🔥 Sempre online
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => handleEntrarSala('sala-pegacao-fixa', 'Só Pegação')}
+                    className="btn btn-primary"
+                    style={{ background: '#ff4757' }}
+                  >
+                    🔥 Entrar
+                  </button>
+                </div>
+
+                <div className="sala-card card sala-fixa">
+                  <div className="sala-info">
+                    <h3>💕 Relacionamento Sério</h3>
+                    <p>Para quem busca algo sério e duradouro</p>
+                    <div className="sala-stats">
+                      <span className="usuarios-online">
+                        💕 Sempre online
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => handleEntrarSala('sala-relacionamento-serio-fixa', 'Relacionamento Sério')}
+                    className="btn btn-primary"
+                    style={{ background: '#2ed573' }}
+                  >
+                    💕 Entrar
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -239,10 +276,7 @@ const SalasPage: React.FC = () => {
         {salasFiltradas.length === 0 && salasPersonalizadasFiltradas.length === 0 && busca && (
           <div className="no-results">
             <h3>Nenhuma sala encontrada</h3>
-            <p>Tente buscar por outro termo ou crie uma nova sala</p>
-            <button onClick={handleCriarSala} className="btn btn-primary">
-              Criar Nova Sala
-            </button>
+            <p>Tente buscar por outro termo</p>
           </div>
         )}
       </div>

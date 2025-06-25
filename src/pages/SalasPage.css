@@ -235,4 +235,60 @@
 .btn-premium-small:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+}
+
+/* Salas Fixas */
+.salas-fixas-section {
+  margin: 20px 0;
+}
+
+.salas-fixas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin: 15px 0;
+}
+
+.sala-fixa {
+  border: 2px solid #007bff;
+  background: linear-gradient(135deg, #fff, #f8f9ff);
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+}
+
+.sala-fixa::before {
+  content: "FIXA";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #007bff;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.sala-fixa .sala-info h3 {
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.sala-fixa .sala-info p {
+  color: #666;
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .salas-fixas-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .sala-fixa {
+    margin: 0 10px;
+  }
 } 

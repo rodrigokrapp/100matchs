@@ -1580,8 +1580,20 @@ const ChatPage: React.FC = () => {
 
   // Funções para sistema de bloqueio
   const handleBlockUser = (nomeUsuario: string) => {
-    setUserToBlock(nomeUsuario);
-    setShowBlockModal(true);
+    if (nomeUsuario === usuario?.nome) return; // Não pode bloquear a si mesmo
+    
+    // Bloqueio instantâneo sem modal
+    const novosBloqueados = [...usuariosBloqueados, nomeUsuario];
+    setUsuariosBloqueados(novosBloqueados);
+    
+    // Salvar no localStorage do usuário atual
+    const chaveUsuario = usuario?.premium ? 'usuarioPremium' : 'usuarioChat';
+    const dadosUsuario = JSON.parse(localStorage.getItem(chaveUsuario) || '{}');
+    dadosUsuario.usuariosBloqueados = novosBloqueados;
+    localStorage.setItem(chaveUsuario, JSON.stringify(dadosUsuario));
+    
+    // Feedback visual discreto
+    console.log(`🚫 Usuário ${nomeUsuario} foi bloqueado`);
   };
 
   const confirmBlockUser = () => {
@@ -1821,6 +1833,18 @@ const ChatPage: React.FC = () => {
                           {msg.user_name}
                           {msg.is_premium && <FiStar className="premium-icon" />}
                         </span>
+                        {msg.user_name !== usuario?.nome && (
+                          <button 
+                            className="block-user-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBlockUser(msg.user_name);
+                            }}
+                            title="Bloquear usuário"
+                          >
+                            🚫
+                          </button>
+                        )}
                       </div>
                       <span className="time">{formatTime(msg.created_at)}</span>
                       {msg.is_temporary && (
@@ -2336,7 +2360,7 @@ const ChatPage: React.FC = () => {
                 <FiX />
               </button>
             </div>
-            
+
             <div className="foto-modal-body">
               {miniPerfilUsuario.foto ? (
                 <img 
@@ -2344,14 +2368,14 @@ const ChatPage: React.FC = () => {
                   alt={miniPerfilUsuario.nome}
                   className="foto-ampliada"
                 />
-              ) : (
+                ) : (
                 <div className="sem-foto">
                   <FiUser size={80} />
                   <p>Sem foto</p>
-                </div>
-              )}
-            </div>
-            
+                  </div>
+                )}
+              </div>
+
             <div className="foto-modal-actions">
               <button 
                 className="btn-bloquear"
