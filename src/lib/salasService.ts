@@ -26,8 +26,9 @@ export const salvarSalaCompartilhada = async (sala: Omit<SalaCompartilhada, 'cri
     
     let sucessoSupabase = false;
     
-    // Tentar salvar no Supabase
+    // Tentar salvar no Supabase PRIMEIRO
     try {
+      console.log('☁️ Tentando salvar no Supabase...');
       const { data: salaSupabase, error: supabaseError } = await supabase
         .from('salas_personalizadas')
         .insert([{
@@ -41,17 +42,18 @@ export const salvarSalaCompartilhada = async (sala: Omit<SalaCompartilhada, 'cri
         .select()
         .single();
 
-      if (!supabaseError) {
+      if (!supabaseError && salaSupabase) {
         console.log('✅ Sala salva no Supabase:', salaSupabase);
         sucessoSupabase = true;
       } else {
-        console.warn('⚠️ Erro ao salvar no Supabase:', supabaseError.message);
+        console.warn('⚠️ Erro ao salvar no Supabase:', supabaseError?.message);
       }
     } catch (error) {
       console.warn('⚠️ Falha na conexão com Supabase:', error);
     }
     
     // SEMPRE salvar no localStorage como backup e para sincronização imediata
+    console.log('💾 Salvando no localStorage como backup...');
     const salasExistentes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     const salaComFonte = {
       ...novaSala,
@@ -64,6 +66,8 @@ export const salvarSalaCompartilhada = async (sala: Omit<SalaCompartilhada, 'cri
       salasExistentes.push(salaComFonte);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(salasExistentes));
       console.log('💾 Sala salva no localStorage global');
+    } else {
+      console.log('ℹ️ Sala já existe no localStorage');
     }
     
     return { success: true, fonte: sucessoSupabase ? 'supabase' : 'localStorage' };
@@ -80,17 +84,19 @@ export const carregarSalasCompartilhadas = async (): Promise<SalaCompartilhada[]
     const agora = new Date().getTime();
     let todasSalas: SalaCompartilhada[] = [];
     
-    // 1. Carregar do Supabase
+    // 1. PRIORIDADE: Carregar do Supabase
+    let salasSupabase: SalaCompartilhada[] = [];
     try {
-      const { data: salasSupabase, error: supabaseError } = await supabase
+      console.log('☁️ Carregando salas do Supabase...');
+      const { data: dados, error: supabaseError } = await supabase
         .from('salas_personalizadas')
         .select('*')
         .order('criada_em', { ascending: false });
 
-      if (!supabaseError && salasSupabase) {
-        console.log('✅ Salas do Supabase:', salasSupabase.length);
+      if (!supabaseError && dados && dados.length > 0) {
+        console.log('✅ Salas encontradas no Supabase:', dados.length);
         
-        const salasSupabaseFormatadas = salasSupabase.map((sala: any) => ({
+        salasSupabase = dados.map((sala: any) => ({
           id: sala.id,
           nome: sala.nome,
           bairro: sala.bairro,
@@ -101,10 +107,11 @@ export const carregarSalasCompartilhadas = async (): Promise<SalaCompartilhada[]
           fonte: 'supabase'
         }));
         
-        todasSalas = [...todasSalas, ...salasSupabaseFormatadas];
+        todasSalas = [...todasSalas, ...salasSupabase];
+        console.log('📝 Salas do Supabase processadas:', salasSupabase.length);
         
-        // Remover salas expiradas do Supabase
-        const salasExpiradas = salasSupabase.filter((sala: any) => {
+        // Remover salas expiradas do Supabase apenas se encontrarmos algumas
+        const salasExpiradas = dados.filter((sala: any) => {
           const criacao = new Date(sala.criada_em).getTime();
           const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
           return diferencaHoras >= 24;
@@ -113,36 +120,55 @@ export const carregarSalasCompartilhadas = async (): Promise<SalaCompartilhada[]
         if (salasExpiradas.length > 0) {
           console.log('🗑️ Removendo salas expiradas do Supabase:', salasExpiradas.length);
           const idsExpirados = salasExpiradas.map((sala: any) => sala.id);
-          await supabase
-            .from('salas_personalizadas')
-            .delete()
-            .in('id', idsExpirados);
+          try {
+            await supabase
+              .from('salas_personalizadas')
+              .delete()
+              .in('id', idsExpirados);
+            console.log('✅ Salas expiradas removidas do Supabase');
+          } catch (deleteError) {
+            console.warn('⚠️ Erro ao remover salas expiradas:', deleteError);
+          }
         }
       } else {
-        console.warn('⚠️ Erro ao carregar do Supabase:', supabaseError?.message);
+        console.warn('⚠️ Nenhuma sala encontrada no Supabase ou erro:', supabaseError?.message);
       }
     } catch (error) {
       console.warn('⚠️ Falha na conexão com Supabase:', error);
     }
     
-    // 2. Carregar do localStorage global
-    const salasLocais: SalaCompartilhada[] = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    console.log('📱 Salas do localStorage:', salasLocais.length);
-    
-    // Adicionar salas locais que não estão no Supabase
-    const idsSupabase = new Set(todasSalas.map(s => s.id));
-    salasLocais.forEach(sala => {
-      if (!idsSupabase.has(sala.id)) {
-        todasSalas.push(sala);
+    // 2. Carregar do localStorage global como backup/complemento
+    let salasLocais: SalaCompartilhada[] = [];
+    try {
+      console.log('📱 Carregando salas do localStorage...');
+      salasLocais = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      console.log('📱 Salas encontradas no localStorage:', salasLocais.length);
+      
+      // Adicionar salas locais que não estão no Supabase
+      const idsSupabase = new Set(todasSalas.map(s => s.id));
+      const salasLocaisNovas = salasLocais.filter(sala => !idsSupabase.has(sala.id));
+      
+      if (salasLocaisNovas.length > 0) {
+        console.log('📝 Adicionando salas únicas do localStorage:', salasLocaisNovas.length);
+        todasSalas = [...todasSalas, ...salasLocaisNovas];
       }
-    });
+    } catch (error) {
+      console.warn('⚠️ Erro ao carregar localStorage:', error);
+    }
     
-    // 3. Filtrar salas válidas (24 horas)
+    // 3. Filtrar salas válidas (menos de 24 horas)
     const salasValidas = todasSalas.filter(sala => {
       const criacao = new Date(sala.criada_em).getTime();
       const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
-      console.log(`⏰ Sala "${sala.nome}" criada há ${diferencaHoras.toFixed(1)} horas (${sala.fonte})`);
-      return diferencaHoras < 24;
+      const valida = diferencaHoras < 24;
+      
+      if (valida) {
+        console.log(`⏰ Sala válida: "${sala.nome}" (${diferencaHoras.toFixed(1)}h - ${sala.fonte})`);
+      } else {
+        console.log(`⏰ Sala expirada: "${sala.nome}" (${diferencaHoras.toFixed(1)}h - ${sala.fonte})`);
+      }
+      
+      return valida;
     });
     
     // 4. Limpar localStorage de salas expiradas
@@ -157,9 +183,10 @@ export const carregarSalasCompartilhadas = async (): Promise<SalaCompartilhada[]
       console.log('🧹 localStorage limpo de salas expiradas');
     }
     
-    // 5. Se não há salas, criar exemplos
+    // 5. Se não há salas válidas, criar exemplos GARANTIDOS
     if (salasValidas.length === 0) {
-      console.log('📭 Criando salas de exemplo permanentes...');
+      console.log('📭 ZERO salas encontradas! Criando salas de exemplo...');
+      const agora = new Date().toISOString();
       const salasExemplo: SalaCompartilhada[] = [
         {
           id: `exemplo-sp-${Date.now()}`,
@@ -167,7 +194,7 @@ export const carregarSalasCompartilhadas = async (): Promise<SalaCompartilhada[]
           bairro: 'Centro',
           cidade: 'São Paulo',
           criador: 'Sistema',
-          criada_em: new Date().toISOString(),
+          criada_em: agora,
           usuarios: Math.floor(Math.random() * 5) + 1,
           fonte: 'exemplo'
         },
@@ -177,7 +204,7 @@ export const carregarSalasCompartilhadas = async (): Promise<SalaCompartilhada[]
           bairro: 'Copacabana',
           cidade: 'Rio de Janeiro',
           criador: 'Sistema',
-          criada_em: new Date().toISOString(),
+          criada_em: agora,
           usuarios: Math.floor(Math.random() * 8) + 2,
           fonte: 'exemplo'
         },
@@ -187,18 +214,20 @@ export const carregarSalasCompartilhadas = async (): Promise<SalaCompartilhada[]
           bairro: 'Savassi',
           cidade: 'Belo Horizonte',
           criador: 'Sistema',
-          criada_em: new Date().toISOString(),
+          criada_em: agora,
           usuarios: Math.floor(Math.random() * 6) + 1,
           fonte: 'exemplo'
         }
       ];
       
-      // Salvar exemplos no localStorage
+      // Salvar exemplos no localStorage PRIMEIRO
       localStorage.setItem(STORAGE_KEY, JSON.stringify(salasExemplo));
+      console.log('💾 Salas de exemplo salvas no localStorage');
       
-      // Tentar salvar no Supabase também
+      // Tentar salvar no Supabase também (mas não bloquear se falhar)
       try {
-        await supabase
+        console.log('☁️ Tentando salvar exemplos no Supabase...');
+        const { error } = await supabase
           .from('salas_personalizadas')
           .insert(salasExemplo.map(sala => ({
             id: sala.id,
@@ -208,28 +237,47 @@ export const carregarSalasCompartilhadas = async (): Promise<SalaCompartilhada[]
             criador: sala.criador,
             usuarios_online: sala.usuarios
           })));
-        console.log('✅ Salas de exemplo salvas no Supabase');
+          
+        if (!error) {
+          console.log('✅ Salas de exemplo salvas no Supabase');
+        } else {
+          console.warn('⚠️ Erro ao salvar exemplos no Supabase:', error.message);
+        }
       } catch (error) {
-        console.warn('⚠️ Não foi possível salvar exemplos no Supabase');
+        console.warn('⚠️ Não foi possível salvar exemplos no Supabase:', error);
       }
       
+      console.log('🎯 Retornando salas de exemplo:', salasExemplo.length);
       return salasExemplo;
     }
     
     console.log('✅ Total de salas válidas carregadas:', salasValidas.length);
+    salasValidas.forEach((sala, index) => {
+      console.log(`  ${index + 1}. "${sala.nome}" (${sala.cidade}) - ${sala.fonte}`);
+    });
+    
     return salasValidas;
     
   } catch (error) {
-    console.error('❌ Erro ao carregar salas:', error);
+    console.error('❌ ERRO CRÍTICO ao carregar salas:', error);
     
-    // Fallback final: retornar do localStorage apenas
-    const salasLocais = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    const agora = new Date().getTime();
-    return salasLocais.filter((sala: SalaCompartilhada) => {
-      const criacao = new Date(sala.criada_em).getTime();
-      const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
-      return diferencaHoras < 24;
-    });
+    // Fallback de emergência: retornar do localStorage apenas
+    console.log('🆘 Usando fallback de emergência - apenas localStorage');
+    try {
+      const salasLocais = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      const agora = new Date().getTime();
+      const salasValidas = salasLocais.filter((sala: SalaCompartilhada) => {
+        const criacao = new Date(sala.criada_em).getTime();
+        const diferencaHoras = (agora - criacao) / (1000 * 60 * 60);
+        return diferencaHoras < 24;
+      });
+      
+      console.log('🆘 Salas do fallback:', salasValidas.length);
+      return salasValidas;
+    } catch (fallbackError) {
+      console.error('❌ Falha total no fallback:', fallbackError);
+      return [];
+    }
   }
 };
 

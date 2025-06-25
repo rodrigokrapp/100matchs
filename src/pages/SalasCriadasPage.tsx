@@ -35,6 +35,55 @@ const SalasCriadasPage: React.FC = () => {
       return;
     }
 
+    // Forçar criação de salas de exemplo se não existirem
+    const garantirSalasExemplo = () => {
+      const STORAGE_KEY = 'salas-compartilhadas-globais';
+      const salasExistentes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      
+      if (salasExistentes.length === 0) {
+        console.log('🚀 [SalasCriadasPage] Forçando criação de salas de exemplo');
+        const agora = new Date().toISOString();
+        const salasExemplo = [
+          {
+            id: `exemplo-sp-${Date.now()}`,
+            nome: 'Chat Geral - Centro, São Paulo',
+            bairro: 'Centro',
+            cidade: 'São Paulo',
+            criador: 'Sistema',
+            criada_em: agora,
+            usuarios: 3,
+            fonte: 'exemplo'
+          },
+          {
+            id: `exemplo-rj-${Date.now() + 1}`,
+            nome: 'Galera da Praia - Copacabana, Rio de Janeiro',
+            bairro: 'Copacabana',
+            cidade: 'Rio de Janeiro',
+            criador: 'Sistema',
+            criada_em: agora,
+            usuarios: 5,
+            fonte: 'exemplo'
+          },
+          {
+            id: `exemplo-mg-${Date.now() + 2}`,
+            nome: 'Pessoal de BH - Savassi, Belo Horizonte',
+            bairro: 'Savassi',
+            cidade: 'Belo Horizonte',
+            criador: 'Sistema',
+            criada_em: agora,
+            usuarios: 2,
+            fonte: 'exemplo'
+          }
+        ];
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(salasExemplo));
+        console.log('✅ [SalasCriadasPage] Salas de exemplo criadas no localStorage');
+      }
+    };
+
+    // Garantir salas de exemplo primeiro
+    garantirSalasExemplo();
+    
     // Carregar salas imediatamente
     carregarSalas();
     
@@ -53,14 +102,20 @@ const SalasCriadasPage: React.FC = () => {
   const carregarSalas = async () => {
     try {
       setCarregando(true);
-      console.log('📂 Carregando todas as salas compartilhadas...');
+      console.log('📂 [SalasCriadasPage] Carregando todas as salas compartilhadas...');
       
       const salas = await carregarSalasCompartilhadas();
-      console.log('✅ Salas carregadas:', salas.length);
+      console.log('✅ [SalasCriadasPage] Salas carregadas:', salas.length);
       
-      setSalasPersonalizadas(salas);
+      if (salas && salas.length > 0) {
+        setSalasPersonalizadas(salas);
+        console.log('📝 [SalasCriadasPage] Estado atualizado com', salas.length, 'salas');
+      } else {
+        console.warn('⚠️ [SalasCriadasPage] Nenhuma sala retornada pelo serviço');
+        setSalasPersonalizadas([]);
+      }
     } catch (error) {
-      console.error('❌ Erro ao carregar salas:', error);
+      console.error('❌ [SalasCriadasPage] Erro ao carregar salas:', error);
       setSalasPersonalizadas([]);
     } finally {
       setCarregando(false);
