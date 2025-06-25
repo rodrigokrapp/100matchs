@@ -207,14 +207,9 @@ const InicioPage: React.FC = () => {
               <p>Expresse-se com emojis (Premium)</p>
             </div>
             <div className="feature-card card">
-              <div className="feature-icon">👀</div>
-              <h3>Ver Todas as Fotos</h3>
-              <p>Veja o perfil completo dos outros usuários (Premium)</p>
-            </div>
-            <div className="feature-card card">
-              <div className="feature-icon">📝</div>
-              <h3>Ver Toda Descrição</h3>
-              <p>Leia a descrição completa dos perfis (Premium)</p>
+              <div className="feature-icon">🖼️</div>
+              <h3>Galeria</h3>
+              <p>Acesse galeria completa de fotos e perfis (Premium)</p>
             </div>
           </div>
         </div>
