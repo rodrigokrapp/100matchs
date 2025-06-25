@@ -7,9 +7,11 @@ const InicioPage: React.FC = () => {
   const navigate = useNavigate();
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
+  const [foto, setFoto] = useState('');
   const [nomePremium, setNomePremium] = useState('');
   const [emailPremium, setEmailPremium] = useState('');
   const [senhaPremium, setSenhaPremium] = useState('');
+  const [fotoPremium, setFotoPremium] = useState('');
   const [aceitarTermos, setAceitarTermos] = useState(false);
   const [aceitarTermosPremium, setAceitarTermosPremium] = useState(false);
 
@@ -47,15 +49,16 @@ const InicioPage: React.FC = () => {
       }
     }
 
-    // Salvar usuário de chat gratuito sem foto
+    // Salvar usuário de chat gratuito com foto opcional
     const usuarioChat = {
       nome: nome.trim(),
       email: email.trim() || `${nome.trim().toLowerCase().replace(/\s+/g, '')}@chat.com`,
       premium: false,
       tipo: 'chat',
-      foto: null,
+      foto: foto.trim() || null,
       limiteTempo: 15 * 60 * 1000, // 15 minutos em milissegundos
-      inicioSessao: new Date().getTime()
+      inicioSessao: new Date().getTime(),
+      usuariosBloqueados: [] // Lista de usuários que este usuário bloqueou
     };
 
     localStorage.setItem('usuarioChat', JSON.stringify(usuarioChat));
@@ -86,12 +89,13 @@ const InicioPage: React.FC = () => {
       return;
     }
 
-    // Login bem-sucedido sem foto obrigatória
+    // Login bem-sucedido com foto opcional
     const usuarioLogado = {
       ...usuarioPremium,
       premium: true,
       tipo: 'premium',
-      foto: usuarioPremium.foto || null
+      foto: fotoPremium.trim() || usuarioPremium.foto || null,
+      usuariosBloqueados: usuarioPremium.usuariosBloqueados || [] // Lista de usuários bloqueados
     };
 
     localStorage.setItem('usuarioPremium', JSON.stringify(usuarioLogado));
@@ -128,6 +132,14 @@ const InicioPage: React.FC = () => {
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
                   className="input"
+                />
+                <input
+                  type="url"
+                  placeholder="URL da sua foto (opcional)"
+                  value={foto}
+                  onChange={(e) => setFoto(e.target.value)}
+                  className="input"
+                  style={{ fontSize: '12px' }}
                 />
                 
                 <div className="terms-checkbox">
@@ -172,6 +184,14 @@ const InicioPage: React.FC = () => {
                   value={senhaPremium}
                   onChange={(e) => setSenhaPremium(e.target.value)}
                   className="input"
+                />
+                <input
+                  type="url"
+                  placeholder="URL da sua foto (opcional)"
+                  value={fotoPremium}
+                  onChange={(e) => setFotoPremium(e.target.value)}
+                  className="input"
+                  style={{ fontSize: '12px' }}
                 />
                 
                 <div className="terms-checkbox">

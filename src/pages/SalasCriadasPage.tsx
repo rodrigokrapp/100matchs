@@ -4,6 +4,7 @@ import { FiArrowLeft, FiTrash2, FiUsers, FiClock } from 'react-icons/fi';
 import Header from '../components/Header';
 import { carregarSalasCompartilhadas, excluirSalaCompartilhada, sincronizarSalas } from '../lib/salasService';
 import './SalasCriadasPage.css';
+import '../components/FotoModal.css';
 
 interface SalaCriada {
   id: string;
@@ -191,12 +192,6 @@ const SalasCriadasPage: React.FC = () => {
               >
                 {carregando ? '⏳ Carregando...' : '🔄 Atualizar Lista'}
               </button>
-              <button 
-                onClick={() => navigate('/criarsala')}
-                className="btn btn-primary"
-              >
-                ➕ Criar Nova Sala
-              </button>
             </div>
           </div>
         </div>
@@ -210,18 +205,82 @@ const SalasCriadasPage: React.FC = () => {
           <div className="no-salas">
             <div className="no-salas-card card">
               <h3>📭 Nenhuma sala ativa no momento</h3>
-              <p>Seja o primeiro a criar uma sala personalizada para a comunidade!</p>
-              <p><small>💡 As salas ficam visíveis para todos os usuários por 24 horas</small></p>
-              <button 
-                onClick={() => navigate('/criarsala')} 
-                className="btn btn-primary"
-              >
-                🚀 Criar Primeira Sala
-              </button>
+              <p>As salas fixas aparecerão em breve!</p>
+              <p><small>💡 Sempre há salas disponíveis para conversar</small></p>
             </div>
           </div>
         ) : (
           <div className="salas-grid">
+            {/* Salas Fixas - Sempre no topo */}
+            <div className="sala-card card sala-fixa">
+              <div className="sala-header">
+                <h3>🔥 Só Pegação</h3>
+                <div className="sala-fonte">🔥</div>
+              </div>
+              
+              <div className="sala-info">
+                <div className="sala-location">
+                  📍 Para quem busca diversão sem compromisso
+                </div>
+                
+                <div className="sala-stats">
+                  <div className="stat">
+                    <FiUsers />
+                    <span>🔥 Online</span>
+                  </div>
+                </div>
+                
+                <div className="sala-details">
+                  <small>Sala fixa - sempre disponível</small>
+                </div>
+              </div>
+              
+              <div className="sala-actions">
+                <button 
+                  onClick={() => handleEntrarSala('sala-pegacao-fixa', 'Só Pegação')}
+                  className="btn btn-primary"
+                  style={{ background: '#ff4757' }}
+                >
+                  🔥 Entrar na Sala
+                </button>
+              </div>
+            </div>
+
+            <div className="sala-card card sala-fixa">
+              <div className="sala-header">
+                <h3>💕 Relacionamento Sério</h3>
+                <div className="sala-fonte">💕</div>
+              </div>
+              
+              <div className="sala-info">
+                <div className="sala-location">
+                  📍 Para quem busca algo sério e duradouro
+                </div>
+                
+                <div className="sala-stats">
+                  <div className="stat">
+                    <FiUsers />
+                    <span>💕 Online</span>
+                  </div>
+                </div>
+                
+                <div className="sala-details">
+                  <small>Sala fixa - sempre disponível</small>
+                </div>
+              </div>
+              
+              <div className="sala-actions">
+                <button 
+                  onClick={() => handleEntrarSala('sala-relacionamento-serio-fixa', 'Relacionamento Sério')}
+                  className="btn btn-primary"
+                  style={{ background: '#2ed573' }}
+                >
+                  💕 Entrar na Sala
+                </button>
+              </div>
+            </div>
+
+            {/* Salas criadas pela comunidade */}
             {salasPersonalizadas.map((sala) => (
               <div key={sala.id} className="sala-card card">
                 <div className="sala-header">

@@ -2326,49 +2326,40 @@ const ChatPage: React.FC = () => {
         </div>
       )}
 
-      {/* Mini Janela de Perfil Premium */}
+      {/* Modal de Foto do Usuário com Bloqueio */}
       {showMiniPerfil && miniPerfilUsuario && (
-        <div className="mini-perfil-overlay" onClick={handleCloseMiniPerfil}>
-          <div className="mini-perfil-content" onClick={(e) => e.stopPropagation()}>
-            <div className="mini-perfil-header">
-              <div className="mini-perfil-title">
-                <FiStar className="premium-star" />
-                <span>Perfil Premium</span>
-              </div>
-              <button className="mini-close-button" onClick={handleCloseMiniPerfil}>
+        <div className="foto-modal-overlay" onClick={handleCloseMiniPerfil}>
+          <div className="foto-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="foto-modal-header">
+              <h3>{miniPerfilUsuario.nome}</h3>
+              <button className="close-button" onClick={handleCloseMiniPerfil}>
                 <FiX />
               </button>
             </div>
-
-            <div className="mini-perfil-body">
-              {/* Fotos do usuário premium */}
-              <div className="mini-fotos-section">
-                {miniPerfilUsuario.fotos && miniPerfilUsuario.fotos.length > 0 ? (
-                  <div className="mini-fotos-grid">
-                    {miniPerfilUsuario.fotos.slice(0, 5).map((foto: string, index: number) => (
-                      <div key={index} className="mini-foto-item">
-                        <img src={foto} alt={`Foto ${index + 1}`} />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mini-no-photos">
-                    <FiUser size={40} />
-                    <span>Sem fotos</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Informações do usuário */}
-              <div className="mini-info-section">
-                <h3>{miniPerfilUsuario.nome}</h3>
-                <div className="mini-idade">
-                  <span>📅 {miniPerfilUsuario.idade} anos</span>
+            
+            <div className="foto-modal-body">
+              {miniPerfilUsuario.foto ? (
+                <img 
+                  src={miniPerfilUsuario.foto} 
+                  alt={miniPerfilUsuario.nome}
+                  className="foto-ampliada"
+                />
+              ) : (
+                <div className="sem-foto">
+                  <FiUser size={80} />
+                  <p>Sem foto</p>
                 </div>
-                <div className="mini-descricao">
-                  <p>{miniPerfilUsuario.descricao || 'Usuário premium'}</p>
-                </div>
-              </div>
+              )}
+            </div>
+            
+            <div className="foto-modal-actions">
+              <button 
+                className="btn-bloquear"
+                onClick={() => handleBlockUser(miniPerfilUsuario.nome)}
+              >
+                <FiUserX />
+                Bloquear
+              </button>
             </div>
           </div>
         </div>
